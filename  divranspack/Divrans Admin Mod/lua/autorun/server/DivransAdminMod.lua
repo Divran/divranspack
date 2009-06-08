@@ -1,7 +1,7 @@
 //This admin mod was made by Divran. I know it sucks, but so what
 function Speak( ply, text, toall )
+local Msg = string.Explode(" ", text)
 	if (ply:IsAdmin()) then
-		local Msg = string.Explode(" ", text)
 		local Dis = false
 		
 		//Tele
