@@ -453,7 +453,7 @@ function Help( ply )
 	ply:PrintMessage( HUD_PRINTTALK, "[D] !goto, !bring, !send - Go to someone, bring someone, send someone." )
 	ply:PrintMessage( HUD_PRINTTALK, "[D] !slay, !god, !ungod - Slay someone, make someone invurnable, make someone vurnable." )
 	ply:PrintMessage( HUD_PRINTTALK, "[D] !hp, !armor, !speed, !jump - Changes someones' health, armor, movement speed or jump strength." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !burn, !unburn, !explode - Ignite someone, unignite someone, make someone explode." )
+	ply:PrintMessage( HUD_PRINTTALK, "[D] !burn, !unburn, !blow - Ignite someone, unignite someone, make someone blow up." )
 	ply:PrintMessage( HUD_PRINTTALK, "[D] !kick, !ban - !kick <Name> <Reason>, !ban <name> <time (minutes)> <reason>." )
 	ply:PrintMessage( HUD_PRINTTALK, "[D] !freeze, !unfreeze - Freeze and unfreeze someone." )
 end
