@@ -370,7 +370,7 @@ function D_Speed( ply, Target, Num )
 				T:SetRunSpeed( 500 )
 				Num = 250
 			end
-				Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s movement speed to " .. T:WalkSpeed() .. ".")
+				Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s movement speed to " .. tostring(math.Clamp(tonumber(Num), 1,1000000))  .. ".")
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
@@ -390,7 +390,7 @@ function D_Jump( ply, Target, Num )
 				T:SetJumpPower( 160 )
 				Num = 160
 			end
-			Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s jump strength to " .. T:JumpPower() .. ".")
+			Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s jump strength to " .. tostring(math.Clamp(tonumber(Num), 1,1000000)) .. ".")
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
