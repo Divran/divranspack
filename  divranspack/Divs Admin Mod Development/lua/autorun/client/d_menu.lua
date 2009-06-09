@@ -283,7 +283,8 @@ function CreateDmenu( ply )
 			
 			--List
 			local HelpList = vgui.Create( "DPanelList", HelpTab )
-			HelpList:SetPos( 5, 5 )
+			HelpList.Paint = function( ) end
+			HelpList:SetPos( 10, 20 )
 			HelpList:SetSize( Tabs:GetWide() - 10, Tabs:GetTall() - 10 )
 			HelpList:SetSpacing( 5 )
 			HelpList:EnableHorizontal( false )
@@ -293,9 +294,11 @@ function CreateDmenu( ply )
 				HelpText1:SetText([[Here is a list of all chat commands:
 								On some of the commands, <name> is optional.
 								If you do not enter a name in these chat commands, you will target yourself.
-								<> = Target Player's Name
-								[] = A number
-								{} = A string (text)
+								
+								     <> = Target Player's Name
+								     [] = A number
+								     {} = A string (text)
+									 
 								!tele <name> - Teleport to where you aim
 								!goto <name> - Teleport to someone else
 								!bring <name> - Teleport someone else to you
@@ -309,13 +312,13 @@ function CreateDmenu( ply )
 								!god <name> - Make someone invurnable
 								!ungod <name> - Make someone vurnable
 								!burn <name> - Set someone on fire
-								!unburn <name> - Unignite someone]])
+								!unburn <name> - Unignite someone	]])
 				HelpText1:SizeToContents()
 				HelpText1:SetTextColor(Color(0, 0, 0, 255))
 			HelpList:AddItem( HelpText1 )
 
 				local HelpText2 = vgui.Create( "DLabel" )
-				HelpText2:SetText([[!decals - Clear all the decals (explosion marks, bullet holes, and such)
+				HelpText2:SetText([[	!decals - Clear all the decals (explosion marks, bullet holes, and such)
 								!kick <name> {reason} - Kick someone
 								!ban <name> [time] {reason} - Ban someone
 								!freeze <name> - Freeze someone
