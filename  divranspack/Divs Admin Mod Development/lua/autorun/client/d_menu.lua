@@ -8,18 +8,19 @@ function CreateDmenu( ply )
 	if (ply:IsAdmin()) then
 		--Window
 		local w, h = 1400, 600
+		if (w > ScrW()) then w = ScrW() - 20 end
 		local Menu = vgui.Create( "DFrame" )
 		Menu:SetPos( ScrW() / 2 - w / 2, ScrH() / 2 - h / 2 )
 		Menu:SetSize( w, h )
 		Menu:SetTitle( "[D] Menu" )
 		Menu:SetVisible( true )
-		Menu:SetDraggable( false )
+		Menu:SetDraggable( true )
 		Menu:ShowCloseButton( false )
 		Menu:MakePopup()
 		
 		--Close Button
 		local CloseButton = vgui.Create( "DButton", Menu )
-		CloseButton:SetWide( w - 30 )
+		CloseButton:SetWide( w - 10 )
 		CloseButton:SetTall( 20 )
 		CloseButton:SetText( "Close Menu" )
 		CloseButton:SetPos( Menu:GetWide() / 2 - CloseButton:GetWide() / 2, Menu:GetTall() - CloseButton:GetTall() - 5 )
@@ -31,7 +32,7 @@ function CreateDmenu( ply )
 		local PlayerList = vgui.Create( "DListView" )
 		PlayerList:SetParent( Menu )
 		PlayerList:SetPos( 5, 30 )
-		PlayerList:SetSize( 300 - 5, h - 60 )
+		PlayerList:SetSize( w / 3 - 10, h - 60 )
 		PlayerList:SetMultiSelect( false )
 		local Name = PlayerList:AddColumn("Name")
 		Name:SetWide(250)
@@ -48,8 +49,8 @@ function CreateDmenu( ply )
 			--Tabs
 			local Tabs = vgui.Create( "DPropertySheet" )
 			Tabs:SetParent( Menu )
-			Tabs:SetPos( 315 + 5, 30 )
-			Tabs:SetSize(PlayerList:GetWide() + w / 2 + 150, h - 60 )
+			Tabs:SetPos( 10 + PlayerList:GetWide(), 30 )
+			Tabs:SetSize( w * (2/3) - 10, h - 60 )
 			
 			--Tab nr 1
 			local TeleTab = vgui.Create( "DPanel" )
