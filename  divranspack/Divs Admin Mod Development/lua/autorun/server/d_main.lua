@@ -1,15 +1,16 @@
 //This admin mod was made by Divran. I know it sucks, but so what
 AddCSLuaFile( "autorun/client/d_menu.lua" )
+AddCSLuaFile( "autorun/shared/d_teams.lua" )
 resource.AddFile( "materials/gui/silkicons/lightning.vmt" )
 resource.AddFile( "materials/gui/silkicons/lightning.vtf" )
 resource.AddFile( "materials/gui/silkicons/exclamation.vmt" )
 resource.AddFile( "materials/gui/silkicons/exclamation.vtf" )
 
 --Player Spawn
-function FirstSpawn( ply )
+function D_FirstSpawn( ply )
 	Con( "[D] " .. ply:Nick() .. " has spawned." )
 end
-hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
+hook.Add( "PlayerInitialSpawn", "D_PlayerInitialSpawn", D_FirstSpawn )
 
 function Speak( ply, text, toall )
 local Msg = string.Explode(" ", text)
@@ -18,7 +19,7 @@ local Msg = string.Explode(" ", text)
 		
 		//Menu
 		if (string.lower(Msg[1]) == "!menu") then
-		ply:ConCommand("D_menu")
+		ply:ConCommand("Dmod_Menu")
 		Dis = true
 		end
 		
@@ -108,7 +109,7 @@ local Msg = string.Explode(" ", text)
 		
 		//Help
 		if (string.lower(Msg[1]) == "!help") then
-		D_Help( ply )
+		ply:ConCommand("Dmod_Help")
 		Dis = true
 		end
 		
@@ -167,6 +168,12 @@ local Msg = string.Explode(" ", text)
 		D_Unspectate( ply )
 		Dis = true
 		end
+		
+		//Noclip
+		if (string.lower(Msg[1]) == "!noclip") then
+		D_Noclip( ply, Msg[2] )
+		Dis = true
+		end
 
 		if (Dis == true) then
 			return ""
@@ -195,8 +202,9 @@ local Msg = string.Explode(" ", text)
 		if string.lower(Msg[1]) == "!unfreeze" then C = true end
 		if string.lower(Msg[1]) == "!spectate" then C = true end
 		if string.lower(Msg[1]) == "!unspectate" then C = true end
+		if string.lower(Msg[1]) == "!noclip" then C = true end
 		if string.lower(Msg[1]) == "!menu" then C = true end
-		if C == true then return "", ply:PrintMessage( HUD_PRINTTALK, "[D] You are not an admin!") end
+		if C == true then return "", ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are not an admin!") end
 	end
 end
 hook.Add( "PlayerSay", "Speak", Speak )
@@ -241,7 +249,7 @@ function D_Tele( ply, Target )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " teleported " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		local Pos = ply:GetEyeTrace()
@@ -261,7 +269,7 @@ function D_Goto( ply, Target )
 			ply:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " sent him/herself to " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -278,7 +286,7 @@ function D_Bring( ply, Target )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " brought " .. T:Nick() .. " to him/herself.")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -296,7 +304,7 @@ function D_Send( ply, Target, Target2 )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " sent " .. T:Nick() .. " to " .. T2:Nick() .. ".")
 		else
-			Con("[D] One or more of the players were not found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter two names!")
@@ -312,7 +320,7 @@ function D_Slay( ply, Target )
 			T:AddFrags(1)
 			Con("[D] " .. ply:Nick() .. " slayed " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -327,7 +335,7 @@ function D_Health( ply, Target, Num )
 			T:SetHealth( math.Clamp( tonumber(Num), 1, 99999 ) )
 			Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s health to " .. T:Health() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -342,7 +350,7 @@ function D_Armor( ply, Target, Num )
 			T:SetArmor( math.Clamp( tonumber(Num), 1, 99999 ) )
 			Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s armor to " .. T:Armor() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -364,7 +372,7 @@ function D_Speed( ply, Target, Num )
 			end
 				Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s movement speed to " .. T:WalkSpeed() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -384,7 +392,7 @@ function D_Jump( ply, Target, Num )
 			end
 			Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. "'s jump strength to " .. T:JumpPower() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -399,7 +407,7 @@ function D_God( ply, Target )
 			T:GodEnable( )
 			Con("[D] " .. ply:Nick() .. " enabled godmode for " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		ply:GodEnable()
@@ -415,7 +423,7 @@ function D_Ungod( ply, Target )
 			T:GodDisable( )
 			Con("[D] " .. ply:Nick() .. " disabled godmode for " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		ply:GodDisable()
@@ -435,7 +443,7 @@ function D_Blow( ply, Target )
 			util.Effect( "Explosion", effectdata, true, true )
 			Con("[D] " .. ply:Nick() .. " blew " .. T:Nick() .. " up.")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 			local Pos = ply:GetPos() + Vector(0,0,50)
@@ -455,7 +463,7 @@ function D_Burn( ply, Target )
 			T:Ignite( 35, 0 )
 			Con("[D] " .. ply:Nick() .. " set " .. T:Nick() .. " on fire.")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		ply:Ignite( 35, 0 )
@@ -471,24 +479,12 @@ function D_Unburn( ply, Target )
 			T:Extinguish()
 			Con("[D] " .. ply:Nick() .. " unignited " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		ply:Extinguish()
 		Con("[D] " .. ply:Nick() .. " unignited him/herself.")
 	end
-end
-
-----------Help
-function D_Help( ply )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] (All Silent) A list of all commands:" )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !tp - Teleports you or someone else to where you aim." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !goto, !bring, !send - Go to someone, bring someone, send someone." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !slay, !god, !ungod - Slay someone, make someone invurnable, make someone vurnable." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !hp, !armor, !speed, !jump - Changes someones' health, armor, movement speed or jump strength." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !burn, !unburn, !explode - Ignite someone, unignite someone, make someone explode." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !kick, !ban - !kick <Name> <Reason>, !ban <name> <time (minutes)> <reason>." )
-	ply:PrintMessage( HUD_PRINTTALK, "[D] !freeze, !unfreeze - Freeze and unfreeze someone." )
 end
 
 ----------Decals
@@ -508,7 +504,7 @@ function D_Kick( ply, Target, Reason )
 				T:Kick(Reason)
 				Con("[D] " .. ply:Nick() .. " has kicked " .. T:Nick() .. " with the reason '" .. Reason .. "'.")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You need to enter a name!")
@@ -526,7 +522,7 @@ function D_Ban( ply, Target, Time, Reason )
 					T:Kick("You've been banned. Reason: '" .. Reason .. "', for " .. Time .. " minutes.")
 					Con("[D] " .. ply:Nick() .. " has banned " .. T:Nick() .. " with the reason '" .. Reason .. "' for " .. Time .. " minutes.")
 			else
-				Con("[D] No player with the name '" .. Target .. "' found!")
+				Con( "[D] No player with the name '" .. Target .. "' found!" )
 			end
 		else
 			Con("[D] No/invalid time specified!")
@@ -544,7 +540,7 @@ function D_Freeze( ply, Target )
 			T:Lock()
 			Con("[D] " .. ply:Nick() .. " froze " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -559,7 +555,7 @@ function D_Unfreeze( ply, Target )
 			T:UnLock()
 			Con("[D] " .. ply:Nick() .. " unfroze " .. T:Nick() .. ".")
 		else
-			Con("[D] No player with the name '" .. Target .. "' found!")
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		Con("[D] You must enter a name!")
@@ -572,20 +568,20 @@ function D_Spectate( ply, Target, Type )
 		if (FindPlayer(Target)) then
 			local T = FindPlayer(Target)
 			if (Type == "chase") then
-				ply:SetMoveType( MOVETYPE_OBSERVER )
 				ply:Spectate( OBS_MODE_CHASE )
 				ply:SpectateEntity( T )
+				ply:StripWeapons()
 				ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are now spectating '" .. T:Nick() .. "' in chase mode." )
 			elseif (Type == "firstperson") then
-				ply:SetMoveType( MOVETYPE_OBSERVER )
 				ply:Spectate( OBS_MODE_IN_EYE )
 				ply:SpectateEntity( T )
+				ply:StripWeapons()
 				ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are now spectating '" .. T:Nick() .. "' in first person mode." )
 			else
 				ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You must enter a spectate type! Types are: 'chase' and 'firstperson'." )
 			end
 		else
-			ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) No player with the name '" .. Target .. "' found!" )
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
 	else
 		ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You must enter a name!" )
@@ -594,40 +590,68 @@ end
 
 ----------Unspectate
 function D_Unspectate( ply )
-	if (ply:GetMoveType() == MOVETYPE_OBSERVER) then
-		ply:SetMoveType( MOVETYPE_WALK )
-		ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are no longer spectating." )
+	ply:UnSpectate()
+	local ppos = ply:GetPos()
+	ply:Spawn()
+	timer.Simple( .05, function() ply:SetPos( ppos + Vector( 0, 0, 10 ) ) end )
+end
+
+----------Noclip
+function D_Noclip( ply, Target )
+	if (Target and Target != "") then
+		if (FindPlayer(Target)) then
+			local T = FindPlayer(Target)
+			if (T:GetMoveType() == MOVETYPE_WALK) then
+			T:SetMoveType( MOVETYPE_NOCLIP )
+			Con("[D] " .. ply:Nick() .. " enabled noclip for " .. T:Nick() .. ".")
+			elseif (T:GetMoveType() == MOVETYPE_NOCLIP) then
+			T:SetMoveType( MOVETYPE_WALK )
+			Con("[D] " .. ply:Nick() .. " disabled noclip for " .. T:Nick() .. ".")
+			end
+		else
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
+		end
 	else
-		ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are not spectating!" )
+		if (ply:GetMoveType() == MOVETYPE_WALK) then
+		ply:SetMoveType( MOVETYPE_NOCLIP )
+		Con("[D] " .. ply:Nick() .. " enabled noclip for him/herself.")
+		elseif (ply:GetMoveType() == MOVETYPE_NOCLIP) then
+		ply:SetMoveType( MOVETYPE_WALK )
+		Con("[D] " .. ply:Nick() .. " disabled noclip for him/herself.")
+		end
 	end
 end
 
 ----------Command Recieve
-function D_CommandRecieve( ply, Com, args )
+function D_CommandRecieve( ply, Com, Command )
 	if (string.lower(Com) == "dmod") then
-		if (args[1] and args[1] != "") then
-			if string.lower(args[1]) == "tele" then D_Tele( ply, args[2] ) end
-			if string.lower(args[1]) == "goto" then D_Goto( ply, args[2] ) end
-			if string.lower(args[1]) == "bring" then D_Bring( ply, args[2] ) end
-			if string.lower(args[1]) == "send" then D_Send( ply, args[2], args[3] ) end
-			if string.lower(args[1]) == "slay" then D_Slay( ply, args[2] ) end
-			if string.lower(args[1]) == "blow" then D_Blow( ply, args[2] ) end
-			if string.lower(args[1]) == "health" then D_Health( ply, args[2], 100 ) end
-			if string.lower(args[1]) == "armor" then D_Armor( ply, args[2], 100 ) end
-			if string.lower(args[1]) == "speed" then D_Speed( ply, args[2] ) end
-			if string.lower(args[1]) == "jump" then D_Jump( ply, args[2] ) end
-			if string.lower(args[1]) == "god" then D_God( ply, args[2] ) end
-			if string.lower(args[1]) == "ungod" then D_Ungod( ply, args[2] ) end
-			if string.lower(args[1]) == "burn" then D_Burn( ply, args[2] ) end
-			if string.lower(args[1]) == "unburn" then D_Unburn( ply, args[2] ) end
-			if string.lower(args[1]) == "help" then D_Help( ply ) end
-			if string.lower(args[1]) == "decals" then D_Decals( ply ) end
-			if string.lower(args[1]) == "kick" then D_Kick( ply, args[2], "No reason" ) end
-			if string.lower(args[1]) == "ban" then D_Ban( ply, args[2], 10, "No reason" ) end
-			if string.lower(args[1]) == "freeze" then D_Freeze( ply, args[2] ) end
-			if string.lower(args[1]) == "unfreeze" then D_Unfreeze( ply, args[2] ) end
-			if string.lower(args[1]) == "spectate" then D_Spectate( ply, args[2] ) end
-			if string.lower(args[1]) == "unspectate" then D_Unspectate( ply ) end
+		if (Command[1] and Command[1] != "") then
+			if string.lower(Command[1]) == "tele" then D_Tele( ply, Command[2] )
+			elseif string.lower(Command[1]) == "goto" then D_Goto( ply, Command[2] )
+			elseif string.lower(Command[1]) == "bring" then D_Bring( ply, Command[2] )
+			elseif string.lower(Command[1]) == "send" then D_Send( ply, Command[2], Command[3] )
+			elseif string.lower(Command[1]) == "slay" then D_Slay( ply, Command[2] )
+			elseif string.lower(Command[1]) == "blow" then D_Blow( ply, Command[2] )
+			elseif string.lower(Command[1]) == "health" then D_Health( ply, Command[2], 100 )
+			elseif string.lower(Command[1]) == "armor" then D_Armor( ply, Command[2], 100 )
+			elseif string.lower(Command[1]) == "speed" then D_Speed( ply, Command[2] )
+			elseif string.lower(Command[1]) == "jump" then D_Jump( ply, Command[2] )
+			elseif string.lower(Command[1]) == "god" then D_God( ply, Command[2] )
+			elseif string.lower(Command[1]) == "ungod" then D_Ungod( ply, Command[2] )
+			elseif string.lower(Command[1]) == "burn" then D_Burn( ply, Command[2] )
+			elseif string.lower(Command[1]) == "unburn" then D_Unburn( ply, Command[2] )
+			elseif string.lower(Command[1]) == "help" then D_Help( ply )
+			elseif string.lower(Command[1]) == "decals" then D_Decals( ply )
+			elseif string.lower(Command[1]) == "kick" then D_Kick( ply, Command[2], "No reason" )
+			elseif string.lower(Command[1]) == "ban" then D_Ban( ply, Command[2], 10, "No reason" )
+			elseif string.lower(Command[1]) == "freeze" then D_Freeze( ply, Command[2] )
+			elseif string.lower(Command[1]) == "unfreeze" then D_Unfreeze( ply, Command[2] )
+			elseif string.lower(Command[1]) == "spectate" then D_Spectate( ply, Command[2] )
+			elseif string.lower(Command[1]) == "unspectate" then D_Unspectate( ply )
+			elseif string.lower(Command[1]) == "noclip" then D_Noclip( ply, Command[2] )
+			else
+			ply:PrintMessage( HUD_PRINTTALK, "[D] Unknown command!")
+			end
 		else
 		ply:PrintMessage( HUD_PRINTTALK, "[D] You must enter a name!")
 		end
