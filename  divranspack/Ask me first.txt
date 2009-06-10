@@ -1,0 +1,2 @@
+If you want to use any of the code, ask me first.
+Though I doubt anyone will want to. I'm no good with lua... Yet.

@@ -1,0 +1,29 @@
+----Divrans Admin Mod:
+This is an older version of the admin mod, without a menu... 
+Except, everything is working.
+
+----Divs Admin Mod Development
+This is the latest version of the admin mod.
+NOTE!!!! It might not work. At all.
+
+----Divrans Chat Sound
+This adds the CSS Chat sound back to your game (The one that was removed in an update)
+NOTE!!!! I believe it requires CSS to work.
+
+----Divrans Chat Temporary Fix
+This fixes the bug where you can't see the chat, and you must look in the console all the time.
+Use this as a temporary fix until you can fix the actual problem.
+NOTE!!!! If you see TWO messages at once, that means your REAL chat is WORKING and you DO NOT NEED THIS FIX.
+NOTE!!!! I have not had the chance to TEST IT yet, as I do not have this bug.
+
+----HOW TO INSTALL.
+
+--IF YOU GOT THIS OFF OF GMOD.ORG:
+	Use this tutorial: 
+	http://www.facepunch.com/showthread.php?t=688324
+	to install Tortoise SVN.
+
+--IF YOU GOT THIS USING TORTOISE SVN:
+	Simply follow the tutorial and Export any addon you want into your addons folder.
+	Do not export the whole folder. You must export one of the subfolders
+	Export, for example, "Divrans Admin Mod" or "Divrans Chat Sound".
