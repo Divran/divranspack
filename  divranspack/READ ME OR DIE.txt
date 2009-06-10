@@ -16,6 +16,11 @@ Use this as a temporary fix until you can fix the actual problem.
 NOTE!!!! If you see TWO messages at once, that means your REAL chat is WORKING and you DO NOT NEED THIS FIX.
 NOTE!!!! I have not had the chance to TEST IT yet, as I do not have this bug.
 
+----Divrans Vehicle Camera Fix
+This addon fixes the view in the jalopy.
+This is only temporary and should not be used forever.
+Since I am so noob at lua coding, it disables the use of 3rd person in the jalopy.
+
 ----HOW TO INSTALL.
 
 --IF YOU GOT THIS OFF OF GMOD.ORG:
