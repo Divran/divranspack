@@ -8,7 +8,7 @@ NOTE!!!! It might not work. At all.
 
 ----Divrans Chat Sound
 This adds the CSS Chat sound back to your game (The one that was removed in an update)
-NOTE!!!! I believe it requires CSS to work.
+NOTE!!!! Doesn't need CSS to work!!
 
 ----Divrans Chat Temporary Fix
 This fixes the bug where you can't see the chat, and you must look in the console all the time.

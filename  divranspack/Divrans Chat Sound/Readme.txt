@@ -1,2 +1,4 @@
 This addon adds the "click" sound back.
-Needs CSS to work!!!
+Doesn't need CSS to work!!!
+
+The sound "talk.wav" was taken from HLDSUpdateTool, so it is not illegal.
