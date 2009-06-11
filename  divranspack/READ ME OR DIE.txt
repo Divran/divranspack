@@ -21,6 +21,12 @@ This addon fixes the view in the jalopy.
 This is only temporary and should not be used forever.
 Since I am so noob at lua coding, it disables the use of 3rd person in the jalopy.
 
+----Divrans Weld E2 Plugin
+Put this in
+addons\wire\lua\entities\gmod_wire_expression2\core\custom
+or it will not work!
+This adds a weld and unweld function to your Expression 2.
+
 ----HOW TO INSTALL.
 
 --IF YOU GOT THIS OFF OF GMOD.ORG:
