@@ -1,10 +1,12 @@
 //This admin mod was made by Divran. I know it sucks, but so what
 AddCSLuaFile( "autorun/client/d_menu.lua" )
-AddCSLuaFile( "autorun/shared/d_teams.lua" )
+AddCSLuaFile( "autorun/d_teams.lua" )
 resource.AddFile( "materials/gui/silkicons/lightning.vmt" )
 resource.AddFile( "materials/gui/silkicons/lightning.vtf" )
 resource.AddFile( "materials/gui/silkicons/exclamation.vmt" )
 resource.AddFile( "materials/gui/silkicons/exclamation.vtf" )
+resource.AddFile( "materials/gui/silkicons/color_wheel.vmt" )
+resource.AddFile( "materials/gui/silkicons/color_wheel.vtf" )
 
 --Player Spawn
 function D_FirstSpawn( ply )
@@ -646,7 +648,7 @@ function D_CommandRecieve( ply, Com, Command )
 			elseif string.lower(Command[1]) == "ban" then D_Ban( ply, Command[2], 10, "No reason" )
 			elseif string.lower(Command[1]) == "freeze" then D_Freeze( ply, Command[2] )
 			elseif string.lower(Command[1]) == "unfreeze" then D_Unfreeze( ply, Command[2] )
-			elseif string.lower(Command[1]) == "spectate" then D_Spectate( ply, Command[2] )
+			elseif string.lower(Command[1]) == "spectate" then D_Spectate( ply, Command[2], Command[3] )
 			elseif string.lower(Command[1]) == "unspectate" then D_Unspectate( ply )
 			elseif string.lower(Command[1]) == "noclip" then D_Noclip( ply, Command[2] )
 			else
