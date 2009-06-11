@@ -11,7 +11,7 @@ registerFunction("weld", "ee","n", function(self, args)
     local rv1, rv2 = op1[1](self, op1), op2[1](self, op2)
 	if (!validEntity(rv1) or !validEntity(rv2)) then return 0 end
 	if (!isOwner(self, rv1) or !isOwner(self, rv2)) then return 0 end
-	constraint.Weld(rv1,rv2,0,0,0,0)
+	constraint.Weld(rv1,rv2,0,0,0,false)
 	return 1
 end)
 
@@ -23,7 +23,7 @@ registerFunction("weld", "eenn","n", function(self, args)
 	if (!validEntity(rv1) or !validEntity(rv2)) then return 0 end
 	if (!isOwner(self, rv1) or !isOwner(self, rv2)) then return 0 end
 	local Strength =  math.Clamp( rv3, 0, 1000000 )
-	constraint.Weld(rv1,rv2,0,0,Strength,rv4)
+	constraint.Weld(rv1,rv2,0,0,Strength,util.tobool(rv4))
 	return 1
 end)
 
