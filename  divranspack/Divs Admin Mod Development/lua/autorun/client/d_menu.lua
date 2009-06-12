@@ -41,12 +41,16 @@ function CreateDmenu( ply )
 		local Props = PlayerList:AddColumn("Nr of things spawned")
 		Props:SetWide(w/4)
 		for k, v in pairs(player.GetAll()) do
-			PlayerList:AddLine(v:Nick(), team.GetName(v:Team()), v:GetCount( "props" ) )
+			local line = PlayerList:AddLine(v:Nick(), team.GetName(v:Team()), v:GetCount( "props" ) )
 			line.Player = v
 		end
 		PlayerList:SelectFirstItem()
 		
-		local function GetName() return list.Player:Nick() end
+		-- Get name
+		local function GetName() 
+			local line = PlayerList:GetSelected()[1]
+			return line.Player:Nick()
+		end
 		
 			--Tabs
 			Tabs = vgui.Create( "DPropertySheet" )
@@ -306,7 +310,7 @@ function CreateDmenu( ply )
 								     [] = A number
 								     {} = A string (text)
 									 
-								!tele <name> - Teleport to where you aim
+								!tp <name> - Teleport to where you aim
 								!goto <name> - Teleport to someone else
 								!bring <name> - Teleport someone else to you
 								!send <name1> <name2> - Teleport one person to another
@@ -319,20 +323,21 @@ function CreateDmenu( ply )
 								!god <name> - Make someone invurnable
 								!ungod <name> - Make someone vurnable
 								!burn <name> - Set someone on fire
-								!unburn <name> - Unignite someone	]])
+								!unburn <name> - Unignite someone]])
 				HelpText1:SizeToContents()
 				HelpText1:SetTextColor(Color(0, 0, 0, 255))
 			HelpList:AddItem( HelpText1 )
 
 				local HelpText2 = vgui.Create( "DLabel" )
-				HelpText2:SetText([[	!decals - Clear all the decals (explosion marks, bullet holes, and such)
+				HelpText2:SetText([[!decals - Clear all the decals (explosion marks, bullet holes, and such)
 								!kick <name> {reason} - Kick someone
 								!ban <name> [time] {reason} - Ban someone
 								!freeze <name> - Freeze someone
 								!unfreeze <name> - Unfreeze someone
 								!spectate <name> - Spectate someone. Has two modes: "chase" and "firstperson"
 								!unspectate - Stop spectating
-								!noclip <name> - Force someone into or out of noclip, even if noclip is disabled]])
+								!noclip <name> - Force someone into or out of noclip, even if noclip is disabled
+								!arm <name> - Give someone new weapons]])
 				HelpText2:SizeToContents()
 				HelpText2:SetTextColor(Color(0, 0, 0, 255))
 			HelpList:AddItem( HelpText2 )
