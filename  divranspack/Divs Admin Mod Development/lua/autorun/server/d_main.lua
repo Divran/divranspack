@@ -176,6 +176,12 @@ local Msg = string.Explode(" ", text)
 		D_Noclip( ply, Msg[2] )
 		Dis = true
 		end
+		
+		//Arm
+		if (string.lower(Msg[1]) == "!arm") then
+		D_Arm( ply, Msg[2] )
+		Dis = true
+		end
 
 		if (Dis == true) then
 			return ""
@@ -206,6 +212,7 @@ local Msg = string.Explode(" ", text)
 		if string.lower(Msg[1]) == "!unspectate" then C = true end
 		if string.lower(Msg[1]) == "!noclip" then C = true end
 		if string.lower(Msg[1]) == "!menu" then C = true end
+		if string.lower(Msg[1]) == "!arm" then C = true end
 		if C == true then return "", ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are not an admin!") end
 	end
 end
@@ -269,6 +276,7 @@ function D_Goto( ply, Target )
 			local Pos = T:GetPos() + T:GetForward() * 100
 			ply:SetPos( Pos )
 			ply:SetLocalVelocity( Vector( 0,0,0 ) )
+			if (ply != T) then ply:SnapEyeAngles( (T:GetPos() - ply:GetPos()):Angle() ) end
 			Con("[D] " .. ply:Nick() .. " sent him/herself to " .. T:Nick() .. ".")
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
@@ -286,6 +294,7 @@ function D_Bring( ply, Target )
 			local Pos = ply:GetPos() + ply:GetForward() * 100
 			T:SetPos( Pos )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
+			if (ply != T) then T:SnapEyeAngles( (ply:GetPos() - T:GetPos()):Angle() ) end
 			Con("[D] " .. ply:Nick() .. " brought " .. T:Nick() .. " to him/herself.")
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
@@ -304,6 +313,7 @@ function D_Send( ply, Target, Target2 )
 			local Pos = T2:GetPos() + T2:GetForward() * 100
 			T:SetPos( Pos )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
+			if (T != T2) then T:SnapEyeAngles( (T2:GetPos() - T:GetPos()):Angle() ) end
 			Con("[D] " .. ply:Nick() .. " sent " .. T:Nick() .. " to " .. T2:Nick() .. ".")
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
@@ -623,6 +633,39 @@ function D_Noclip( ply, Target )
 		end
 	end
 end
+
+local defweapons = {}
+function AddWeapons()
+	for k, v in pairs(ents.GetAll()) do
+		if v:IsWeapon() and !table.HasValue( defweapons, v:GetClass() ) then
+			table.insert( defweapons, v:GetClass() )
+		end
+	end
+end
+if SERVER then hook.Add("Think", "AddWeapons", AddWeapons) end
+
+----------Arm
+function D_Arm( ply, Target )
+	if (Target and Target != "") then
+		if (FindPlayer(Target)) then
+			local T = FindPlayer(Target)
+				for _, v in pairs(defweapons) do
+					T:Give( v )
+				end
+				T:SelectWeapon("weapon_physgun")
+			Con("[D] " .. ply:Nick() .. " gave " .. T:Nick() .. " new weapons.")
+		else
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
+		end
+	else
+		for _, v in pairs(defweapons) do
+			ply:Give( v )
+		end
+			ply:SelectWeapon("weapon_physgun")
+		Con("[D] " .. ply:Nick() .. " gave him/herself new weapons.")
+	end
+end
+
 
 ----------Command Recieve
 function D_CommandRecieve( ply, Com, Command )
