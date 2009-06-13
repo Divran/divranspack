@@ -17,3 +17,5 @@ To make someone admin or super admin:
 Credits go to:
 Me (Divran)
 and Nev for helping a complete n00b like me :D
+
+NOTE: This admin mod is incomplete.
