@@ -176,6 +176,12 @@ local Msg = string.Explode(" ", text)
 		D_Noclip( ply, Msg[2] )
 		Dis = true
 		end
+		
+		//Ammo
+		if (string.lower(Msg[1]) == "!ammo") then
+		D_Ammo( ply, Msg[2] )
+		Dis = true
+		end
 
 		if (Dis == true) then
 			return ""
@@ -206,6 +212,7 @@ local Msg = string.Explode(" ", text)
 		if string.lower(Msg[1]) == "!unspectate" then C = true end
 		if string.lower(Msg[1]) == "!noclip" then C = true end
 		if string.lower(Msg[1]) == "!menu" then C = true end
+		if string.lower(Msg[1]) == "!ammo" then C = true end
 		if C == true then return "", ply:PrintMessage( HUD_PRINTTALK, "[D] (Silent) You are not an admin!") end
 	end
 end
@@ -624,6 +631,28 @@ function D_Noclip( ply, Target )
 	end
 end
 
+----------Ammo
+function D_Ammo( ply, Target )
+	if (Target and Target != "") then
+		if (FindPlayer(Target)) then
+			local T = FindPlayer(Target)
+				for k, v in pairs(T:GetWeapons()) do
+					T:GiveAmmo(999,v:GetPrimaryAmmoType(),true)
+					T:GiveAmmo(999,v:GetSecondaryAmmoType(),true)
+				end
+			Con("[D] " .. ply:Nick() .. " has given loads of ammo to " .. T:Nick() .. ".")
+		else
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
+		end
+	else
+		for k, v in pairs(ply:GetWeapons()) do
+			ply:GiveAmmo(999,v:GetPrimaryAmmoType(),true)
+			ply:GiveAmmo(999,v:GetSecondaryAmmoType(),true)
+		end
+		Con("[D] " .. ply:Nick() .. " has given loads of ammo to him/herself.")
+	end
+end
+
 ----------Command Recieve
 function D_CommandRecieve( ply, Com, Command )
 	if (string.lower(Com) == "dmod") then
@@ -651,6 +680,7 @@ function D_CommandRecieve( ply, Com, Command )
 			elseif string.lower(Command[1]) == "spectate" then D_Spectate( ply, Command[2], Command[3] )
 			elseif string.lower(Command[1]) == "unspectate" then D_Unspectate( ply )
 			elseif string.lower(Command[1]) == "noclip" then D_Noclip( ply, Command[2] )
+			elseif string.lower(Command[1]) == "ammo" then D_Ammo( ply, Command[2] )
 			else
 			ply:PrintMessage( HUD_PRINTTALK, "[D] Unknown command!")
 			end
