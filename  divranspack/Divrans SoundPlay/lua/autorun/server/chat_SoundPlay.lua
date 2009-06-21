@@ -26,7 +26,7 @@ local SoundList = {}
 -------------------------------------------------------------------------------------------------------------------------
 
 -- Example sounds. You can replace these with your own sounds if you want.
-	local Sound1 = {}
+local Sound1 = {}
 Sound1.ChatCmd = "hax"
 Sound1.Path = "vo/npc/male01/hacks01.wav"
 Sound1.Pitch = 150
