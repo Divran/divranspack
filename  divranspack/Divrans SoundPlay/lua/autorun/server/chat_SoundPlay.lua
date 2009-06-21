@@ -57,7 +57,7 @@ Sound4.Volume = 100
 
 function Detect( ply, text )
 	for k,v in pairs(SoundList) do
-		if (string.find( text, SoundList[k].ChatCmd )) then
+		if (string.find( string.lower(text), SoundList[k].ChatCmd )) then
 			ply:EmitSound( SoundList[k].Path, SoundList[k].Volume, SoundList[k].Pitch )
 		end
 	end
