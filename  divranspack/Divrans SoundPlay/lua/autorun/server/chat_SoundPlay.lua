@@ -12,6 +12,7 @@ Sound5.Pitch = 100
 Sound5.Volume = 100
 	table.insert( SoundList, Sound5)
 */
+-- Paste it after the example sounds below.
 -- After you have copied it, change the number "5" if necessary.
 -------------------------------------------------------------------------------------------------------------------------
 
@@ -24,6 +25,7 @@ local SoundList = {}
 -- NOTE: Pitch and Volume are in % (percent)
 -------------------------------------------------------------------------------------------------------------------------
 
+-- Example sounds. You can replace these with your own sounds if you want.
 	local Sound1 = {}
 Sound1.ChatCmd = "hax"
 Sound1.Path = "vo/npc/male01/hacks01.wav"
