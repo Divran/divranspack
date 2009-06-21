@@ -27,25 +27,25 @@ local SoundList = {}
 
 -- Example sounds. You can replace these with your own sounds if you want.
 local Sound1 = {}
-Sound1.ChatCmd = "hax"
+Sound1.ChatCmd = " hax "
 Sound1.Path = "vo/npc/male01/hacks01.wav"
 Sound1.Pitch = 150
 Sound1.Volume = 100
 	table.insert( SoundList, Sound1 )
 local Sound2 = {}
-Sound2.ChatCmd = "lol"
+Sound2.ChatCmd = " lol "
 Sound2.Path = "vo/Citadel/br_laugh01.wav"
 Sound2.Pitch = 190
 Sound2.Volume = 100
 	table.insert( SoundList, Sound2 )
 local Sound3 = {}
-Sound3.ChatCmd = "muhaha"
+Sound3.ChatCmd = " muhaha "
 Sound3.Path = "vo/ravenholm/madlaugh03.wav"
 Sound3.Pitch = 70
 Sound3.Volume = 100
 	table.insert( SoundList, Sound3 )
 local Sound4 = {}
-Sound4.ChatCmd = "rawr"
+Sound4.ChatCmd = " rawr "
 Sound4.Path = "npc/ichthyosaur/attack_growl3.wav"
 Sound4.Pitch = 85
 Sound4.Volume = 100
