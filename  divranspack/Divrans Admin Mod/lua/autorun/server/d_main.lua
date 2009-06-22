@@ -182,6 +182,12 @@ local Msg = string.Explode(" ", text)
 		D_Ammo( ply, Msg[2] )
 		Dis = true
 		end
+			
+		//Arm
+		if (string.lower(Msg[1]) == "!arm") then
+		D_Arm( ply, Msg[2] )
+		Dis = true
+		end
 
 		if (Dis == true) then
 			return ""
@@ -650,6 +656,38 @@ function D_Ammo( ply, Target )
 			ply:GiveAmmo(999,v:GetSecondaryAmmoType(),true)
 		end
 		Con("[D] " .. ply:Nick() .. " has given loads of ammo to him/herself.")
+	end
+end
+
+local Wpns = {}
+function AddWeapons()
+	for k, v in pairs(ents.GetAll()) do
+		if v:IsWeapon() and !table.HasValue( Wpns, v:GetClass() ) then
+			table.insert( Wpns, v:GetClass() )
+		end
+	end
+end
+if SERVER then hook.Add("Think", "AddWeapons", AddWeapons) end
+
+----------Arm
+function D_Arm( ply, Target )
+	if (Target and Target != "") then
+		if (FindPlayer(Target)) then
+			local T = FindPlayer(Target)
+				for _, v in pairs(Wpns) do
+					T:Give( v )
+				end
+				T:SelectWeapon("weapon_physgun")
+			Con("[D] " .. ply:Nick() .. " gave " .. T:Nick() .. " new weapons.")
+		else
+			Con( "[D] No player with the name '" .. Target .. "' found!" )
+		end
+	else
+		for _, v in pairs(Wpns) do
+			ply:Give( v )
+		end
+			ply:SelectWeapon("weapon_physgun")
+		Con("[D] " .. ply:Nick() .. " gave him/herself new weapons.")
 	end
 end
 
