@@ -20,7 +20,7 @@ end
 
 function ENT:Initialize()
 	self.Entity:SetModel("models/props_trainstation/trainstation_clock001.mdl")
-	
+	self.Entity:SetMaterial("models/debug/debugwhite")
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
 	self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -28,8 +28,7 @@ function ENT:Initialize()
 
 	local phys = self.Entity:GetPhysicsObject()
 	if (phys:IsValid()) then phys:Wake() end
-	
-	phys:SetMaterial("models/debug/debugwhite")
+
 	phys:SetAngle(Angle(90,0,0))
 	self.Entity:SetColor(255,50,50,200)
 	self.Position = Vector()
