@@ -38,12 +38,10 @@ function ENT:Use(activator, caller) -- Use
 	if (activator == self.Player) then
 		if (activator.SpawnPoint == nil or activator.SpawnPoint != self.Entity) then -- Activate
 			activator.SpawnPoint = self.Entity
-			local Clr = self.Entity:GetColor()
-			self.Entity:SetColor(50,255,50,Clr[4]) -- Set Color
+			self.Entity:SetColor(50,255,50,200) -- Set Color
 		else -- Deactivate
 			activator.SpawnPoint = nil
-			local Clr = self.Entity:GetColor()
-			self.Entity:SetColor(255,50,50,Clr[4]) -- Set Color
+			self.Entity:SetColor(255,50,50,200) -- Set Color
 		end
 	end
 end
@@ -57,7 +55,6 @@ hook.Add("PlayerSpawn", "Spawn", Spawn)
 
 function ENT:Think()
 	if (self.Player.SpawnPoint != self.Entity) then
-		local Clr = self.Entity:GetColor()
-		self.Entity:SetColor(255,50,50,Clr[4])
+		self.Entity:SetColor(255,50,50,200)
 	end
 end
