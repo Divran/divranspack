@@ -9,7 +9,7 @@ include('shared.lua')
 
 function ENT:SpawnFunction(ply, tr)
 	if (!tr.Hit) then return end
-	local SpawnPos = tr.HitPos
+	local SpawnPos = tr.HitPos + Vector(0,0,5)
 	local ent = ents.Create("sent_customspawnpoint")
 	ent:SetPos(SpawnPos)
 	ent:SetVar("Owner",ply)
