@@ -32,7 +32,7 @@ function PLUGIN:Call( ply, args )
 			end
 			
 			pl:SetWalkSpeed( math.Clamp( Speed, 1, 10000000 ) ) 
-			pl:SetRunSpeed( math.Clamp( Speed + 250, 1, 10000000 ) ) 
+			pl:SetRunSpeed( math.Clamp( Speed * 2, 1, 10000000 ) ) 
 			
 			return true, ply:Nick() .. " has set " .. pl:Nick() .. "'s movement speed to " .. math.Clamp( Speed, 1, 10000000 ) .. "."
 		else
