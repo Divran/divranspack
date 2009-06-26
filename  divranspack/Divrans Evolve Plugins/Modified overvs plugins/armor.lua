@@ -31,10 +31,6 @@ function PLUGIN:Call( ply, args )
 				return false, "The armor must be numeric!"
 			end
 			
-			if Armor > 10000 then
-				return false, "The armor can't be over 10000!"
-			end
-			
 			math.Clamp( Armor, 1, 99999 )
 			
 			return true, ply:Nick() .. " has set " .. pl:Nick() .. "'s armor to " .. math.Clamp( Armor, 1, 99999 ) .. "."
