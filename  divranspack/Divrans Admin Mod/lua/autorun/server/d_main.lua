@@ -283,6 +283,7 @@ function D_Goto( ply, Target )
 			ply:SetPos( Pos )
 			ply:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " sent him/herself to " .. T:Nick() .. ".")
+			if (ply != T) then ply:SnapEyeAngles( (T:GetPos() - ply:GetPos()):Angle() ) end
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
@@ -300,6 +301,7 @@ function D_Bring( ply, Target )
 			T:SetPos( Pos )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " brought " .. T:Nick() .. " to him/herself.")
+			if (ply != T) then ply:SnapEyeAngles( (T:GetPos() - ply:GetPos()):Angle() ) end
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
@@ -318,6 +320,7 @@ function D_Send( ply, Target, Target2 )
 			T:SetPos( Pos )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " sent " .. T:Nick() .. " to " .. T2:Nick() .. ".")
+			if (T != T) then T:SnapEyeAngles( (T2:GetPos() - T:GetPos()):Angle() ) end
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
