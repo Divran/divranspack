@@ -28,12 +28,12 @@ function PLUGIN:Call( ply, args )
 			if args[2] and tonumber(args[2]) then
 				Jump = tonumber( args[2] )
 			elseif args[2] then
-				return false, "The health must be numeric!"
+				return false, "The jump power must be numeric!"
 			end
 			
 			pl:SetJumpPower( math.Clamp( Jump, 1, 10000000 ) ) 
 			
-			return true, ply:Nick() .. " has set " .. pl:Nick() .. "'s jump power to " .. math.Clamp( Jump, 1, 99999 ) .. "."
+			return true, ply:Nick() .. " has set " .. pl:Nick() .. "'s jump power to " .. math.Clamp( Jump, 1, 10000000 ) .. "."
 		else
 			return false, "Player not found!"
 		end
