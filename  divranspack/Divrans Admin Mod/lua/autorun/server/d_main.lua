@@ -301,7 +301,7 @@ function D_Bring( ply, Target )
 			T:SetPos( Pos )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			Con("[D] " .. ply:Nick() .. " brought " .. T:Nick() .. " to him/herself.")
-			if (ply != T) then ply:SnapEyeAngles( (T:GetPos() - ply:GetPos()):Angle() ) end
+			if (ply != T) then T:SnapEyeAngles( (ply:GetPos() - T:GetPos()):Angle() ) end
 		else
 			Con( "[D] No player with the name '" .. Target .. "' found!" )
 		end
