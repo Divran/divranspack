@@ -2,7 +2,7 @@ AddCSLuaFile( "autorun/client/clientkeyboardsounds.lua" )
 
 
 local function ChatChanged( ply )
-	local Rnd = math.Round(math.random(0,10))
+	local Rnd = math.Round(math.random(0,20))
 	if (Rnd >= 1 and Rnd <= 7) then 
 		ply:EmitSound( "ambient/machines/keyboard"..Rnd.."_clicks.wav", 100, 100 )
 	end
@@ -11,7 +11,7 @@ concommand.Add( "ChatChanged", ChatChanged )
 
 
 local function ChatChangedEnter( ply )
-	local Rnd = math.Round(math.random(0,3))
+	local Rnd = math.Round(math.random(0,4))
 	if (Rnd == 1 or Rnd == 2) then
 		ply:EmitSound( "ambient/machines/keyboard7_clicks_enter.wav", 100, 100 )
 	end
