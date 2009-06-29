@@ -13,12 +13,3 @@ local function ChatKeyboardSounds( Text )
 	end
 end
 hook.Add( "ChatTextChanged", "ChatKeyboardSounds", ChatKeyboardSounds )
-
-local function ChatKeyboardSoundsEnter( )
-	if (Time == false) then
-		RunConsoleCommand( "ChatChangedEnter" )
-		Time = true
-		timer.Simple( 0.1, function() TimerFalse() end )
-	end
-end
-hook.Add( "OnPlayerChat", "ChatKeyboardSoundsEnter", ChatKeyboardSoundsEnter )
