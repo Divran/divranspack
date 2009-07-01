@@ -3,7 +3,7 @@ if (SERVER) then
 	function D_Respawn( ply )
 		timer.Simple( 0.2, function()
 		-- PUT YOUR STEAM ID HERE TO BECOME OWNER:
-			if (ply:SteamID() == "STEAM_0:0:00000") then
+			if (ply:SteamID() == "STEAM_0:0:00") then
 				ply:SetTeam(1)
 			elseif (ply:IsSuperAdmin()) then
 				ply:SetTeam(2)
