@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "goto"
-DmodPlugin.Name = "goto"
-Dmod_AddPlugin(DmodPlugin)
+DmodPlugin.Name = "Goto"
+if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
 local function Dmod_Goto( ply, Args )

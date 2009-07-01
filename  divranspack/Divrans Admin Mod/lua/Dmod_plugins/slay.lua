@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "slay"
-DmodPlugin.Name = "slay"
-Dmod_AddPlugin(DmodPlugin)
+DmodPlugin.Name = "Slay"
+if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
 local function Dmod_Slay( ply, Args )

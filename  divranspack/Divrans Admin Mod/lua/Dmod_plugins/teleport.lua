@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "tp"
-DmodPlugin.Name = "teleport"
-Dmod_AddPlugin(DmodPlugin)
+DmodPlugin.Name = "Teleport"
+if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
 local function Dmod_Teleport( ply, Args )

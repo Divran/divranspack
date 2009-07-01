@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "kick"
-DmodPlugin.Name = "kick"
-Dmod_AddPlugin(DmodPlugin)
+DmodPlugin.Name = "Kick"
+if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
 local function Dmod_Kick( ply, Args )

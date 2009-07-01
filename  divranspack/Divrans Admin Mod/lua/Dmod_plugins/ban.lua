@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "ban"
-DmodPlugin.Name = "ban"
-Dmod_AddPlugin(DmodPlugin)
+DmodPlugin.Name = "Ban"
+if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
 local function Dmod_Ban( ply, Args )

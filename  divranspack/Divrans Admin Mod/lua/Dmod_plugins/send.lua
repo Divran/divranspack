@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "send"
-DmodPlugin.Name = "send"
-Dmod_AddPlugin(DmodPlugin)
+DmodPlugin.Name = "Send"
+if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
 local function Dmod_Send( ply, Args )
