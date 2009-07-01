@@ -18,4 +18,4 @@ Credits go to:
 Me (Divran)
 and Nev for helping a complete n00b like me :D
 
-NOTE: This admin mod is incomplete.
+NOTE: This admin mod is OLD! Use the NEW admin mod! It's much better!
