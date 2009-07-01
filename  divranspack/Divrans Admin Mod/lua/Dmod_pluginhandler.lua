@@ -87,6 +87,7 @@ Txt = string.lower(Txt) -- Lower
 		Txt = string.Right(Txt, string.len(Txt) - 1 ) -- Remove dot
 		local Args = string.Explode( " ", Txt ) -- KABOOM
 		Dmod_CallPlugin( ply, Args ) -- Continue to CallPlugin
+		return ""
 	end
 end
 hook.Add( "PlayerSay", "ChatDetect", ChatDetect )
