@@ -2,8 +2,11 @@
 -- Kick
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "kick"
-DmodPlugin.Name = "Kick"
+DmodPlugin.ChatCommand = "kick" -- The chat command you need to use this plugin
+DmodPlugin.Name = "Kick" -- The name of the plugin
+DmodPlugin.Description = "Allows you to kick someone from your server." -- The description shown in the Menu
+DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
+DmodPlugin.Creator = "Divran" -- Who created it?
 if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
@@ -11,7 +14,7 @@ local function Dmod_Kick( ply, Args )
 	if (Args[2]) then
 		if (Dmod_FindPlayer(Args[2])) then
 			local T = Dmod_FindPlayer(Args[2])
-			local Reason = Dmod_GetReason(Args)
+			local Reason = Dmod_GetReason(Args, 3)
 			T:Kick(Reason)
 			Dmod_Message(true, ply, ply:Nick() .. " kicked " .. T:Nick() .. " with the reason '" .. Reason .. "'.")
 		else
@@ -21,17 +24,4 @@ local function Dmod_Kick( ply, Args )
 		Dmod_Message( false, ply, "You must enter a name!")
 	end
 end
-hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Kick)
-
-local function Dmod_GetReason( Args )
-	local Rsn = ""
-	if (Args[3] and Args[3] != "") then
-		for i = 1, table.Count(Args) do
-			if (i > 2) then
-				Rsn = Rsn .. Args[i] .. " "
-			end
-		end
-	end
-	if (Rsn == " ") then Rsn = "No reason" end
-	return Rsn
-end
+hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Kick )

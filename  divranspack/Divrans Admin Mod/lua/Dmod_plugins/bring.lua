@@ -2,8 +2,11 @@
 -- Bring
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "bring"
-DmodPlugin.Name = "Bring"
+DmodPlugin.ChatCommand = "bring" -- The chat command you need to use this plugin
+DmodPlugin.Name = "Bring" -- The name of the plugin
+DmodPlugin.Description = "Allows you to teleport someone to you." -- The description shown in the Menu
+DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
+DmodPlugin.Creator = "Divran" -- Who created it?
 if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 

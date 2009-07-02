@@ -2,8 +2,11 @@
 -- Goto
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "goto"
-DmodPlugin.Name = "Goto"
+DmodPlugin.ChatCommand = "goto" -- The chat command you need to use this plugin
+DmodPlugin.Name = "Goto" -- The name of the plugin
+DmodPlugin.Description = "Allows you to teleport to someone." -- The description shown in the Menu
+DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
+DmodPlugin.Creator = "Divran" -- Who created it?
 if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 

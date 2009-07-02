@@ -2,8 +2,11 @@
 -- Teleport
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "tp"
-DmodPlugin.Name = "Teleport"
+DmodPlugin.ChatCommand = "tp" -- The chat command you need to use this plugin
+DmodPlugin.Name = "Teleport" -- The name of the plugin
+DmodPlugin.Description = "" -- The description shown in the Menu
+DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
+DmodPlugin.Creator = "Divran" -- Who created it?
 if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 

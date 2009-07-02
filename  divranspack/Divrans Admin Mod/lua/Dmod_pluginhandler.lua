@@ -37,7 +37,7 @@ function Dmod_FindPlayer( Name )
 	if (!Name) then return nil end
 		
 	for _, pl in pairs(player.GetAll()) do
-		if string.find(string.lower(pl:Nick()), string.lower(Name)) then
+		if string.find(string.lower(pl:Nick()), string.lower(Name), 1, true) then
 			return pl
 		end
 	end
@@ -86,7 +86,7 @@ end
 local function ChatDetect( ply, Txt )
 Txt = string.lower(Txt) -- Lower
 	if (string.Left(Txt, 1) == "!") then -- Check for the "!"
-		Txt = string.Right(Txt, string.len(Txt) - 1 ) -- Remove dot
+		Txt = string.Right(Txt, string.len(Txt) - 1 ) -- Remove the "!"
 		local Args = string.Explode( " ", Txt ) -- KABOOM
 		Dmod_CallPlugin( ply, Args ) -- Continue to CallPlugin
 		return ""
@@ -104,3 +104,21 @@ end
 concommand.Add( "Dmod", Dmod_CommandRecieve )
 
 	Dmod_Message( true, nil, "Dmod Initialized." )
+	
+	
+-------------------------------------------------------------------------------------------------------------------------
+-- Get Reason (Used for Ban and Kick
+-------------------------------------------------------------------------------------------------------------------------
+
+function Dmod_GetReason(Args, Num)
+	local Rsn = ""
+	if (Args[Num] and Args[Num] != "") then
+		for i = 1, table.Count(Args) do
+			if (i >= Num) then
+				Rsn = Rsn .. Args[i] .. " "
+			end
+		end
+	end
+	if (Rsn == " ") then Rsn = "No reason" end
+	return Rsn
+end

@@ -2,8 +2,11 @@
 -- Respawn
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "respawn"
-DmodPlugin.Name = "Respawn"
+DmodPlugin.ChatCommand = "respawn" -- The chat command you need to use this plugin
+DmodPlugin.Name = "Respawn" -- The name of the plugin
+DmodPlugin.Description = "Allows you to make someone instantly Respawn" -- The description shown in the Menu
+DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
+DmodPlugin.Creator = "Divran" -- Who created it?
 if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 
