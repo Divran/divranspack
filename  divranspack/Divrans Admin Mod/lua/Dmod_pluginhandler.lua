@@ -30,6 +30,19 @@ end
 Dmod_LoadPlugins()
 
 -------------------------------------------------------------------------------------------------------------------------
+-- Add gui Materials
+-------------------------------------------------------------------------------------------------------------------------
+
+function Dmod_LoadMaterials()
+	local path = "materials/gui/silkicons/"
+	resource.AddFile( path .. "map.vmt" )
+	resource.AddFile( path .. "map.vtf" )
+	resource.AddFile( path .. "server.vmt" )
+	resource.AddFile( path .. "server.vtf" )
+end
+Dmod_LoadMaterials()
+
+-------------------------------------------------------------------------------------------------------------------------
 -- Find players
 -------------------------------------------------------------------------------------------------------------------------
 
@@ -119,7 +132,7 @@ function Dmod_GetReason(Args, Num)
 			end
 		end
 	end
-	if (Rsn == " ") then Rsn = "No reason" end
+	if (string.Trim(Rsn) == "") then Rsn = "No reason" end
 	return Rsn
 end
 

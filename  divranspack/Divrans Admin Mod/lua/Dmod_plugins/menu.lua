@@ -43,11 +43,11 @@ if CLIENT then
 				MainTab:SetSize( w - 10, h - 60 )
 				
 				
-					-- Players
+					-- Players Tab
 					local PlayerTab = vgui.Create( "DPropertySheet" )
 					PlayerTab:SetParent( PlayerTab )
 					PlayerTab:SetPos( 1, 45 )
-					PlayerTab:SetSize( w - 20, h - 70 )
+					PlayerTab:SetSize( w - 20, h - 100 )
 				
 					for k, v in pairs(player.GetAll()) do
 						local Tab = vgui.Create( "DPanel" )
@@ -108,11 +108,37 @@ if CLIENT then
 					function ApplyButton:DoClick( )
 						RunConsoleCommand( "Dmod", "changelevel", MapList:GetLine(1), GamemodeList:GetLine(1) )
 					end
-					
-					
-					
-					
 					MainTab:AddSheet( "Maps", Maps, "gui/silkicons/map", false, false, "Change the map and gamemode" )
+					
+					-- Server Commands
+					local Sboxes = { "props", "ragdolls", "vehicles", "effects", "balloons", "npcs", "dynamite",
+									"lamps", "lights", "wheels", "thrusters", "hoverballs", "buttons", "emitters",
+									"spawners", "turrets" }
+					
+					-- Server Tab
+					local ServerTab = vgui.Create( "DPanel" )
+					ServerTab.Paint = function( ) end
+						
+					local SboxList = vgui.Create( "DPanelList", ServerTab )
+					SboxList:SetPos( 1,1 )
+					SboxList:SetSize( w/2 - 12, h - 100 )
+					SboxList:SetSpacing( 1 )
+					SboxList:EnableHorizontal( false )
+					SboxList:EnableVerticalScrollbar( true )
+
+					
+					for k, v in pairs( Sboxes ) do
+						local Slider = vgui.Create( "DNumSlider" )
+						Slider:SetSize( SboxList:GetWide(), 50 )
+						Slider:SetText( v )
+						Slider:SetMin( 0 )
+						Slider:SetMax( 1337 )
+						Slider:SetDecimals( 0 )
+						Slider:SetConVar( "Dmod", "sbox", v )
+						SboxList:AddItem( Slider )
+					end
+					
+					MainTab:AddSheet( "Server", ServerTab, "gui/silkicons/server", false, false, "Change server settings" )
 				
 		else
 			Dmod_Message( false, LocalPlayer(), "You are not an admin!" )
