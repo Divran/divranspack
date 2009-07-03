@@ -7,7 +7,8 @@ DmodPlugin.Name = "God" -- The name of the plugin
 DmodPlugin.Description = "Allows you to make someone invurnable." -- The description shown in the Menu
 DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Creator = "Divran" -- Who created it?
-if SERVER then Dmod_AddPlugin(DmodPlugin) end
+if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
+
 
 local function Dmod_God( ply, Args )
 	if (Args[2]) then

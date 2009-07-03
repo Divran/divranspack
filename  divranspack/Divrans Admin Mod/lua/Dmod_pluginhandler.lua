@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------------------------------------------
 -- This admin mod was made by Divran.
--- Thanks to Overv and Nev for helping me.
+-- Thanks to Overv and Nevec for helping me.
 -- This is the server side file that is only loaded on servers.
 -------------------------------------------------------------------------------------------------------------------------
 
@@ -107,7 +107,7 @@ concommand.Add( "Dmod", Dmod_CommandRecieve )
 	
 	
 -------------------------------------------------------------------------------------------------------------------------
--- Get Reason (Used for Ban and Kick
+-- Get Reason (Used for Ban and Kick)
 -------------------------------------------------------------------------------------------------------------------------
 
 function Dmod_GetReason(Args, Num)
@@ -122,3 +122,27 @@ function Dmod_GetReason(Args, Num)
 	if (Rsn == " ") then Rsn = "No reason" end
 	return Rsn
 end
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Get Maps and Gamemodes. (Used for the Menu)
+-- I didn't know how to use usermessages, so thanks Nevec!
+-------------------------------------------------------------------------------------------------------------------------
+
+function GetUserMessage( ply )
+	local files = file.Find( "../maps/*.bsp" )
+	for _, filename in pairs( files ) do
+		umsg.Start( "dmod_addmap", ply )
+			umsg.String( filename:gsub( "%.bsp$", "" ) )
+		umsg.End( )
+	end
+
+	local Gamemodes = file.FindDir("../gamemodes/*")
+	for _, filename in pairs( Gamemodes ) do
+		umsg.Start( "dmod_addgamemode", ply )
+			if (filename != "base") then
+				umsg.String( filename )
+			end
+		umsg.End( )
+	end
+end
+hook.Add( "PlayerInitialSpawn", "GetUserMessage", GetUserMessage )

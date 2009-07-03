@@ -7,7 +7,7 @@ DmodPlugin.Name = "Kick" -- The name of the plugin
 DmodPlugin.Description = "Allows you to kick someone from your server." -- The description shown in the Menu
 DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Creator = "Divran" -- Who created it?
-if SERVER then Dmod_AddPlugin(DmodPlugin) end
+if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
 local function Dmod_Kick( ply, Args )

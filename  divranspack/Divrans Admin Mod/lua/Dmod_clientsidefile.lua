@@ -9,10 +9,18 @@ Dmod = { }
 Dmod.Plugins = { }
 
 -------------------------------------------------------------------------------------------------------------------------
--- Add Plugins
+-- Add & Load Plugins
 -------------------------------------------------------------------------------------------------------------------------
 
-local Files = file.FindInLua( "Dmod_plugins/*.lua" )
-for _, file in pairs( Files ) do
-	include( "Dmod_plugins/" .. file )
+function Dmod_ClientLoadPlugins()
+	local Files = file.FindInLua( "Dmod_plugins/*.lua" )
+	for _, file in pairs( Files ) do
+		include( "Dmod_plugins/" .. file )
+	end
 end
+
+function Dmod_ClientAddPlugin( Table )
+	table.insert( Dmod.Plugins, Table )
+end
+
+Dmod_ClientLoadPlugins()

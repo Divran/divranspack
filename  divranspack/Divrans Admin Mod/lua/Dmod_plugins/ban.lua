@@ -7,7 +7,7 @@ DmodPlugin.Name = "Ban" -- The name of the plugin
 DmodPlugin.Description = "" -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Creator = "Divran" -- Who created it?
-if SERVER then Dmod_AddPlugin(DmodPlugin) end
+if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
 local function Dmod_Ban( ply, Args )
