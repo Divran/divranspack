@@ -4,6 +4,8 @@
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "menu"
 DmodPlugin.Name = "menu"
+DmodPlugin.ShowInMenu = false
+DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 -------------------------------------------------------------------------------------------------------------------------
@@ -110,34 +112,27 @@ if CLIENT then
 					end
 					MainTab:AddSheet( "Maps", Maps, "gui/silkicons/map", false, false, "Change the map and gamemode" )
 					
-					-- Server Commands
-					local Sboxes = { "props", "ragdolls", "vehicles", "effects", "balloons", "npcs", "dynamite",
-									"lamps", "lights", "wheels", "thrusters", "hoverballs", "buttons", "emitters",
-									"spawners", "turrets" }
-					
 					-- Server Tab
 					local ServerTab = vgui.Create( "DPanel" )
 					ServerTab.Paint = function( ) end
+					
+					if (LocalPlayer():IsSuperAdmin()) then	
+						local Lbl = vgui.Create( "DLabel", ServerTab )
+						Lbl:SetText( "Run a console command on the server:" )
+						Lbl:SetPos( 5, 10 )
+						Lbl:SetTextColor(Color(0,0,0,255))
+						Lbl:SizeToContents()
 						
-					local SboxList = vgui.Create( "DPanelList", ServerTab )
-					SboxList:SetPos( 1,1 )
-					SboxList:SetSize( w/2 - 12, h - 100 )
-					SboxList:SetSpacing( 1 )
-					SboxList:EnableHorizontal( false )
-					SboxList:EnableVerticalScrollbar( true )
-
-					
-					for k, v in pairs( Sboxes ) do
-						local Slider = vgui.Create( "DNumSlider" )
-						Slider:SetSize( SboxList:GetWide(), 50 )
-						Slider:SetText( v )
-						Slider:SetMin( 0 )
-						Slider:SetMax( 1337 )
-						Slider:SetDecimals( 0 )
-						Slider:SetConVar( "Dmod", "sbox", v )
-						SboxList:AddItem( Slider )
+						local Text = vgui.Create( "DTextEntry", ServerTab )
+						Text:SetSize( 200, 20 )
+						Text:SetPos( 5, 30 )
+						Text.OnEnter = function() RunConsoleCommand( "Dmod", "rcon", Text:GetValue() ) end
+					else -- Non-Super Admins aren't allowed to use this tab
+						local Text = vgui.Create( "DLabel", ServerTab )
+						Text:SetText( "Only Super Admins are allowed to use this tab." )
+						Text:SizeToContents()
+						Text:SetPos( ServerTab:GetWide()/2-Text:GetWide()/2, ServerTab:GetTall()/2-Text:GetTall()/2)
 					end
-					
 					MainTab:AddSheet( "Server", ServerTab, "gui/silkicons/server", false, false, "Change server settings" )
 				
 		else
@@ -161,7 +156,9 @@ end -- End of Menu
 -------------------------------------------------------------------------------------------------------------------------
 
 local function Dmod_RunMenu( ply, Args )
+if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	if SERVER then ply:ConCommand("Dmod_Menu") end
 	if CLIENT then RunConsoleCommand("Dmod_Menu") end
+end
 end
 hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_RunMenu)

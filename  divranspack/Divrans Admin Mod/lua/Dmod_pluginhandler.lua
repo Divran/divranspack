@@ -5,9 +5,7 @@
 -------------------------------------------------------------------------------------------------------------------------
 
 AddCSLuaFile("autorun/Dmod_autorun.lua")
-AddCSLuaFile("Dmod_teamcolors.lua")
 AddCSLuaFile("Dmod_clientsidefile.lua")
-include( "Dmod_teamcolors.lua" )
 Dmod = { }
 Dmod.Plugins = { }
 
@@ -78,10 +76,8 @@ function Dmod_CallPlugin( ply, Args )
 local Found = false
 	for _, v in pairs( Dmod.Plugins ) do -- Scan all plugins
 		if (v.ChatCommand == string.lower(Args[1])) then -- Find the plugin
-			if (ply:IsAdmin()) then -- Check for admin
+			if (Dmod_CheckRequiredRank(ply, v.RequiredRank)) then
 				hook.Call(v.Name, "", ply, Args ) -- Call the plugin
-			else
-				Dmod_Message( false, ply, "You are not an admin!" )
 			end
 			Found = true -- Found it!
 		end
@@ -118,6 +114,24 @@ concommand.Add( "Dmod", Dmod_CommandRecieve )
 
 	Dmod_Message( true, nil, "Dmod Initialized." )
 	
+-------------------------------------------------------------------------------------------------------------------------
+-- Check Required Rank
+-------------------------------------------------------------------------------------------------------------------------
+function Dmod_CheckRequiredRank( ply, Rank, MessageBool )
+	local PlayerRank = ply:Team()
+	local Nr = 4
+	Rank = string.lower( Rank )
+	if (Rank == "admin") then Nr = 3 elseif
+	(Rank == "super admin") then Nr = 2 elseif
+	(Rank == "owner") then Nr = 1 end
+	
+	if (PlayerRank <= Nr) then 
+		return true 
+	else 
+		if (MessageBool == true or MessageBool == nil) then Dmod_Message( false, ply, "You are a(n) '" .. team.GetName( ply:Team() ) .. "' and that command requires a rank of '" .. Rank .. "' or higher." ) end
+		return false 
+	end
+end
 	
 -------------------------------------------------------------------------------------------------------------------------
 -- Get Reason (Used for Ban and Kick)
@@ -125,13 +139,7 @@ concommand.Add( "Dmod", Dmod_CommandRecieve )
 
 function Dmod_GetReason(Args, Num)
 	local Rsn = ""
-	if (Args[Num] and Args[Num] != "") then
-		for i = 1, table.Count(Args) do
-			if (i >= Num) then
-				Rsn = Rsn .. Args[i] .. " "
-			end
-		end
-	end
+	Rsn = table.concat( Args, " ", Num, table.Count(Args))
 	if (string.Trim(Rsn) == "") then Rsn = "No reason" end
 	return Rsn
 end
@@ -159,3 +167,164 @@ function GetUserMessage( ply )
 	end
 end
 hook.Add( "PlayerInitialSpawn", "GetUserMessage", GetUserMessage )
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Jail Control
+-------------------------------------------------------------------------------------------------------------------------
+
+function Dmod_ControlJail( TargetPly, Bool, Pos )
+		TargetPly.JailPos = Pos
+		TargetPly.JailOn = Bool
+		
+		if (Bool == true) then
+			TargetPly:StripWeapons()
+			TargetPly:SetPos( Pos )
+		else
+			local Ang = TargetPly:GetAimVector():Angle()
+			local Pos2 = TargetPly:GetPos()
+			TargetPly:Spawn()
+			TargetPly:SetPos( Pos2 )
+			TargetPly:SnapEyeAngles( Ang )
+		end
+end
+
+local function Dmod_TeleToJail( ply )
+	if (ply.JailOn == true) then
+		ply:SetPos( ply.JailPos )
+		ply:StripWeapons()
+	end
+end
+hook.Add( "PlayerSpawn", "", Dmod_TeleToJail )
+
+local function Dmod_BlockStuff( ply )
+	if (ply.JailOn == true) then 
+		Dmod_Message( false, ply, "You are jailed!" )
+		return false 
+	else 
+		return true 
+	end
+end
+hook.Add( "PlayerSpawnProp", "", Dmod_BlockStuff )
+hook.Add( "PlayerSpawnSENT", "", Dmod_BlockStuff )
+hook.Add( "PlayerSpawnNPC", "", Dmod_BlockStuff )
+hook.Add( "PlayerSpawnSWEP", "", Dmod_BlockStuff )
+hook.Add( "PlayerSpawnVehicle", "", Dmod_BlockStuff )
+hook.Add( "CanTool", "", Dmod_BlockStuff )
+hook.Add( "PlayerNoClip", "", Dmod_BlockStuff )
+hook.Add( "SpawnMenuOpen", "", Dmod_BlockStuff )
+
+local function Dmod_BlockWeapons( ply )
+	timer.Simple( 0.05, function() if (ply.JailOn == true) then ply:StripWeapons() end end )
+	return true
+end
+hook.Add( "PlayerCanPickupWeapon", "", Dmod_BlockWeapons )
+
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Admin Noclip Control
+-------------------------------------------------------------------------------------------------------------------------
+
+function Dmod_ServerAdminNoclip( ply )
+	if AdminNoclip then AdminNoclip = false else AdminNoclip = true end
+	if (AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " enabled Admin Only Noclip." ) end
+	if (!AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " disabled Admin Only Noclip." ) end
+end
+
+local function Dmod_DisableNoclip( ply )
+	if (AdminNoclip == true and !Dmod_CheckRequiredRank( ply, "admin", false )) then
+		return false
+	end
+	return true
+end
+hook.Add("PlayerNoClip", "", Dmod_DisableNoclip)
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Gimp Control
+-------------------------------------------------------------------------------------------------------------------------
+
+local GimpMessages = { -- Add or change here if you want
+"IM GAY",
+"How do you fly?",
+"CAPS LOCK IS CRUISE CONTROL FOR COOL",
+"Wut",
+"What",
+"Lol",
+"Lul",
+"Lolz",
+"Lulz",
+"GWAFITY KAT NUT AMOOSED",
+"Blah blah blah...",
+"I love lamp..",
+"I love carpet..",
+"I love desk..",
+"Whut",
+"OMGWTFBBQ",
+"MmmmmKaaay",
+"Divran rules!",
+"AAAAAARGH!!!!!!!!!", -- Special
+"IS THIS REEL LIEF???",
+"R U GARRY?",
+"YOU SPIN ME RIGHT ROUND BABY RIGHT ROUND LIKE A RECORD BABY RIGHT ROUND ROUND ROUND!!!!!!!", -- Special
+"HAI WHO R U?",
+"GIMME CAKE",
+"The cake is a LIE!",
+"I C DED PPLZ",
+"Words words words...",
+"Simon says JUMP!", -- Special
+"Simon says RUN!", -- Special
+"Simon says DIE!", -- Special
+"Simon says SHOOT!", -- Special
+"Simon says DUCK!", -- Special
+"Simon says TURN!", -- Special
+"Simon says BLOW UP!" } -- Special
+
+
+local function Dmod_GimpChat( ply )
+	if (ply.Gimped) then
+	local Gimp = table.Random( GimpMessages )
+	Dmod_CheckGimps( Gimp, ply ) -- Put "--" in front of this to disable "special" gimps.
+	return Gimp
+	end
+end
+hook.Add( "PlayerSay" , "", Dmod_GimpChat )
+
+-- "Special" gimps:
+function Dmod_CheckGimps( Gimp, ply ) -- Check if the gimp message is a special one
+if (Gimp == "AAAAAARGH!!!!!!!!!") then ply:ConCommand( "kill" ) end
+if (Gimp == "YOU SPIN ME RIGHT ROUND BABY RIGHT ROUND LIKE A RECORD BABY RIGHT ROUND ROUND ROUND!!!!!!!") then 
+	ply:ConCommand( "+right" )
+	timer.Simple( 10, function( ) ply:ConCommand( "-right" ) end) 
+end
+if (Gimp == "Simon says JUMP!") then
+	ply:ConCommand( "+jump" )
+	timer.Simple( 0.5, function() ply:ConCommand( "-jump" ) end )
+end
+if (Gimp == "Simon says RUN!") then
+	ply:ConCommand( "+forward" )
+	timer.Simple( 10, function() ply:ConCommand( "-forward" ) end )
+end
+if (Gimp == "Simon says DIE!") then
+	ply:ConCommand( "kill" )
+end
+if (Gimp == "Simon says SHOOT!") then
+	ply:ConCommand( "+attack" )
+	timer.Simple( 2, function() ply:ConCommand( "-attack" ) end )
+end
+if (Gimp == "Simon says DUCK!") then
+	ply:ConCommand( "+duck" )
+	timer.Simple( 2, function() ply:ConCommand( "-duck" ) end )
+end
+if (Gimp == "Simon says TURN!") then
+	ply:ConCommand( "+right" )
+	timer.Simple( 0.5, function() ply:ConCommand( "-right; +left" ) end )
+	timer.Simple( 1.5, function() ply:ConCommand( "-left; +right" ) end )
+	timer.Simple( 2, function() ply:ConCommand( "-right" ) end )
+end
+if (Gimp == "Simon says BLOW UP!") then
+	local Pos = ply:GetPos() + Vector(0,0,50)
+	util.BlastDamage( ply, ply, Pos , 100, 9001 )
+	local effectdata = EffectData()
+	effectdata:SetOrigin( Pos )
+	util.Effect( "Explosion", effectdata, true, true )
+end
+end

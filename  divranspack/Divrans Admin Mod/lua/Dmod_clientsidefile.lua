@@ -4,7 +4,6 @@
 -- This is the client side file that is only loaded on clients
 -------------------------------------------------------------------------------------------------------------------------
 
-include( "Dmod_teamcolors.lua" )
 Dmod = { }
 Dmod.Plugins = { }
 
