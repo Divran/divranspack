@@ -17,7 +17,7 @@ if CLIENT then
 	local function Dmod_Menu()
 		if (LocalPlayer():IsAdmin()) then
 			-- Main Window
-			local w, h = 900, 400
+			local w, h = 1200, 400
 				if (w > ScrW()) then w = ScrW() - 20 end
 				local Menu = vgui.Create( "DFrame" )
 				Menu:SetPos( ScrW() / 2 - w / 2, ScrH() / 2 - h / 2 )
@@ -55,25 +55,65 @@ if CLIENT then
 						local Tab = vgui.Create( "DPanel" )
 						Tab.Paint = function( ) end
 						
-						-- Plugin List
-						local PluginList = vgui.Create( "DListView" )
-						PluginList:SetParent( Tab )
-						PluginList:SetPos( 1, 1 )
-						PluginList:SetSize( w-35, h - 130 )
-						PluginList:SetMultiSelect( false )
+						-- Plugin Lists
+						local AdminList = vgui.Create( "DListView" )
+						AdminList:SetParent( Tab )
+						AdminList:SetPos( 1, 1 )
+						AdminList:SetSize( (w-40) / 3, h - 130 )
+						AdminList:SetMultiSelect( false )
 						-- Add the columns
-						local Name = PluginList:AddColumn("Name")
-						Name:SetWide((w-15)/6)
-						local Desc = PluginList:AddColumn("Description")
-						Desc:SetWide((w-15)/2)
-						local Creator = PluginList:AddColumn("Creator")
-						Creator:SetWide((w-15)/6)
-						local ChatCmd = PluginList:AddColumn("Chat Cmd")
-						ChatCmd:SetWide((w-15)/8)
+						local Name = AdminList:AddColumn("Name")
+						Name:SetWide(50)
+						local Desc = AdminList:AddColumn("Administration -- Description")
+						Desc:SetWide(150)
+						local Creator = AdminList:AddColumn("Creator")
+						Creator:SetWide(50)
+						local ChatCmd = AdminList:AddColumn("Chat Cmd")
+						ChatCmd:SetWide(30)
 						-- When you click on a command in the list, run it.
-						PluginList.OnClickLine = function(P,Line,I) RunConsoleCommand("Dmod", Line:GetValue(4), v:Nick()) end
+						AdminList.OnClickLine = function(P,Line,I) RunConsoleCommand("Dmod", Line:GetValue(4), v:Nick()) end
 						-- Fill the list with commands
-						Dmod_FillList(PluginList)
+						Dmod_FillList(AdminList, "administration")
+						
+						local PunishList = vgui.Create( "DListView" )
+						PunishList:SetParent( Tab )
+						PunishList:SetPos( AdminList:GetWide() + 5, 1 )
+						PunishList:SetSize( (w-40) / 3, h - 130 )
+						PunishList:SetMultiSelect( false )
+						-- Add the columns
+						local Name = PunishList:AddColumn("Name")
+						Name:SetWide(50)
+						local Desc = PunishList:AddColumn("Punishment -- Description")
+						Desc:SetWide(150)
+						local Creator = PunishList:AddColumn("Creator")
+						Creator:SetWide(50)
+						local ChatCmd = PunishList:AddColumn("Chat Cmd")
+						ChatCmd:SetWide(30)
+						-- When you click on a command in the list, run it.
+						PunishList.OnClickLine = function(P,Line,I) RunConsoleCommand("Dmod", Line:GetValue(4), v:Nick()) end
+						-- Fill the list with commands
+						Dmod_FillList(PunishList, "punishment")
+						
+						local OtherList = vgui.Create( "DListView" )
+						OtherList:SetParent( Tab )
+						OtherList:SetPos( AdminList:GetWide() + PunishList:GetWide() + 10, 1 )
+						OtherList:SetSize( (w-40) / 3, h - 130 )
+						OtherList:SetMultiSelect( false )
+						-- Add the columns
+						local Name = OtherList:AddColumn("Name")
+						Name:SetWide(50)
+						local Desc = OtherList:AddColumn("Other -- Description")
+						Desc:SetWide(150)
+						local Creator = OtherList:AddColumn("Creator")
+						Creator:SetWide(50)
+						local ChatCmd = OtherList:AddColumn("Chat Cmd")
+						ChatCmd:SetWide(30)
+						-- When you click on a command in the list, run it.
+						OtherList.OnClickLine = function(P,Line,I) RunConsoleCommand("Dmod", Line:GetValue(4), v:Nick()) end
+						-- Fill the list with commands
+						Dmod_FillList(OtherList, "other")
+						
+					
 						-- Add the tab
 						PlayerTab:AddSheet( v:Nick(), Tab, "gui/silkicons/user", false, false, "Do stuff to "..v:Nick() )
 					end
@@ -142,10 +182,12 @@ if CLIENT then
 	concommand.Add("Dmod_Menu", Dmod_Menu)
 
 	-- Fill the list with commands
-	function Dmod_FillList(List)
+	function Dmod_FillList(List, Type)
 		for _, v in pairs( Dmod.Plugins ) do
 			if (v.ShowInMenu == true) then
-				List:AddLine(v.Name, v.Description, v.Creator, v.ChatCommand)
+				if (v.Type == Type) then
+					List:AddLine(v.Name, v.Description, v.Creator, v.ChatCommand)
+				end
 			end
 		end
 	end

@@ -1,34 +1,36 @@
 -------------------------------------------------------------------------------------------------------------------------
--- Jail
+-- Ammo
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "jail" -- The chat command you need to use this plugin
-DmodPlugin.Name = "Jail" -- The name of the plugin
-DmodPlugin.Description = "Jail someone (without a cage)." -- The description shown in the Menu
+DmodPlugin.ChatCommand = "ammo" -- The chat command you need to use this plugin
+DmodPlugin.Name = "Ammo" -- The name of the plugin
+DmodPlugin.Description = "Give loads of ammo to someone." -- The description shown in the Menu
 DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
-DmodPlugin.Type = "punishment" -- Where in the Menu will it show?
+DmodPlugin.Type = "other" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
 DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
+
 
 local function Dmod_Plugin( ply, Args )
 if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	if (Args[2]) then
 		if (Dmod_FindPlayer(Args[2])) then
 			local T = Dmod_FindPlayer(Args[2])
-			if (T.Jailed == false) then
-				local Pos1 = ply:GetEyeTrace()
-				local Pos2 = Pos1.HitPos + Vector(0,0,10)
-				Dmod_ControlJail( T, true, Pos2, false )
-				Dmod_Message(true, ply, ply:Nick() .. " jailed " .. T:Nick() .. ".")
-			else
-				Dmod_Message(false, ply, T:Nick() .. " is already caged or jailed!")
-			end
+				for k, v in pairs(T:GetWeapons()) do
+					T:GiveAmmo(1337,v:GetPrimaryAmmoType(),true)
+					T:GiveAmmo(1337,v:GetSecondaryAmmoType(),true)
+				end
+			Dmod_Message(true, ply, ply:Nick() .. " gave loads of ammo to " .. T:Nick() .. ".")
 		else
 			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		for k, v in pairs(T:GetWeapons()) do
+			T:GiveAmmo(1337,v:GetPrimaryAmmoType(),true)
+			T:GiveAmmo(1337,v:GetSecondaryAmmoType(),true)
+		end
+		Dmod_Message( true, ply, ply:Nick() .. " got loads of ammo.")
 	end
 end
 end

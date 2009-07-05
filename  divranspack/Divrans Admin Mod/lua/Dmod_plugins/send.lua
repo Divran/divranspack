@@ -6,12 +6,13 @@ DmodPlugin.ChatCommand = "send" -- The chat command you need to use this plugin
 DmodPlugin.Name = "Send" -- The name of the plugin
 DmodPlugin.Description = "" -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
+DmodPlugin.Type = "" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
 DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
-local function Dmod_Send( ply, Args )
+local function Dmod_Plugin( ply, Args )
 if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	if (Args[2] and Args[3]) then
 		if (Dmod_FindPlayer(Args[2]) and Dmod_FindPlayer(Args[3])) then
@@ -29,4 +30,4 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	end
 end
 end
-hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Send)
+hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Plugin )
