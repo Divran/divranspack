@@ -20,15 +20,15 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			local Pos = ply:GetEyeTrace()
 			T:SetPos( Pos.HitPos + Vector(0,0,1) )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
-			Dmod_Message(true, ply, ply:Nick() .. " teleported " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " teleported " .. T:Nick() .. ".","normal")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
 		local Pos = ply:GetEyeTrace()
 		ply:SetPos( Pos.HitPos + Vector(0,0,1) )
 		ply:SetLocalVelocity( Vector( 0,0,0 ) )
-		Dmod_Message( true, ply, ply:Nick() .. " teleported.")
+		Dmod_Message( true, ply, ply:Nick() .. " teleported.","normal")
 	end
 end
 end

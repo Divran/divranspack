@@ -22,15 +22,15 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 				local Reason = Dmod_GetReason(Args, 4)
 				T:Ban(Time, Reason)
 				T:Kick("You've been banned. Reason: '" .. Reason .. "', for " .. Time .. " minutes.")		
-				Dmod_Message(true, ply, ply:Nick() .. " banned " .. T:Nick() .. " with the reason '" .. Reason .. "' for " .. Time .. " minutes.")
+				Dmod_Message(true, ply, ply:Nick() .. " banned " .. T:Nick() .. " with the reason '" .. Reason .. "' for " .. Time .. " minutes.", "punish")
 			else
-				Dmod_Message(false, ply, "You must enter a time!")
+				Dmod_Message(false, ply, "You must enter a time!","warning")
 			end
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end

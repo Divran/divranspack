@@ -17,7 +17,7 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	for k, v in pairs(player.GetAll()) do
 		v:ConCommand("r_cleardecals 1")
 	end
-	Dmod_Message( true, ply, ply:Nick() .. " cleared all the decals.")
+	Dmod_Message( true, ply, ply:Nick() .. " cleared all the decals.","normal")
 end
 end
 hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Plugin )

@@ -21,7 +21,7 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 		ply.Spec = false
 		ply.SpecPos = nil
 	else
-		Dmod_Message( false, ply, "You are not spectating!" )
+		Dmod_Message( false, ply, "You are not spectating!","warning" )
 	end
 
 end

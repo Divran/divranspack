@@ -20,12 +20,12 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			local Value = 160
 			if (Args[3]) then Value = math.Clamp(tonumber(Args[3]), 1, 1000000000) end
 			T:SetJumpPower(Value)
-			Dmod_Message(true, ply, ply:Nick() .. " set " .. T:Nick() .. "'s  jump power to " .. Value )
+			Dmod_Message(true, ply, ply:Nick() .. " set " .. T:Nick() .. "'s jump power to " .. Value,"normal" )
 		else
-			Dmod_Message(false, ply, "No player named '".. Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '".. Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message(false, ply, "You must enter a name!" )
+		Dmod_Message(false, ply, "You must enter a name!","warning" )
 	end
 end
 end

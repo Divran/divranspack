@@ -2,7 +2,6 @@
 -- Team Colors
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
-DmodPlugin.ChatCommand = "" -- The chat command you need to use this plugin
 DmodPlugin.Name = "" -- The name of the plugin
 DmodPlugin.Description = "" -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?

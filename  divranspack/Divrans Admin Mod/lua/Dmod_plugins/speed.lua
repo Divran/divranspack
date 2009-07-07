@@ -21,12 +21,12 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			if (Args[3]) then Value = math.Clamp(tonumber(Args[3]), 1, 1000000000) end
 			T:SetWalkSpeed(Value)
 			T:SetRunSpeed(Value*2)
-			Dmod_Message(true, ply, ply:Nick() .. " set " .. T:Nick() .. "'s movement speed to " .. Value )
+			Dmod_Message(true, ply, ply:Nick() .. " set " .. T:Nick() .. "'s movement speed to " .. Value,"normal" )
 		else
-			Dmod_Message(false, ply, "No player named '".. Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '".. Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message(false, ply, "You must enter a name!" )
+		Dmod_Message(false, ply, "You must enter a name!","warning" )
 	end
 end
 end

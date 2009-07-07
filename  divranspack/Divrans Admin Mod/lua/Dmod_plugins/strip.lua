@@ -18,13 +18,13 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 		if (Dmod_FindPlayer(Args[2])) then
 			local T = Dmod_FindPlayer(Args[2])
 			T:StripWeapons()
-			Dmod_Message(true, ply, ply:Nick() .. " removed " .. T:Nick() .. "'s weapons.")
+			Dmod_Message(true, ply, ply:Nick() .. " removed " .. T:Nick() .. "'s weapons.","punish")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
 		ply:StripWeapons()
-		Dmod_Message( true, ply, ply:Nick() .. " removed his/her own weapons.")
+		Dmod_Message( true, ply, ply:Nick() .. " removed his/her own weapons.","punish")
 	end
 end
 end

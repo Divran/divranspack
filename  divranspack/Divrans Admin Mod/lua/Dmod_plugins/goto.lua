@@ -12,7 +12,7 @@ DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can 
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
-local function Dmod_Goto( ply, Args )
+local function Dmod_Plugin( ply, Args )
 if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	if (Args[2]) then
 		if (Dmod_FindPlayer(Args[2])) then
@@ -21,12 +21,12 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			ply:SetPos( Pos )
 			ply:SetLocalVelocity( Vector( 0,0,0 ) )
 			if (ply != T) then ply:SnapEyeAngles( (T:GetPos() - ply:GetPos()):Angle() ) end
-			Dmod_Message(true, ply, ply:Nick() .. " went to " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " went to " .. T:Nick() .. ".","normal")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name.")
+		Dmod_Message( false, ply, "You must enter a name.","warning")
 	end
 end
 end

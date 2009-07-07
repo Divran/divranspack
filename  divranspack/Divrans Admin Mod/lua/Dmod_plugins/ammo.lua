@@ -21,16 +21,16 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 					T:GiveAmmo(1337,v:GetPrimaryAmmoType(),true)
 					T:GiveAmmo(1337,v:GetSecondaryAmmoType(),true)
 				end
-			Dmod_Message(true, ply, ply:Nick() .. " gave loads of ammo to " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " gave loads of ammo to " .. T:Nick() .. ".", "normal")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.", "warning")
 		end
 	else
-		for k, v in pairs(T:GetWeapons()) do
-			T:GiveAmmo(1337,v:GetPrimaryAmmoType(),true)
-			T:GiveAmmo(1337,v:GetSecondaryAmmoType(),true)
+		for k, v in pairs(ply:GetWeapons()) do
+			ply:GiveAmmo(1337,v:GetPrimaryAmmoType(),true)
+			ply:GiveAmmo(1337,v:GetSecondaryAmmoType(),true)
 		end
-		Dmod_Message( true, ply, ply:Nick() .. " got loads of ammo.")
+		Dmod_Message( true, ply, ply:Nick() .. " got loads of ammo.","warning")
 	end
 end
 end

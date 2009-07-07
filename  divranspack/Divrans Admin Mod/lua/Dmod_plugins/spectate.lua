@@ -23,22 +23,22 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 				ply:Spectate( OBS_MODE_CHASE )
 				ply:SpectateEntity( T )
 				ply:StripWeapons()
-				Dmod_Message( false, ply, "You are now spectating " .. T:Nick() .. " in chase mode." )
+				Dmod_Message( false, ply, "You are now spectating " .. T:Nick() .. " in chase mode.","normal" )
 			elseif (Args[3] == "firstperson") then
 				ply.SpecPos = ply:GetPos() + Vector(0,0,10)
 				ply.Spec = true
 				ply:Spectate( OBS_MODE_IN_EYE )
 				ply:SpectateEntity( T )
 				ply:StripWeapons()
-				Dmod_Message( false, ply, "You are now spectating " .. T:Nick() .. " in first person mode." )
+				Dmod_Message( false, ply, "You are now spectating " .. T:Nick() .. " in first person mode.","normal" )
 			else
-				Dmod_Message( false, ply, "Invalid mode. Modes are: 'chase' and 'firstperson'.")
+				Dmod_Message( false, ply, "Invalid mode. Modes are: 'chase' and 'firstperson'.","warning")
 			end
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end

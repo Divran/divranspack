@@ -17,12 +17,12 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 		if (Dmod_FindPlayer(Args[2])) then
 			local T = Dmod_FindPlayer(Args[2])
 			T.Gimped = false
-			Dmod_Message(true, ply, ply:Nick() .. " ungimped " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " ungimped " .. T:Nick() .. ".","punish")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end

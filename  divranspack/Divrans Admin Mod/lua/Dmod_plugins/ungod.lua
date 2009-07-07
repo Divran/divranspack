@@ -19,14 +19,14 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			local T = Dmod_FindPlayer(Args[2])
 			T:GodDisable()
 			T.GodOn = false
-			Dmod_Message(true, ply, ply:Nick() .. " disabled godmode for " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " disabled godmode for " .. T:Nick() .. ".","normal")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
 		ply:GodDisable()
 		ply.GodOn = false
-		Dmod_Message( true, ply, ply:Nick() .. " disabled godmode for him/herself.")
+		Dmod_Message( true, ply, ply:Nick() .. " disabled godmode for him/herself.","normal")
 	end
 end
 end

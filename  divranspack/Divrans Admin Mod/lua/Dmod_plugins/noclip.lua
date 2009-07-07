@@ -19,18 +19,18 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			local T = Dmod_FindPlayer(Args[2])
 			if (T:GetMoveType() == MOVETYPE_WALK) then
 				T:SetMoveType( MOVETYPE_NOCLIP )
-				Dmod_Message( true, ply, ply:Nick() .. " noclipped " .. T:Nick() .. ".")
+				Dmod_Message( true, ply, ply:Nick() .. " noclipped " .. T:Nick() .. ".","normal")
 			elseif (T:GetMoveType() == MOVETYPE_NOCLIP) then
 				T:SetMoveType( MOVETYPE_WALK )
-				Dmod_Message( true, ply, ply:Nick() .. " unnoclipped " .. T:Nick() .. ".")
+				Dmod_Message( true, ply, ply:Nick() .. " unnoclipped " .. T:Nick() .. ".","normal")
 			else
-				Dmod_Message( false, ply, "Unable to use this command on " .. T:Nick() .. ".")
+				Dmod_Message( false, ply, "Unable to use this command on " .. T:Nick() .. " at this time.","warning")
 			end
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end

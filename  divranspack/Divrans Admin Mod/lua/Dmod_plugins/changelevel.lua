@@ -21,7 +21,7 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			game.ConsoleCommand( "changelevel " .. Args[2] .. "\n" )
 		end
 	else
-		Dmod_Message(false, ply, "You must enter a map name!" )
+		Dmod_Message(false, ply, "You must enter a map name!","warning" )
 	end
 end
 end

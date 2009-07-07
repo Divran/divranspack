@@ -18,13 +18,13 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 		if (Dmod_FindPlayer(Args[2])) then
 			local T = Dmod_FindPlayer(Args[2])
 			T:Spawn()
-			Dmod_Message(true, ply, ply:Nick() .. " respawned " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " respawned " .. T:Nick() .. ".","normal")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
 		ply:Spawn()
-		Dmod_Message( true, ply, ply:Nick() .. " respawned.")
+		Dmod_Message( true, ply, ply:Nick() .. " respawned.","normal")
 	end
 end
 end

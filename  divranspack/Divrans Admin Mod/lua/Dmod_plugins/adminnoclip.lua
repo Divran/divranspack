@@ -18,3 +18,13 @@ local function Dmod_Plugin( ply, Args )
 	end
 end
 hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Plugin )
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Admin Noclip Control
+-------------------------------------------------------------------------------------------------------------------------
+
+function Dmod_ServerAdminNoclip( ply )
+	if AdminNoclip then AdminNoclip = false else AdminNoclip = true end
+	if (AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " enabled Admin Only Noclip.", "normal" ) end
+	if (!AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " disabled Admin Only Noclip.", "normal" ) end
+end

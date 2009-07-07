@@ -16,17 +16,17 @@ local function Dmod_Plugin( ply, Args )
 if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	if (Args[2] and Args[3]) then
 		if (Dmod_FindPlayer(Args[2]) and Dmod_FindPlayer(Args[3])) then
-			local T = FindPlayer(Args[2])
-			local T2 = FindPlayer(Args[3])
+			local T = Dmod_FindPlayer(Args[2])
+			local T2 = Dmod_FindPlayer(Args[3])
 			T:SetPos( T2:GetPos() + T2:GetForward() * 100 )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
-			Dmod_Message(true, ply, ply:Nick() .. " sent " .. T:Nick() .. " to " .. T2:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " sent " .. T:Nick() .. " to " .. T2:Nick() .. ".","normal")
 			if (T != T) then T:SnapEyeAngles( (T2:GetPos() - T:GetPos()):Angle() ) end
 		else
-			Dmod_Message(false, ply, "One of the players were not found!")
+			Dmod_Message(false, ply, "One of the players were not found!","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter two names!")
+		Dmod_Message( false, ply, "You must enter two names!","warning")
 	end
 end
 end

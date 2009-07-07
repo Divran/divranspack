@@ -19,12 +19,12 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			local T = Dmod_FindPlayer(Args[2])
 			T:Kill()
 			T:AddFrags(1)
-			Dmod_Message(true, ply, ply:Nick() .. " slayed " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " slayed " .. T:Nick() .. ".","punish")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end

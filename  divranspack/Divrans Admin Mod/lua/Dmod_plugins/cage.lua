@@ -20,15 +20,15 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			if (T.Jailed == false) then
 				local Pos = T:GetPos() + Vector(0,0,5)
 				Dmod_ControlJail( T, true, Pos, true )
-				Dmod_Message(true, ply, ply:Nick() .. " caged " .. T:Nick() .. "." )
+				Dmod_Message(true, ply, ply:Nick() .. " caged " .. T:Nick() .. ".", "punish" )
 			else
-				Dmod_Message(false, ply, T:Nick() .. " is already caged or jailed!")
+				Dmod_Message(false, ply, T:Nick() .. " is already caged or jailed!","warning")
 			end
 		else
-			Dmod_Message(false, ply, "No player named '".. Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '".. Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message(false, ply, "You must enter a name!" )
+		Dmod_Message(false, ply, "You must enter a name!","warning" )
 	end
 end
 end

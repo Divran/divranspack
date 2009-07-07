@@ -20,12 +20,12 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			T:SetPos( ply:GetPos() + ply:GetForward() * 100 )
 			T:SetLocalVelocity( Vector( 0,0,0 ) )
 			if (ply != T) then T:SnapEyeAngles( (ply:GetPos() - T:GetPos()):Angle() ) end
-			Dmod_Message(true, ply, ply:Nick() .. " brought " .. T:Nick() .. ".")
+			Dmod_Message(true, ply, ply:Nick() .. " brought " .. T:Nick() .. ".","normal")
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end

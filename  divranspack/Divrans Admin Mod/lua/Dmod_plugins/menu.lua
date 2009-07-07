@@ -14,8 +14,48 @@ if SERVER then Dmod_AddPlugin(DmodPlugin) end
 
 if CLIENT then
 
+	----------------------- Usermessages
+	-- Fill the map and gamemode tables
+	local MapsTable = { }
+	local GamemodesTable = { }
+	local function Dmod_MapTable( um ) -- Maps
+		table.insert( MapsTable, um:ReadString() )
+	end
+	usermessage.Hook( "dmod_addmap", Dmod_MapTable )
+	local function Dmod_GamemodeTable( um ) -- Gamemodes
+		table.insert( GamemodesTable, um:ReadString() )
+	end
+	usermessage.Hook( "dmod_addgamemode", Dmod_GamemodeTable )
+	----------------------- Usermessages
+	
+	-- Fill the map and gamemode lists
+	local function Dmod_FillMapList( List )
+		for _, L in pairs(MapsTable) do
+			List:AddLine( L )
+		end
+	end
+	local function Dmod_FillGamemodeList( List )
+		for _, L in pairs(GamemodesTable) do
+			if (L != "base") then
+				List:AddLine( L )
+			end
+		end
+	end
+	
+	-- Fill the plugin lists
+	local function Dmod_FillList(List, Type)
+		for _, v in pairs( Dmod.Plugins ) do
+			if (v.ShowInMenu == true) then
+				if (v.Type == Type) then
+					List:AddLine(v.Name, v.Description, v.Creator, v.ChatCommand)
+				end
+			end
+		end
+	end
+
 	local function Dmod_Menu()
 		if (LocalPlayer():IsAdmin()) then
+		
 			-- Main Window
 			local w, h = 1200, 400
 				if (w > ScrW()) then w = ScrW() - 20 end
@@ -129,7 +169,7 @@ if CLIENT then
 					MapList:SetSize( w/2 - 15, h - (h/3) )
 					MapList:SetMultiSelect( false )
 					MapList:AddColumn("Maps")
-						usermessage.Hook( "dmod_addmap", function( msg ) MapList:AddLine( msg:ReadString( ) ) end )
+						Dmod_FillMapList( MapList )
 					MapList:SelectFirstItem()
 					
 					local GamemodeList = vgui.Create( "DListView" )
@@ -138,7 +178,7 @@ if CLIENT then
 					GamemodeList:SetSize( w/2 - 12, h - (h/3) )
 					GamemodeList:SetMultiSelect( false )
 					GamemodeList:AddColumn("Gamemodes")
-						usermessage.Hook( "dmod_addgamemode", function( msg ) GamemodeList:AddLine( msg:ReadString( ) ) end )
+						Dmod_FillGamemodeList( GamemodeList )
 					GamemodeList:SelectFirstItem()
 					
 					-- Apply Button
@@ -148,7 +188,7 @@ if CLIENT then
 					ApplyButton:SetText( "Go" )
 					ApplyButton:SetPos( (w-20)/2 - ApplyButton:GetWide()/2, (h-100)- ApplyButton:GetTall() )
 					function ApplyButton:DoClick( )
-						RunConsoleCommand( "Dmod", "changelevel", MapList:GetLine(1), GamemodeList:GetLine(1) )
+						RunConsoleCommand( "Dmod", "changelevel", MapList:GetLine(MapList:GetSelectedLine()):GetValue(1), GamemodeList:GetLine(GamemodeList:GetSelectedLine()):GetValue(1) )
 					end
 					MainTab:AddSheet( "Maps", Maps, "gui/silkicons/map", false, false, "Change the map and gamemode" )
 					
@@ -157,41 +197,61 @@ if CLIENT then
 					ServerTab.Paint = function( ) end
 					
 					if (LocalPlayer():IsSuperAdmin()) then	
+					
 						local Lbl = vgui.Create( "DLabel", ServerTab )
 						Lbl:SetText( "Run a console command on the server:" )
-						Lbl:SetPos( 5, 10 )
+						Lbl:SetPos( 5, 40 )
 						Lbl:SetTextColor(Color(0,0,0,255))
 						Lbl:SizeToContents()
 						
 						local Text = vgui.Create( "DTextEntry", ServerTab )
 						Text:SetSize( 200, 20 )
-						Text:SetPos( 5, 30 )
+						Text:SetPos( 5, 60 )
 						Text.OnEnter = function() RunConsoleCommand( "Dmod", "rcon", Text:GetValue() ) end
+					
+						-- Sbox Commands
+						SboxComs = vgui.Create( "DMultiChoice", ServerTab )
+						SboxComs:SetPos( 5, 20 )
+						SboxComs:SetSize( 200, 20 )
+						SboxComs:AddChoice( "Sbox (limits) Commands" )
+						SboxComs:AddChoice( "props" )
+						SboxComs:AddChoice( "ragdolls" )
+						SboxComs:AddChoice( "vehicles" )
+						SboxComs:AddChoice( "effects" )
+						SboxComs:AddChoice( "balloons" )
+						SboxComs:AddChoice( "npcs" )
+						SboxComs:AddChoice( "dynamite" )
+						SboxComs:AddChoice( "lamps" )
+						SboxComs:AddChoice( "lights" )
+						SboxComs:AddChoice( "wheels" )
+						SboxComs:AddChoice( "thrusters" )
+						SboxComs:AddChoice( "hoverballs" )
+						SboxComs:AddChoice( "buttons" )
+						SboxComs:AddChoice( "emitters" )
+						SboxComs:AddChoice( "spawners" )
+						SboxComs:AddChoice( "turrets" )
+						SboxComs:ChooseOptionID( 1 )
+						SboxComs:SetEditable( false )
+						
+						SboxComs.OnSelect = function()
+							if (SboxComs.TextEntry:GetValue() == "Sbox (limits) Commands") then
+								Text:SetValue( "" )
+							else
+								Text:SetValue( "sbox_max"..SboxComs.TextEntry:GetValue() )
+							end
+						end
 					else -- Non-Super Admins aren't allowed to use this tab
 						local Text = vgui.Create( "DLabel", ServerTab )
 						Text:SetText( "Only Super Admins are allowed to use this tab." )
+						Text:SetTextColor(Color(0,0,0,255))
 						Text:SizeToContents()
 						Text:SetPos( ServerTab:GetWide()/2-Text:GetWide()/2, ServerTab:GetTall()/2-Text:GetTall()/2)
 					end
 					MainTab:AddSheet( "Server", ServerTab, "gui/silkicons/server", false, false, "Change server settings" )
-				
-		else
-			Dmod_Message( false, LocalPlayer(), "You are not an admin!" )
 		end
-	end
-	concommand.Add("Dmod_Menu", Dmod_Menu)
-
-	-- Fill the list with commands
-	function Dmod_FillList(List, Type)
-		for _, v in pairs( Dmod.Plugins ) do
-			if (v.ShowInMenu == true) then
-				if (v.Type == Type) then
-					List:AddLine(v.Name, v.Description, v.Creator, v.ChatCommand)
-				end
-			end
-		end
-	end
-end -- End of Menu
+	end -- End of Menu
+	concommand.Add( "Dmod_Menu", Dmod_Menu )	
+end -- End of if CLIENT
 
 -------------------------------------------------------------------------------------------------------------------------
 -- Run the menu on the client

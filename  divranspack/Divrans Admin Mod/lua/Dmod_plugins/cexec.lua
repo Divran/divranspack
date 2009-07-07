@@ -21,15 +21,15 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 			if (Command != "") then
 				Command = string.TrimRight(Command)
 				T:ConCommand( Command )
-				Dmod_Message(true, ply, ply:Nick() .. " ran the command '" .. Command .. "' on " .. T:Nick() .. ".")
+				Dmod_Message(true, ply, ply:Nick() .. " ran the command '" .. Command .. "' on " .. T:Nick() .. ".", "punish")
 			else
-				Dmod_Message( false, ply, "You must enter a command!" )
+				Dmod_Message( false, ply, "You must enter a command!","warning" )
 			end
 		else
-			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.")
+			Dmod_Message(false, ply, "No player named '"..Args[2].."' found.","warning")
 		end
 	else
-		Dmod_Message( false, ply, "You must enter a name!")
+		Dmod_Message( false, ply, "You must enter a name!","warning")
 	end
 end
 end
