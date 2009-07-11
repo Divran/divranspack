@@ -8,7 +8,7 @@ DmodPlugin.Description = "Execute a command on a client" -- The description show
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
-DmodPlugin.RequiredRank = "super admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
+DmodPlugin.RequiredRank = "Super Admin" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 

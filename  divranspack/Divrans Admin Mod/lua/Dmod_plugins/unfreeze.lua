@@ -8,7 +8,7 @@ DmodPlugin.Description = "Unfreeze someone." -- The description shown in the Men
 DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "punishment" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
-DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
+DmodPlugin.RequiredRank = "Admin" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 

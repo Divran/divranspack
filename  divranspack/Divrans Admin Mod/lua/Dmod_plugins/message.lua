@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------------------------------------------------
 local DmodPlugin = {}
 DmodPlugin.Name = "Message" -- The name of the plugin
-DmodPlugin.Description = "" -- The description shown in the Menu
+DmodPlugin.Description = "Code used for displaying messages in the chat." -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?

@@ -8,6 +8,8 @@ AddCSLuaFile("autorun/Dmod_autorun.lua")
 AddCSLuaFile("Dmod_clientsidefile.lua")
 Dmod = { }
 Dmod.Plugins = { }
+entitymeta = FindMetaTable( "Entity" )
+function entitymeta:Nick( ) if ( !self:IsValid( ) ) then return "Console" end end
 
 -------------------------------------------------------------------------------------------------------------------------
 -- Add & Load Plugins
@@ -37,6 +39,8 @@ function Dmod_LoadMaterials()
 	resource.AddFile( path .. "map.vtf" )
 	resource.AddFile( path .. "server.vmt" )
 	resource.AddFile( path .. "server.vtf" )
+	resource.AddFile( path .. "text_list_numbers.vtf" )
+	resource.AddFile( path .. "text_list_numbers.vmt" )
 end
 Dmod_LoadMaterials()
 
@@ -118,33 +122,32 @@ concommand.Add( "Dmod", Dmod_CommandRecieve )
 -- Check Required Rank
 -------------------------------------------------------------------------------------------------------------------------
 function Dmod_CheckRequiredRank( ply, Rank, MessageBool )
-	local PlayerRank = 4
-	if (ply:IsAdmin()) then PlayerRank = 3 end
-	if (ply:IsSuperAdmin()) then PlayerRank = 2 end
-	if (ply:Team() == 1) then PlayerRank = 1 end
-	local Nr = 4
-	Rank = string.lower( Rank )
-	if (Rank == "admin") then Nr = 3 elseif
-	(Rank == "super admin") then Nr = 2 elseif
-	(Rank == "owner") then Nr = 1 end
-	
-	if (PlayerRank <= Nr) then 
-		return true 
-	else 
-		if (MessageBool == true or MessageBool == nil) then Dmod_Message( false, ply, "You are a(n) '" .. team.GetName( ply:Team() ) .. "' and that command requires a rank of '" .. Rank .. "' or higher.", "warning" ) end
-		return false 
+	if (ply:Nick() != "Console") then
+		local PlayerRank = 5
+		if (ply:IsUserGroup("respected")) then PlayerRank = 4 end
+		if (ply:IsUserGroup("admin")) then PlayerRank = 3 end
+		if (ply:IsUserGroup("superadmin")) then PlayerRank = 2 end
+		if (ply:IsUserGroup("superadmin") and ply.Owner == true) then PlayerRank = 1 end
+		local Nr = 5
+		if (Rank == "Respected") then Nr = 4 elseif
+		(Rank == "Admin") then Nr = 3 elseif
+		(Rank == "Super Admin") then Nr = 2 elseif
+		(Rank == "Owner") then Nr = 1 end
+		
+		if (PlayerRank <= Nr) then 
+			return true 
+		else
+		local Group = "Guest"
+		if (ply:IsUserGroup("respected")) then Group = "Respected" end
+		if (ply:IsUserGroup("admin")) then Group = "Admin" end
+		if (ply:IsUserGroup("superadmin")) then Group = "Super Admin" end
+		if (ply:IsUserGroup("superadmin") and ply.Owner == true) then Group = "Owner" end
+			if (MessageBool == true or MessageBool == nil) then Dmod_Message( false, ply, "You are a(n) '" .. Group .. "' and that command requires a rank of '" .. Rank .. "' or higher.", "warning" ) end
+			return false 
+		end
+	elseif (ply:Nick() == "Console" and !ply:IsValid()) then
+		return true
 	end
-end
-	
--------------------------------------------------------------------------------------------------------------------------
--- Get Reason (Used for Ban and Kick)
--------------------------------------------------------------------------------------------------------------------------
-
-function Dmod_GetReason(Args, Num)
-	local Rsn = ""
-	Rsn = table.concat( Args, " ", Num, table.Count(Args))
-	if (string.Trim(Rsn) == "") then Rsn = "No reason" end
-	return Rsn
 end
 
 -------------------------------------------------------------------------------------------------------------------------
@@ -173,31 +176,11 @@ function Dmod_InitialSpawn( ply )
 	ply.Spec = false
 	ply.Ragdolled = false
 	ply.GodOn = false
+	ply.Cloaked = false
 	
 	Dmod_Message( true, ply, ply:Nick() .. " has spawned!", "normal" )
 end
 hook.Add( "PlayerInitialSpawn", "", Dmod_InitialSpawn )
-
--------------------------------------------------------------------------------------------------------------------------
--- A table of weapons & the Arm function
--------------------------------------------------------------------------------------------------------------------------
-
-local Wpns = {}
-function AddWeapons()
-	for k, v in pairs(ents.GetAll()) do
-		if v:IsWeapon() and !table.HasValue( Wpns, v:GetClass() ) then
-			table.insert( Wpns, v:GetClass() )
-		end
-	end
-end
-if SERVER then hook.Add("Think", "AddWeapons", AddWeapons) end
-
-function Dmod_GiveWpns( ply )
-	for _, v in pairs(Wpns) do
-		ply:Give( v )
-	end
-	ply:SelectWeapon("weapon_physgun")
-end
 
 -------------------------------------------------------------------------------------------------------------------------
 -- Several Jail, Cage and Noclip controls:
@@ -216,8 +199,7 @@ function Dmod_ControlJail( TargetPly, Bool, Pos, Cage )
 	if (Cage == true) then
 		Dmod_SpawnCage( TargetPly )
 	end
-	if (TargetPly:GetMoveType() == MOVETYPE_NOCLIP) then TargetPly:SetMoveType( MOVETYPE_WALK ) end
-			
+	if (TargetPly:GetMoveType() == MOVETYPE_NOCLIP) then TargetPly:SetMoveType( MOVETYPE_WALK ) end		
 end
 
 local function Dmod_TeleToJail( ply )

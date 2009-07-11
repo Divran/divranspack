@@ -8,7 +8,7 @@ DmodPlugin.Description = "Allows you to kick someone from your server." -- The d
 DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "administration" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
-DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
+DmodPlugin.RequiredRank = "Admin" -- The rank required to use this command. Can be "guest", "respected", "admin", "super admin", or "owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
@@ -29,3 +29,14 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 end
 end
 hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Plugin )
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Get Reason
+-------------------------------------------------------------------------------------------------------------------------
+
+function Dmod_GetReason(Args, Num)
+	local Rsn = ""
+	Rsn = table.concat( Args, " ", Num, table.Count(Args))
+	if (string.Trim(Rsn) == "") then Rsn = "No reason" end
+	return Rsn
+end

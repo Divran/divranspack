@@ -8,7 +8,7 @@ DmodPlugin.Description = "Give someone new weapons." -- The description shown in
 DmodPlugin.ShowInMenu = true -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "other" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
-DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
+DmodPlugin.RequiredRank = "Respected" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
@@ -29,3 +29,24 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 end
 end
 hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Plugin )
+
+-------------------------------------------------------------------------------------------------------------------------
+-- A table of weapons & the Arm function
+-------------------------------------------------------------------------------------------------------------------------
+
+local Wpns = {}
+function AddWeapons()
+	for k, v in pairs(ents.GetAll()) do
+		if v:IsWeapon() and !table.HasValue( Wpns, v:GetClass() ) then
+			table.insert( Wpns, v:GetClass() )
+		end
+	end
+end
+if SERVER then hook.Add("Think", "AddWeapons", AddWeapons) end
+
+function Dmod_GiveWpns( ply )
+	for _, v in pairs(Wpns) do
+		ply:Give( v )
+	end
+	ply:SelectWeapon("weapon_physgun")
+end

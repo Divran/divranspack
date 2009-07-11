@@ -4,11 +4,11 @@
 local DmodPlugin = {}
 DmodPlugin.ChatCommand = "tp" -- The chat command you need to use this plugin
 DmodPlugin.Name = "Teleport" -- The name of the plugin
-DmodPlugin.Description = "" -- The description shown in the Menu
+DmodPlugin.Description = "Teleport to where you are aiming." -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
-DmodPlugin.RequiredRank = "admin" -- The rank required to use this command. Can be "guest", "admin", "super admin", or "owner".
+DmodPlugin.RequiredRank = "Respected" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 
