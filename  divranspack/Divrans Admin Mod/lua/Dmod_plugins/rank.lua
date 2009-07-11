@@ -100,10 +100,10 @@ function Dmod_AddUser( ply, T, Rank )
 				return
 			end
 			local File = ""
-			if (T:IsUserGroup("Respected")) then File = "respected.txt" end
-			if (T:IsUserGroup("Admin")) then File = "admin.txt" end
-			if (T:IsUserGroup("Super Admin")) then File = "superadmin.txt" end
-			if (T:IsUserGroup("Owner")) then File = "owner.txt" end
+			if (T:IsUserGroup("respected")) then File = "respected.txt" end
+			if (T:IsUserGroup("admin")) then File = "admin.txt" end
+			if (T:IsUserGroup("superadmin")) then File = "superadmin.txt" end
+			if (T:IsUserGroup("owner")) then File = "owner.txt" end
 			local Txt = file.Read("dmod/"..File)
 			local Txt2 = string.Replace( Txt, ID, " " )
 			file.Write("dmod/"..File,Txt2 )

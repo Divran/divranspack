@@ -7,7 +7,7 @@ DmodPlugin.Description = "The base code used for voting." -- The description sho
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
 DmodPlugin.Type = "" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
-DmodPlugin.RequiredRank = "Respected" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
+DmodPlugin.RequiredRank = "" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end
 
 if CLIENT then
