@@ -110,7 +110,7 @@ if CLIENT then
 					PlayerTab:SetPos( 1, 45 )
 					PlayerTab:SetSize( w - 20, h - 100 )
 					
-				if (LocalPlayer():IsUserGroup("respected") or LocalPlayer():IsUserGroup("superadmin") or LocalPlayer():IsUserGroup("Owner") or LocalPlayer():IsAdmin()) then	
+				if (LocalPlayer():IsUserGroup("respected") or LocalPlayer():IsUserGroup("superadmin") or LocalPlayer():IsAdmin()) then	
 						for k, v in pairs(player.GetAll()) do
 							local Tab = vgui.Create( "DPanel" )
 							Tab.Paint = function( ) end
@@ -190,7 +190,7 @@ if CLIENT then
 					local Maps = vgui.Create( "DPanel" )
 					Maps.Paint = function() end
 					
-					if (LocalPlayer():IsUserGroup("admin") or LocalPlayer():IsUserGroup("superadmin") or LocalPlayer():IsUserGroup("Owner") or LocalPlayer():IsAdmin()) then	
+					if (LocalPlayer():IsUserGroup("admin") or LocalPlayer():IsUserGroup("superadmin") or LocalPlayer():IsAdmin()) then	
 					
 						local MapList = vgui.Create( "DListView" )
 						MapList:SetParent( Maps )
@@ -233,7 +233,7 @@ if CLIENT then
 					local ServerTab = vgui.Create( "DPanel" )
 					ServerTab.Paint = function( ) end
 					
-					if (LocalPlayer():IsUserGroup("superadmin") or LocalPlayer():IsUserGroup("Owner") or LocalPlayer():IsSuperAdmin()) then	
+					if (LocalPlayer():IsUserGroup("superadmin") or LocalPlayer():IsSuperAdmin()) then	
 					
 						local Lbl = vgui.Create( "DLabel", ServerTab )
 						Lbl:SetText( "Run a console command on the server:" )
