@@ -6,7 +6,7 @@ DmodPlugin.ChatCommand = "ban" -- The chat command you need to use this plugin
 DmodPlugin.Name = "Ban" -- The name of the plugin
 DmodPlugin.Description = "Ban someone from the server. Syntax example: '!ban <name> <time> <reason>'" -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
-DmodPlugin.Type = ""  -- Where in the Menu will it show?
+DmodPlugin.Type = "administration"  -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
 DmodPlugin.RequiredRank = "Admin" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end

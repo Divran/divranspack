@@ -82,7 +82,7 @@ if CLIENT then
 			Btn:SetSize(Btn:GetWide()+20,Btn:GetTall()+5)
 			Btn:SetPos( 20, i*20+40 )
 			function Btn:DoClick( )
-				RunConsoleCommand( "Dmod_Cast_Vote", i )
+				RunConsoleCommand( "Dmod_Cast_Vote", l )
 			end
 		end
 	end

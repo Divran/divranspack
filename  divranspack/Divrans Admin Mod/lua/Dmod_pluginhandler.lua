@@ -177,6 +177,7 @@ function Dmod_InitialSpawn( ply )
 	ply.Ragdolled = false
 	ply.GodOn = false
 	ply.Cloaked = false
+	ply.Gagged = false
 	
 	Dmod_Message( true, ply, ply:Nick() .. " has spawned!", "normal" )
 end
@@ -217,13 +218,3 @@ local function Dmod_TeleToJail( ply )
 	end
 end
 hook.Add( "PlayerSpawn", "", Dmod_TeleToJail )
-
-
-local function Dmod_DisableNoclip( ply )
-	if ((AdminNoclip == true and !Dmod_CheckRequiredRank( ply, "admin", false )) or ply.Jailed == true) then
-		if (ply.Jailed == true) then Dmod_Message( false, ply, "You are caged or jailed!", "warning" ) end
-		return false
-	end
-		return true
-end
-hook.Add("PlayerNoClip", "", Dmod_DisableNoclip)

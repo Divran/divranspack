@@ -9,7 +9,7 @@ local MapList = {}
 /*
 local Map1 = {}
 Map1.Name = "gm_flatgrass"
-Map1.DeafultPos = Vector(0,0,0)
+Map1.DefaultPos = Vector(0,0,0)
 Map1.SuperAdminPos = nil
 Map1.AdminPos = nil
 Map1.GuestPos = nil
@@ -18,12 +18,12 @@ table.insert( MapList, Map1 )
 -- Paste it below.
 -- Change the number 1 in "Map1", and change the map name and the Vectors.
 -- A good way to get the vectors is by going ingame and typing "getpos" in console.
--- If you set a Vector to "nil", it will cause the players of that rank to spawn at the DeafultPos position instead.
+-- If you set a Vector to "nil", it will cause the players of that rank to spawn at the DefaultPos position instead.
 -------------------------------------------------------------------------------------------------------------------------
 -- Example level. Sets Super Admins to spawn on Coruscant, Admins on Kobol, and guests in the bunker on Hiigara.
 local Map1 = {}
 Map1.Name = "sb_gooniverse"
-Map1.DeafultPos = nil
+Map1.DefaultPos = nil
 Map1.SuperAdminPos = Vector(-233, 367, 4688)
 Map1.AdminPos = Vector(10577, 11032, 4672)
 Map1.GuestPos = Vector(-11241, -2505, -8030)
@@ -36,8 +36,8 @@ function CustomSpawnPoint( ply )
 			-- Check if Super Admin
 			if (ply:IsSuperAdmin()) then
 				if (MapList[k].SuperAdminPos == nil) then
-					-- Spawn at DeafultPos if it isn't nil. If it is nil, spawn at the MAP'S deafult spawn point.
-					if (MapList[k].DeafultPos != nil) then ply:SetPos( MapList[k].DeafultPos ) end
+					-- Spawn at DefaultPos if it isn't nil. If it is nil, spawn at the MAP'S Default spawn point.
+					if (MapList[k].DefaultPos != nil) then ply:SetPos( MapList[k].DefaultPos ) end
 				else
 					-- Spawn at SuperAdminPos
 					ply:SetPos( MapList[k].SuperAdminPos )
@@ -45,8 +45,8 @@ function CustomSpawnPoint( ply )
 			-- Check if Admin
 			elseif (ply:IsAdmin()) then
 				if (MapList[k].AdminPos == nil) then
-					-- Spawn at DeafultPos if it isn't nil. If it is nil, spawn at the MAP'S deafult spawn point.
-					if (MapList[k].DeafultPos != nil) then ply:SetPos( MapList[k].DeafultPos ) end
+					-- Spawn at DefaultPos if it isn't nil. If it is nil, spawn at the MAP'S Default spawn point.
+					if (MapList[k].DefaultPos != nil) then ply:SetPos( MapList[k].DefaultPos ) end
 				else
 					-- Spawn at AdminPos
 					ply:SetPos( MapList[k].AdminPos )
@@ -54,8 +54,8 @@ function CustomSpawnPoint( ply )
 			-- Else if Guest
 			else
 				if (MapList[k].GuestPos == nil) then
-					-- Spawn at DeafultPos if it isn't nil. If it is nil, spawn at the MAP'S deafult spawn point.
-					if (MapList[k].DeafultPos != nil) then ply:SetPos( MapList[k].DeafultPos ) end
+					-- Spawn at DefaultPos if it isn't nil. If it is nil, spawn at the MAP'S Default spawn point.
+					if (MapList[k].DefaultPos != nil) then ply:SetPos( MapList[k].DefaultPos ) end
 				else
 					-- Spawn at GuestPos
 					ply:SetPos( MapList[k].GuestPos )

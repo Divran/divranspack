@@ -310,12 +310,17 @@ if CLIENT then
 					Dmod_FillList(PluginList)
 					
 					local PluginCats = vgui.Create( "DMultiChoice", Plugins )
-					PluginCats:SetPos( (w-40)/2-160, 5 )
+					PluginCats:SetPos( (w-40)/2-160/2, 5 )
 					PluginCats:SetSize( 150, 20 )
 					PluginCats:AddChoice( "All" )
-					PluginCats:AddChoice( "Administration" )
-					PluginCats:AddChoice( "Punishment" )
-					PluginCats:AddChoice( "Other" )
+					PluginCats:AddChoice( "Type - Administration" )
+					PluginCats:AddChoice( "Type - Punishment" )
+					PluginCats:AddChoice( "Type - Other" )
+					PluginCats:AddChoice( "Rank - Guest" )
+					PluginCats:AddChoice( "Rank - Respected" )
+					PluginCats:AddChoice( "Rank - Admin" )
+					PluginCats:AddChoice( "Rank - Super Admin" )
+					PluginCats:AddChoice( "Rank - Owner" )
 					PluginCats:ChooseOptionID( 1 )
 					PluginCats:SetEditable( false )
 					
@@ -325,28 +330,11 @@ if CLIENT then
 						if (id == 2) then Dmod_FillList( PluginList, "administration", true ) end
 						if (id == 3) then Dmod_FillList( PluginList, "punishment", true ) end
 						if (id == 4) then Dmod_FillList( PluginList, "other", true ) end
-					end
-					
-					local PluginSort = vgui.Create( "DMultiChoice", Plugins )
-					PluginSort:SetPos( (w-40)/2, 5 )
-					PluginSort:SetSize( 150, 20 )
-					PluginSort:AddChoice( "All" )
-					PluginSort:AddChoice( "Guest" )
-					PluginSort:AddChoice( "Respected" )
-					PluginSort:AddChoice( "Admin" )
-					PluginSort:AddChoice( "Super Admin" )
-					PluginSort:AddChoice( "Owner" )
-					PluginSort:ChooseOptionID( 1 )
-					PluginSort:SetEditable( false )
-					
-					function PluginSort:OnSelect( id, value, data )
-						PluginList:Clear()
-						if (id == 1) then Dmod_FillList( PluginList ) end
-						if (id == 2) then Dmod_FillList( PluginList, "Guest", true ) end
-						if (id == 3) then Dmod_FillList( PluginList, "Respected", true ) end
-						if (id == 4) then Dmod_FillList( PluginList, "Admin", true ) end
-						if (id == 5) then Dmod_FillList( PluginList, "Super Admin", true ) end
-						if (id == 6) then Dmod_FillList( PluginList, "Owner", true ) end
+						if (id == 5) then Dmod_FillList( PluginList, "Guest", true ) end
+						if (id == 6) then Dmod_FillList( PluginList, "Respected", true ) end
+						if (id == 7) then Dmod_FillList( PluginList, "Admin", true ) end
+						if (id == 8) then Dmod_FillList( PluginList, "Super Admin", true ) end
+						if (id == 9) then Dmod_FillList( PluginList, "Owner", true ) end
 					end
 					MainTab:AddSheet( "Plugin List", Plugins, "gui/silkicons/text_list_numbers", false, false, "A list of all plugins on the server" )
 	end -- End of Menu

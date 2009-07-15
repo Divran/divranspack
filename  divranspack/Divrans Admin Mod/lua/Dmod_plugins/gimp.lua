@@ -76,7 +76,7 @@ local function Dmod_GimpChat( ply )
 	return Gimp
 	end
 end
-hook.Add( "PlayerSay" , "", Dmod_GimpChat )
+hook.Add( "PlayerSay" , "GimpChat", Dmod_GimpChat )
 
 -- "Special" gimps:
 function Dmod_CheckGimps( Gimp, ply ) -- Check if the gimp message is a special one

@@ -6,7 +6,7 @@ DmodPlugin.ChatCommand = "vote" -- The chat command you need to use this plugin
 DmodPlugin.Name = "Custom Vote" -- The name of the plugin
 DmodPlugin.Description = "Start a custom vote. Syntax example: '!vote Question,Answer1,Answer2,Answer3'" -- The description shown in the Menu
 DmodPlugin.ShowInMenu = false -- Do you want this plugin to be shown in the menu at all?
-DmodPlugin.Type = "" -- Where in the Menu will it show?
+DmodPlugin.Type = "other" -- Where in the Menu will it show?
 DmodPlugin.Creator = "Divran" -- Who created it?
 DmodPlugin.RequiredRank = "Respected" -- The rank required to use this command. Can be "Guest", "Respected", "Admin", "Super Admin", or "Owner".
 if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) end

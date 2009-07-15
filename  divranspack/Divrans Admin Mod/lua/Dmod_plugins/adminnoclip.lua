@@ -14,17 +14,22 @@ if SERVER then Dmod_AddPlugin(DmodPlugin) else Dmod_ClientAddPlugin(DmodPlugin) 
 
 local function Dmod_Plugin( ply, Args )
 	if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
-		Dmod_ServerAdminNoclip( ply )
+		if AdminNoclip then AdminNoclip = false else AdminNoclip = true end
+		if (AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " enabled Admin Only Noclip.", "normal" ) end
+		if (!AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " disabled Admin Only Noclip.", "normal" ) end
 	end
 end
 hook.Add( DmodPlugin.Name, DmodPlugin.Name, Dmod_Plugin )
 
 -------------------------------------------------------------------------------------------------------------------------
--- Admin Noclip Control
+-- Noclip Control
 -------------------------------------------------------------------------------------------------------------------------
 
-function Dmod_ServerAdminNoclip( ply )
-	if AdminNoclip then AdminNoclip = false else AdminNoclip = true end
-	if (AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " enabled Admin Only Noclip.", "normal" ) end
-	if (!AdminNoclip) then Dmod_Message( true, ply, ply:Nick() .. " disabled Admin Only Noclip.", "normal" ) end
+local function Dmod_DisableNoclip( ply )
+	if ((AdminNoclip == true and !Dmod_CheckRequiredRank( ply, "admin", false )) or ply.Jailed == true) then
+		if (ply.Jailed == true) then Dmod_Message( false, ply, "You are caged or jailed!", "warning" ) end
+		return false
+	end
+		return true
 end
+hook.Add("PlayerNoClip", "", Dmod_DisableNoclip)
