@@ -54,7 +54,7 @@ function Dmod_AddUser( ply, T, Rank )
 		Dmod_CheckForAdmin()
 		T:Spawn()
 		T:SetPos(Pos)
-		T:SetAngles(Ang)
+		T:SnapEyeAngles(Ang)
 		elseif (Rank == "superadmin") then
 			if (T:IsUserGroup("superadmin")) then
 				Dmod_Message( false, ply, T:Nick() .. " is already a Super Admin!", "warning" )
@@ -67,7 +67,7 @@ function Dmod_AddUser( ply, T, Rank )
 		Dmod_CheckForAdmin()
 		T:Spawn()
 		T:SetPos(Pos)
-		T:SetAngles(Ang)
+		T:SnapEyeAngles(Ang)
 		elseif (Rank == "admin") then
 			if (T:IsUserGroup("Admin")) then
 				Dmod_Message( false, ply, T:Nick() .. " is already an Admin!", "warning" )
@@ -80,7 +80,7 @@ function Dmod_AddUser( ply, T, Rank )
 		Dmod_CheckForAdmin()
 		T:Spawn()
 		T:SetPos(Pos)
-		T:SetAngles(Ang)
+		T:SnapEyeAngles(Ang)
 		elseif (Rank == "respected") then
 			if (T:IsUserGroup("Respected")) then
 				Dmod_Message( false, ply, T:Nick() .. " is already Respected!", "warning" )
