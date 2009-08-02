@@ -47,17 +47,22 @@ if CLIENT then
 	end
 	
 	function Dmod_VoteWindow()
-		local VoteMenu = vgui.Create( "DFrame" )
+		local VoteMenu = vgui.Create( "DListView" )
 		VoteMenu:SetPos( 50, ScrH() / 2 - 150 )
 		VoteMenu:SetSize( 300, VoteNum * 50 )
-		VoteMenu:SetTitle( "[D] Vote Menu" )
 		VoteMenu:SetVisible( true )
-		VoteMenu:SetDraggable( true )
-		VoteMenu:ShowCloseButton( true )
 		VoteMenu:MakePopup()
 		
+		local CancelBtn = vgui.Create( "DButton", VoteMenu )
+		Btn:SetText( "Cancel" )
+		Btn:SizeToContents()
+		Btn:SetPos(0, VoteMenu:GetWide() - Btn:GetWide() - 5 )
+		function Btn:DoClick()
+			VoteMenu:Remove()
+		end
+		
 		local Text1 = vgui.Create( "DLabel", VoteMenu )
-		Text1:SetText( "Place your vote. Duration: " )
+		Text1:SetText( "[D] Vote Menu - Place your vote. Duration: " )
 		Text1:SetTextColor(Color(0,0,0,255))
 		Text1:SizeToContents()
 		Text1:SetPos( 5, 25 )
@@ -82,7 +87,7 @@ if CLIENT then
 			Btn:SetSize(Btn:GetWide()+20,Btn:GetTall()+5)
 			Btn:SetPos( 20, i*20+40 )
 			function Btn:DoClick( )
-				RunConsoleCommand( "Dmod_Cast_Vote", l )
+				RunConsoleCommand( "Dmod_Cast_Vote", i )
 			end
 		end
 	end
