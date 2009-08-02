@@ -54,10 +54,10 @@ if CLIENT then
 		VoteMenu:MakePopup()
 		
 		local CancelBtn = vgui.Create( "DButton", VoteMenu )
-		Btn:SetText( "Cancel" )
-		Btn:SizeToContents()
-		Btn:SetPos(0, VoteMenu:GetWide() - Btn:GetWide() - 5 )
-		function Btn:DoClick()
+		CancelBtn:SetText( "Cancel" )
+		CancelBtn:SizeToContents()
+		CancelBtn:SetPos(0, VoteMenu:GetWide() - Btn:GetWide() - 5 )
+		function CancelBtn:DoClick()
 			VoteMenu:Remove()
 		end
 		
