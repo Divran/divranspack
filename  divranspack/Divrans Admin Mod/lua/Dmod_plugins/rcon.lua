@@ -16,7 +16,7 @@ local function Dmod_Plugin( ply, Args )
 if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 	Command = Dmod_GetReason( Args, 2 )
 
-	if (Command != "") then
+	if (Args[2] != "") then
 		Command = string.TrimRight(Command)
 		game.ConsoleCommand( Command .. "\n" )
 		Dmod_Message( true, ply, ply:Nick() .. " ran the command '" .. Command .. "' on the server.","normal" )

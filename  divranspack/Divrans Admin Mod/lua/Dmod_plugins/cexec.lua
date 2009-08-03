@@ -18,7 +18,7 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 		if (Dmod_FindPlayer(Args[2])) then
 			local T = Dmod_FindPlayer(Args[2])
 			Command = Dmod_GetReason( Args, 3 )
-			if (Command != "") then
+			if (Args[3] != "") then
 				Command = string.TrimRight(Command)
 				T:ConCommand( Command )
 				Dmod_Message(true, ply, ply:Nick() .. " ran the command '" .. Command .. "' on " .. T:Nick() .. ".", "punish")
