@@ -43,7 +43,6 @@ local function Dmod_BlockStuff( ply )
 		Dmod_Message( false, ply, "You are caged or jailed!","warning" )
 		return false 
 	end
-	return true
 end
 hook.Add( "PlayerSpawnProp", "", Dmod_BlockStuff )
 hook.Add( "PlayerSpawnSENT", "", Dmod_BlockStuff )
