@@ -53,7 +53,6 @@ hook.Add( "CanTool", "", Dmod_BlockStuff )
 
 local function Dmod_BlockWeapons( ply )
 	timer.Simple( 0.05, function() if (ply.JailOn == true) then ply:StripWeapons() end end )
-	return true
 end
 hook.Add( "PlayerCanPickupWeapon", "", Dmod_BlockWeapons )
 
