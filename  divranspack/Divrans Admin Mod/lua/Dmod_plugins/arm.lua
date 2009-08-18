@@ -24,7 +24,7 @@ if (Dmod_CheckRequiredRank(ply, DmodPlugin.RequiredRank)) then
 		end
 	else
 		Dmod_GiveWpns( ply )
-		Dmod_Message( true, ply, ply:Nick() .. " gave him/herself new weapons.","warning")
+		Dmod_Message( true, ply, ply:Nick() .. " gave him/herself new weapons.","normal")
 	end
 end
 end
