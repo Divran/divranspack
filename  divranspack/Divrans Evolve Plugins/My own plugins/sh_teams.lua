@@ -79,12 +79,12 @@ if CLIENT then
 -- Recieve Usermessage
 usermessage.Hook( "EVColors", function(um)
 	local Nr = um:ReadLong()
-	print("RECIEVED NR: " .. Nr )
+	--print("RECIEVED NR: " .. Nr )
 	for I=1, Nr do
 		local Str = um:ReadString()
-		print("RECIEVED STRING: " .. Str )
+		--print("RECIEVED STRING: " .. Str )
 		local Col = um:ReadVector()
-		print("RECIEVED VECTOR: " .. tostring(Col))
+		--print("RECIEVED VECTOR: " .. tostring(Col))
 		team.SetUp(I, Str, Color( Col.x, Col.y, Col.z, 255 ) )
 	end
 end )
