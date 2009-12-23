@@ -94,7 +94,7 @@ end
 -- Check if blocked
 __e2setcost(15)
 e2function number entity:sgBlockedByIris()
-	if !validEntity(this) or !this.IsStargate then return nil end
+	if !validEntity(this) or !this.IsStargate then return -1 end
 	local ret = this:IsBlocked(1)
 	if (ret) then
 		return 1
@@ -113,7 +113,7 @@ end
 -- Get Private
 __e2setcost(5)
 e2function number entity:sgPrivate()
-	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return nil end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return -1 end
 	local ret = this:GetPrivate()
 	if (ret) then
 		return 1
@@ -133,7 +133,7 @@ end
 -- Open
 __e2setcost(4)
 e2function number entity:sgOpen()
-	if !validEntity(this) or !this.IsStargate then return nil end
+	if !validEntity(this) or !this.IsStargate then return -1 end
 	local ret = this.IsOpen
 	if (ret) then
 		return 1
@@ -145,7 +145,7 @@ end
 -- Inbound
 __e2setcost(4)
 e2function number entity:sgInbound()
-	if !validEntity(this) or !this.IsStargate then return nil end
+	if !validEntity(this) or !this.IsStargate then return -1 end
 	local ret = !this.Outbound and this.Active
 	if (ret) then
 		return 1
@@ -157,7 +157,7 @@ end
 -- Active
 __e2setcost(4)
 e2function number entity:sgActive()
-	if !validEntity(this) or !this.IsStargate then return nil end
+	if !validEntity(this) or !this.IsStargate then return -1 end
 	local ret = this.Active
 	if (ret) then
 		return 1
