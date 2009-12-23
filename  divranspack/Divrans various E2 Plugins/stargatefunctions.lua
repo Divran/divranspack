@@ -94,7 +94,7 @@ end
 -- Check if blocked
 __e2setcost(15)
 e2function number entity:sgBlockedByIris()
-	if !validEntity(this) or !this.IsStargate then return -1 end
+	if !validEntity(this) or !this.IsStargate then return 0 end
 	local ret = this:IsBlocked(1)
 	if (ret) then
 		return 1
