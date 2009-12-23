@@ -1,3 +1,5 @@
+AddCSLuaFile('stargatefunctions.lua')
+
 -- Stargate Functions by Divran
 if (CLIENT) then
 	-- I couldn't get these working. Oh well.
@@ -6,6 +8,7 @@ if (CLIENT) then
 	E2Helper.Descriptions["sgName(e)"] = "Gets the name."
 	E2Helper.Descriptions["sgSetName(e:s)"] = "Sets the name."
 	E2Helper.Descriptions["sgDial(e:sn)"] = "Causes the gate to dial to the address, with a number input for dial mode (fast/slow)."
+	E2Helper.Descriptions["sgDial(e:en)"] = "Causes the gate to dial to the target gate, with a number input for dial more (fast/slow)."
 	E2Helper.Descriptions["sgAbort(e)"] = "Closes the gate and aborts the dialing sequence."
 	E2Helper.Descriptions["sgSetPrivate(e:n)"] = "Set the gate's private state."
 	E2Helper.Descriptions["sgPrivate(e)"] = "Gets the gate's private state."
@@ -13,7 +16,7 @@ if (CLIENT) then
 	E2Helper.Descriptions["sgTarget(e)"] = "Returns the connected gate."
 	E2Helper.Descriptions["sgActive(e)"] = "Returns 1 if the gate is active.."
 	E2Helper.Descriptions["sgOpen(e)"] = "Returns 1 if the gate is open."
-	E2Helper.Descriptions["sgInbound(e)"] = "Returns 1 if the current wormhole is inbound.")
+	E2Helper.Descriptions["sgInbound(e)"] = "Returns 1 if the current wormhole is inbound."
 end
 
 
@@ -64,7 +67,22 @@ end
 __e2setcost(10)
 e2function void entity:sgDial(string address, number mode)
 	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return nil end
-	this:DialGate(string.upper(address),mode)
+	local dialmode=false
+	if (mode!=0) then
+		dialmode = true
+	end
+	this:DialGate(string.upper(address),dialmode)
+end
+
+-- Dial the gate (with entity input)
+__e2setcost(10)
+e2function void entity:sgDial(entity target, number mode)
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate or !target.IsStargate or target:GetGateAddress() == nil or target:GetGateAddress() == "" or this == target then return nil end
+	local dialmode=false
+	if (mode!=0) then
+		dialmode = true
+	end
+	this:DialGate(target:GetGateAddress(), dialmode)
 end
 
 -- Abort dialing
