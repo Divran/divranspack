@@ -2,7 +2,6 @@ AddCSLuaFile('stargatefunctions.lua')
 
 -- Stargate Functions by Divran
 if (CLIENT) then
-	-- I couldn't get these working. Oh well.
 	E2Helper.Descriptions["sgAddress(e)"] = "Gets the address."
 	E2Helper.Descriptions["sgSetAddress(e:s)"] = "Sets the address."
 	E2Helper.Descriptions["sgName(e)"] = "Gets the name."
