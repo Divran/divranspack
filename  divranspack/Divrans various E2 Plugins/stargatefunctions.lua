@@ -28,8 +28,7 @@ end
 -- Sets the address of the stargate
 __e2setcost(10)
 e2function number entity:sgSetAddress( string address )
-	if !validEntity(this) then return 0 end
-	if !isOwner(self, this) then return 0 end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return 0 end
 	local oldaddress = this:GetGateAddress()
 	this:SetGateAddress(address)
 	local newaddress = this:GetGateAddress()
@@ -43,15 +42,14 @@ end
 -- Gets the name of the stargate
 __e2setcost(5)
 e2function string entity:sgName()
-	if !validEntity(this) then return "" end
+	if !validEntity(this) or !this.IsStargate then return "" end
 	return this:GetGateName()
 end
 
 -- Sets the name of the stargate
 __e2setcost(10)
 e2function number entity:sgSetName( string name )
-	if !validEntity(this) then return 0 end
-	if !isOwner(self, this) then return 0 end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return 0 end
 	local oldname = this:GetGateName()
 	this:SetGateName( name )
 	local newname = this:GetGateName()
@@ -65,23 +63,21 @@ end
 -- Dial the gate
 __e2setcost(10)
 e2function void entity:sgDial(string address, number mode)
-	if !validEntity(this) then return nil end
-	if !isOwner(self, this) then return nil end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return nil end
 	this:DialGate(string.upper(address),mode)
 end
 
 -- Abort dialing
 __e2setcost(10)
 e2function void entity:sgAbort()
-	if !validEntity(this) then return nil end
-	if !isOwner(self, this) then return nil end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate  then return nil end
 	this:AbortDialling()
 end
 
 -- Check if blocked
 __e2setcost(15)
 e2function number entity:sgBlockedByIris()
-	if !validEntity(this) then return nil end
+	if !validEntity(this) or !this.IsStargate then return nil end
 	local ret = this:IsBlocked(1)
 	if (ret) then
 		return 1
@@ -93,16 +89,14 @@ end
 -- Set Private
 __e2setcost(10)
 e2function void entity:sgSetPrivate( number bool )
-	if !validEntity(this) then return nil end
-	if !isOwner(self, this) then return nil end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return nil end
 	this:SetPrivate(bool)
 end
 
 -- Get Private
 __e2setcost(5)
 e2function number entity:sgPrivate()
-	if !validEntity(this) then return nil end
-	if !isOwner(self, this) then return nil end
+	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return nil end
 	local ret = this:GetPrivate()
 	if (ret) then
 		return 1
@@ -114,7 +108,7 @@ end
 -- Get Target
 __e2setcost(4)
 e2function entity entity:sgTarget()
-	if !validEntity(this) then return nil end
+	if !validEntity(this) or !this.IsStargate then return nil end
 	return this.Target
 end
 
@@ -122,7 +116,7 @@ end
 -- Open
 __e2setcost(4)
 e2function number entity:sgOpen()
-	if !validEntity(this) then return nil end
+	if !validEntity(this) or !this.IsStargate then return nil end
 	local ret = this.IsOpen
 	if (ret) then
 		return 1
@@ -134,7 +128,7 @@ end
 -- Inbound
 __e2setcost(4)
 e2function number entity:sgInbound()
-	if !validEntity(this) then return nil end
+	if !validEntity(this) or !this.IsStargate then return nil end
 	local ret = !this.Outbound and this.Active
 	if (ret) then
 		return 1
@@ -146,7 +140,7 @@ end
 -- Active
 __e2setcost(4)
 e2function number entity:sgActive()
-	if !validEntity(this) then return nil end
+	if !validEntity(this) or !this.IsStargate then return nil end
 	local ret = this.Active
 	if (ret) then
 		return 1
