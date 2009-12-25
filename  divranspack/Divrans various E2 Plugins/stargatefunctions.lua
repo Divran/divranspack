@@ -16,9 +16,15 @@ if (CLIENT) then
 	E2Helper.Descriptions["sgActive(e)"] = "Returns 1 if the gate is active.."
 	E2Helper.Descriptions["sgOpen(e)"] = "Returns 1 if the gate is open."
 	E2Helper.Descriptions["sgInbound(e)"] = "Returns 1 if the current wormhole is inbound."
+	E2Helper.Descriptions["sgAsgardSend(e:vvn)"] = "Causes the asgard to teleport from one vector to the other. The number indicates send all/only players."
+	E2Helper.Descriptions["sgRingDialClosest(e)"] = "Causes the ring teleporter to dial the closest ring."
+	E2Helper.Descriptions["sgRingDial(e:s)"] = "Causes the ring teleporter to dial the target address."
+	E2Helper.Descriptions["sgRingAddress(e)"] = "Returns the target ring's address."
+	E2Helper.Descriptions["sgRingSetAddress(e:s)"] = "Sets the ring's address."
 end
 
 
+----- STARGATE
 
 -- Gets the address of the stargate
 __e2setcost(5)
@@ -66,22 +72,14 @@ end
 __e2setcost(10)
 e2function void entity:sgDial(string address, number mode)
 	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate then return nil end
-	local dialmode=false
-	if (mode!=0) then
-		dialmode = true
-	end
-	this:DialGate(string.upper(address),dialmode)
+	this:DialGate(string.upper(address),util.tobool(mode))
 end
 
 -- Dial the gate (with entity input)
 __e2setcost(10)
 e2function void entity:sgDial(entity target, number mode)
 	if !validEntity(this) or !isOwner(self, this) or !this.IsStargate or !target.IsStargate or target:GetGateAddress() == nil or target:GetGateAddress() == "" or this == target then return nil end
-	local dialmode=false
-	if (mode!=0) then
-		dialmode = true
-	end
-	this:DialGate(target:GetGateAddress(), dialmode)
+	this:DialGate(target:GetGateAddress(), util.tobool(mode))
 end
 
 -- Abort dialing
@@ -164,6 +162,41 @@ e2function number entity:sgActive()
 	else
 		return 0
 	end
+end
+
+----- ASGARD
+__e2setcost(15)
+e2function void entity:sgAsgardSend( vector origin, vector destination, number sendall )
+	if !validEntity(this) or this:GetClass() != "transporter" or !isOwner(self, this) then return nil end
+	this.TeleportEverything = util.tobool(sendall)
+	this:Teleport( origin, destination )
+end
+
+----- RINGS
+__e2setcost(10)
+e2function void entity:sgRingDialClosest()
+	if !validEntity(this) or this:GetClass() != "ring_base" or !isOwner(self, this) or this.Busy then return nil end
+	this:Dial("")
+end
+
+__e2setcost(10)
+e2function void entity:sgRingDial( string address )
+	if !validEntity(this) or this:GetClass() != "ring_base" or !isOwner(self, this) or this.Busy then return nil end
+	this:Dial( address )
+end
+
+__e2setcost(4)
+e2function string entity:sgRingAddress()
+	if !validEntity(this) or this:GetClass() != "ring_base" then return "" end
+	return this.Address or ""
+end
+
+__e2setcost(10)
+e2function number entity:sgRingSetAddress( string address )
+	if !validEntity(this) or this:GetClass() != "ring_base" or !isOwner(self, this) or this.Busy then return 0 end
+	self.RingNameEnt = this
+	RingsNamingCallback( self, "", { address } )
+	return 1
 end
 
 __e2setcost(nil)
