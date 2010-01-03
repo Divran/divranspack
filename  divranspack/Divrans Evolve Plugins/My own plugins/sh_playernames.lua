@@ -47,8 +47,17 @@ else
 					
 					local drawPos = pl:GetAttachment( pl:LookupAttachment( "eyes" ) ).Pos:ToScreen()
 					local distance = LocalPlayer():GetShootPos():Distance( pl:GetShootPos() )
-					drawPos.x = drawPos.x - w / 2
-					drawPos.y = drawPos.y - h - 12
+
+					local title = pl:GetNWString("EV_Title")
+					if (title and title != "") then
+						local w2 = surface.GetTextSize( title ) + 6
+						drawPos.y = drawPos.y - h - 20
+						w = math.max(w, w2)
+						h = 38
+					else
+						drawPos.y = drawPos.y - h - 12
+					end
+						drawPos.x = drawPos.x - w / 2
 					
 					local alpha = 128
 					if ( distance > 512 ) then
@@ -76,7 +85,11 @@ else
 					
 					local teamColor = team.GetColor( pl:Team() )
 					teamColor.a = math.Clamp( alpha * 2, 0, 255 )
+					
 					draw.DrawText( pl:Nick(), "ScoreboardText", drawPos.x + 24, drawPos.y + 4, teamColor, 0 )
+					if (title and title != "") then
+						draw.DrawText( title, "ScoreboardText", drawPos.x + 2, drawPos.y + 20, teamColor, 0)
+					end
 				end
 				
 			end
