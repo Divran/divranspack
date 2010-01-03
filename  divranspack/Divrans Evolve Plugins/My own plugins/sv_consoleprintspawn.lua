@@ -20,10 +20,10 @@ function PLUGIN:Call( ply, args )
 end
 
 function PLUGIN:PlayerSpawnedProp( ply, mdl ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned a prop. Model: " .. mdl) end end
-function PLUGIN:PlayerSpawnedVehicle( ply, mdl ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned a vehicle. Model: " .. mdl) end end
-function PLUGIN:PlayerSpawnedNPC( ply, mdl ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned an NPC Model: " .. mdl) end end
+function PLUGIN:PlayerSpawnedVehicle( ply, obj ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned a vehicle. Model: " .. obj:GetModel()) end end
+function PLUGIN:PlayerSpawnedNPC( ply, npc ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned an NPC. Model: " .. npc:GetModel()) end end
 function PLUGIN:PlayerSpawnedEffect( ply, mdl ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned an effect. Model: " .. mdl) end end
 function PLUGIN:PlayerSpawnedRagdoll( ply, mdl ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned a ragdoll. Model: " .. mdl) end end
-function PLUGIN:PlayerSpawnSENT( ply, mdl ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned an entity. Type: " .. mdl) end end
+function PLUGIN:PlayerSpawnedSENT( ply, obj ) if (self.Enabled) then print("[EV] " .. ply:Nick() .. " ("..ply:SteamID()..") spawned an entity. Type: " .. obj:GetClass()) end end
 	
 evolve:RegisterPlugin( PLUGIN )
