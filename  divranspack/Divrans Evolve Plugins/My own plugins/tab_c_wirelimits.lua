@@ -118,6 +118,10 @@ function TAB:Update()
 		v:SetChecked( GetConVar( v.ConVar ):GetInt() > 0 )
 	end
 	
+	for _, v in pairs( self.ConVarCheckboxes ) do
+		v:SetChecked( GetConVar( v.ConVar ):GetInt() > 0 )
+	end
+	
 	if ( LocalPlayer():EV_IsAdmin() ) then
 		self.Block:SetPos( self.Block:GetWide(), 0 )
 	else
@@ -164,7 +168,7 @@ function TAB:Initialize()
 		end
 	end
 	
-	-- these arent needed for this tab..
+	-- these aren't needed for this tab..
 	/*
 	self.Settings = vgui.Create( "DPanelList", self.Container )
 	self.Settings:SetPos( self.LimitsContainer:GetPos() + self.LimitsContainer:GetWide() + 5, 2 )
