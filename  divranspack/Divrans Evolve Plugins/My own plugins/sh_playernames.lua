@@ -31,7 +31,9 @@ else
 	PLUGIN.iconChat = surface.GetTextureID( "gui/silkicons/comments" )
 
 	function PLUGIN:HUDPaint()
-		for _, pl in pairs( player.GetAll() ) do
+		if ( !evolve.installed ) then return end
+		
+		for _, pl in ipairs( player.GetAll() ) do
 			if ( pl != LocalPlayer() ) then
 				local td = { }
 				td.start = LocalPlayer():GetShootPos()
@@ -40,25 +42,17 @@ else
 				
 				if ( !trace.HitWorld and !pl:GetNWBool( "EV_Ghosted", false ) ) then
 					surface.SetFont( "ScoreboardText" )
-					local w = surface.GetTextSize( pl:Nick() ) + 28
+					local w = surface.GetTextSize( pl:Nick() ) + 8 + 20
 					local h = 24
 					
-					local drawPos = pl:GetShootPos():ToScreen()
+					local drawPos = pl:GetAttachment( pl:LookupAttachment( "eyes" ) ).Pos:ToScreen()
 					local distance = LocalPlayer():GetShootPos():Distance( pl:GetShootPos() )
 					drawPos.x = drawPos.x - w / 2
-					drawPos.y = drawPos.y - h - 8
+					drawPos.y = drawPos.y - h - 12
 					
 					local alpha = 128
 					if ( distance > 512 ) then
 						alpha = 128 - math.Clamp( ( distance - 512 ) / ( 2048 - 512 ) * 128, 0, 128 )
-					end
-					
-					-- Make it extra fat C:
-					local title = pl:GetNWString( "EV_Title" )
-					if (title != " " and title and string.len(title) > 0) then
-						w = math.Max( surface.GetTextSize( title ) + 8, surface.GetTextSize( pl:Nick() ) + 28 )
-						h = 38
-						drawPos.y = drawPos.y - 20
 					end
 					
 					surface.SetDrawColor( 0, 0, 0, alpha )
@@ -83,12 +77,8 @@ else
 					local teamColor = team.GetColor( pl:Team() )
 					teamColor.a = math.Clamp( alpha * 2, 0, 255 )
 					draw.DrawText( pl:Nick(), "ScoreboardText", drawPos.x + 24, drawPos.y + 4, teamColor, 0 )
-					
-					-- Draw the custom title
-					if (title != " " and title and string.len(title) > 0) then
-						draw.DrawText( title, "ScoreboardText", drawPos.x + 4, drawPos.y + 20, teamColor, ALIGN_CENTER )
-					end
 				end
+				
 			end
 		end
 	end
