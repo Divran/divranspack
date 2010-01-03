@@ -118,10 +118,6 @@ function TAB:Update()
 		v:SetChecked( GetConVar( v.ConVar ):GetInt() > 0 )
 	end
 	
-	for _, v in pairs( self.ConVarCheckboxes ) do
-		v:SetChecked( GetConVar( v.ConVar ):GetInt() > 0 )
-	end
-	
 	if ( LocalPlayer():EV_IsAdmin() ) then
 		self.Block:SetPos( self.Block:GetWide(), 0 )
 	else
