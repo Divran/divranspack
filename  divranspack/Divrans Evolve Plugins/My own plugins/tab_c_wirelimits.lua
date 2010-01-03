@@ -153,7 +153,7 @@ function TAB:Initialize()
 	end
 	
 	for i, cv in pairs( self.Limits ) do
-		if ( ConVarExists( cv[1] ) ) then
+		--if ( ConVarExists( cv[1] ) ) then
 			local cvSlider = vgui.Create( "DNumSlider", self.Container )
 			cvSlider:SetText( cv[2] )
 			cvSlider:SetWide( self.LimitsContainer:GetWide() / 2 - 20 )
@@ -165,7 +165,7 @@ function TAB:Initialize()
 			self.LimitsContainer:AddItem( cvSlider )
 		
 			table.insert( self.ConVarSliders, cvSlider )
-		end
+		--end
 	end
 	
 	-- these aren't needed for this tab..
