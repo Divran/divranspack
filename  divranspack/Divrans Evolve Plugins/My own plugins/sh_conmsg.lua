@@ -25,7 +25,7 @@ if (SERVER) then
 			end
 		end
 		
-		local String = "[EV] " .. ply:Nick() .. " (" .. ply:SteamID() .. ") spawned " .. what .. "(" .. model .. ")"
+		local String = "[EV] " .. ply:Nick() .. " (" .. ply:SteamID() .. ") spawned " .. what .. " (" .. model .. ")"
 		
 		if (#targets > 0) then
 			-- Send to targets
