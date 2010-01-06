@@ -41,7 +41,7 @@ if (SERVER) then
 	-- Check for spawns
 	function PLUGIN:PlayerSpawnedProp( ply, mdl, obj ) self:SendData( ply, obj ) end
 	function PLUGIN:PlayerSpawnedVehicle( ply, obj ) self:SendData( ply, obj ) end
-	function PLUGIN:PlayerSpawnedNPC( ply, npc ) self:SendData( ply, obj ) end
+	function PLUGIN:PlayerSpawnedNPC( ply, npc ) self:SendData( ply, npc ) end
 	function PLUGIN:PlayerSpawnedEffect( ply, mdl, obj ) self:SendData( ply, obj ) end
 	function PLUGIN:PlayerSpawnedRagdoll( ply, mdl, obj ) self:SendData( ply, obj ) end
 	function PLUGIN:PlayerSpawnedSENT( ply, obj ) self:SendData( ply, obj ) end
