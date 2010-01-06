@@ -16,7 +16,7 @@ if (SERVER) then
 		evolve:Notify( ply, evolve.colors.blue, "Conmsg Print ", evolve.colors.white, "set to: ", evolve.colors.red, tostring(ply.EV_ConmsgEnabled) )
 	end
 	
-	function PLUGIN:SendData( ply, what, model )
+	function PLUGIN:SendData( ply, obj )
 		-- Get targets
 		local targets = {}
 		for _,v in pairs( player.GetAll() ) do
@@ -25,7 +25,7 @@ if (SERVER) then
 			end
 		end
 		
-		local String = "[EV] " .. ply:Nick() .. " (" .. ply:SteamID() .. ") spawned " .. what .. " (" .. model .. ")"
+		local String = "[EV] " .. ply:Nick() .. " (" .. ply:SteamID() .. ") spawned (" .. obj:GetClass() .. ") " .. obj:GetModel()
 		
 		if (#targets > 0) then
 			-- Send to targets
@@ -39,12 +39,12 @@ if (SERVER) then
 	end
 
 	-- Check for spawns
-	function PLUGIN:PlayerSpawnedProp( ply, mdl ) self:SendData( ply, "a prop", mdl ) end
-	function PLUGIN:PlayerSpawnedVehicle( ply, obj ) self:SendData( ply, "a vehicle", obj:GetModel() ) end
-	function PLUGIN:PlayerSpawnedNPC( ply, npc ) self:SendData( ply, "an npc", npc:GetModel() ) end
-	function PLUGIN:PlayerSpawnedEffect( ply, mdl ) self:SendData( ply, "an effect", mdl ) end
-	function PLUGIN:PlayerSpawnedRagdoll( ply, mdl ) self:SendData( ply, "a ragdoll", mdl ) end
-	function PLUGIN:PlayerSpawnedSENT( ply, obj ) self:SendData( ply, "an entity", obj:GetClass() ) end
+	function PLUGIN:PlayerSpawnedProp( ply, mdl, obj ) self:SendData( ply, obj ) end
+	function PLUGIN:PlayerSpawnedVehicle( ply, obj ) self:SendData( ply, obj ) end
+	function PLUGIN:PlayerSpawnedNPC( ply, npc ) self:SendData( ply, obj ) end
+	function PLUGIN:PlayerSpawnedEffect( ply, mdl, obj ) self:SendData( ply, obj ) end
+	function PLUGIN:PlayerSpawnedRagdoll( ply, mdl, obj ) self:SendData( ply, obj ) end
+	function PLUGIN:PlayerSpawnedSENT( ply, obj ) self:SendData( ply, obj ) end
 	
 	-- Enabled by default
 	function PLUGIN:PlayerInitialSpawn( ply )
