@@ -29,7 +29,7 @@ end
 -- Gets the address of the stargate
 __e2setcost(5)
 e2function string entity:sgAddress()
-	if !validEntity(this) then return "" end
+	if !validEntity(this) or !this.IsStargate then return "" end
 	return this:GetGateAddress()
 end
 
