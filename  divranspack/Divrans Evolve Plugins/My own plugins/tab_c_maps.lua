@@ -14,11 +14,11 @@ function TAB:ChangeLevel( what )
 	local gamemode = self.GamemodeList:GetLine(self.GamemodeList:GetSelectedLine()):GetValue(1)
 	if (map and map != "" and gamemode and gamemode != "") then
 		if (what == "both") then			
-			RunConsoleCommand( "changelevel", map, gamemode )
+			RunConsoleCommand( "ev map", map, gamemode )
 		elseif (what == "map") then
-			RunConsoleCommand( "changelevel", map, GAMEMODE.Title)
+			RunConsoleCommand( "ev map", map, GAMEMODE.Title)
 		elseif (what == "gamemode") then
-			RunConsoleCommand( "changelevel", game.GetMap(), gamemode )
+			RunConsoleCommand( "ev map", game.GetMap(), gamemode )
 		end
 	end
 end
