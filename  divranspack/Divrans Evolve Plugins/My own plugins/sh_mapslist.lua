@@ -9,7 +9,20 @@ PLUGIN.Author = "Divran"
 PLUGIN.ChatCommand = nil
 PLUGIN.Usage = nil
 
+if !datastream then require"datastream" end
+
 if (SERVER) then
+	concommand.Add( "ev_changemapandgamemode", function( ply, command, args )
+		if ( ply:EV_IsAdmin() ) then
+			local map = args[1]
+			local gamemode = args[2]
+			evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has changed the map to ", evolve.colors.red, map, evolve.colors.white, " and gamemode to ", evolve.colors.red, gamemode, evolve.colors.white, "." )
+			RunConsoleCommand("changegamemode", map, gamemode)
+		else
+			evolve:Notify( ply, evolve.colors.red, evolve.constants.notallowed )
+		end
+	end)
+
 	function PLUGIN:GetMaps()
 		PLUGIN.Maps = {}
 		PLUGIN.Gamemodes = {}
@@ -32,8 +45,6 @@ if (SERVER) then
 		datastream.StreamToClients( ply, "evolve_sendmaps", { self.Maps, self.Gamemodes } )
 	end
 else
-	if !datastream then require"datastream" end
-
 	evolve.Maps = {}
 	evolve.Gamemodes = {}
 	

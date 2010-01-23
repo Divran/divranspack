@@ -14,11 +14,11 @@ function TAB:ChangeLevel( what )
 	local gamemode = self.GamemodeList:GetLine(self.GamemodeList:GetSelectedLine()):GetValue(1)
 	if (map and map != "" and gamemode and gamemode != "") then
 		if (what == "both") then			
-			RunConsoleCommand( "ev map", map, gamemode )
+			RunConsoleCommand( "ev_changemapandgamemode", map, gamemode )
 		elseif (what == "map") then
-			RunConsoleCommand( "ev map", map, GAMEMODE.Title)
+			RunConsoleCommand( "ev_changemapandgamemode", map, GAMEMODE.Name)
 		elseif (what == "gamemode") then
-			RunConsoleCommand( "ev map", game.GetMap(), gamemode )
+			RunConsoleCommand( "ev_changemapandgamemode", game.GetMap(), gamemode )
 		end
 	end
 end
@@ -77,6 +77,22 @@ function TAB:Initialize()
 	function self.GamemodeButton:DoClick()
 		TAB:ChangeLevel( "gamemode" )
 	end
+	
+	
+	self.Block = vgui.Create( "DFrame", self.Container )
+	self.Block:SetDraggable( false )
+	self.Block:SetTitle( "" )
+	self.Block:ShowCloseButton( false )
+	self.Block:SetPos( 0, 0 )
+	self.Block:SetSize( self.Container:GetWide(), self.Container:GetTall() )
+	self.Block.Paint = function()
+		surface.SetDrawColor( 46, 46, 46, 255 )
+		surface.DrawRect( 0, 0, self.Block:GetWide(), self.Block:GetTall() )
+		
+		draw.SimpleText( "You need the Mapst List Plugin ('sh_mapslist.lua') for this tab to work.", "ScoreboardText", self.Block:GetWide() / 2, self.Block:GetTall() / 2 - 20, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
+	end
+	
+	if ( table.Count(evolve.Maps) ) then self.Block:SetPos( self.Block:GetWide(), 0 ) end
 end
 
 evolve:RegisterMenuTab( TAB )
