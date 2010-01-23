@@ -17,7 +17,7 @@ if (SERVER) then
 			local map = args[1]
 			local gamemode = args[2]
 			evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has changed the map to ", evolve.colors.red, map, evolve.colors.white, " and gamemode to ", evolve.colors.red, gamemode, evolve.colors.white, "." )
-			RunConsoleCommand("changegamemode", map, gamemode)
+			timer.Simple( 0.5, function() RunConsoleCommand("changegamemode", map, gamemode) end)
 		else
 			evolve:Notify( ply, evolve.colors.red, evolve.constants.notallowed )
 		end
