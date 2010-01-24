@@ -15,7 +15,7 @@ function PLUGIN:Call( ply, args )
 		if (string.len(title) > 25) then title = string.Left(title,23) .. ".." end
 		ply:SetProperty( "Title", title)
 		ply:SetNWString( "EV_Title", title )
-		ply:CommitProperties()
+		evolve:SavePlayerInfo()
 		if (string.Trim(title) != "") then
 			evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " changed their title to ", evolve.colors.blue, title, evolve.colors.white, "." )
 		else
