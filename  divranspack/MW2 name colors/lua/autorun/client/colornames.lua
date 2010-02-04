@@ -48,7 +48,7 @@ local function ColorNames( ply, Txt, TeamChat, IsDead )
 						table.insert( Msg, string.Right(str, string.len(str)-1) )
 					else
 						table.insert( Msg, team.GetColor( ply:Team() ) )
-						table.insert( Msg, string.Right(str, string.len(str)) )
+						table.insert( Msg, "^" .. string.Right(str, string.len(str)) )
 					end
 			end
 			
