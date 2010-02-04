@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Color Names"
+	"version"     "1.0"
+	"author_name" "Divran"
+	"author_url"  ""
+	"info"        "Lets you use ^# to change the color of your name in chat."
+	"override"    "0"
+}
