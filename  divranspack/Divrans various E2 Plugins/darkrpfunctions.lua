@@ -1,6 +1,6 @@
 e2function string entity:shipmentContents()
 	if (!validEntity(this) or this:GetClass() != "spawned_shipment") then return "" end
-	return this.dt.contents
+	return CustomShipments[this.dt.contents]["name"]
 end
 
 e2function number entity:shipmentAmount()
