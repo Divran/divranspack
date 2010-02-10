@@ -1,6 +1,6 @@
 ENT.Type 			= "anim"  
 ENT.Base 			= "base_gmodentity"     
-ENT.PrintName		= "Gcombat Base Bullet"  
+ENT.PrintName		= "PewPew Base Bullet"  
 ENT.Author			= "Divran"  
 ENT.Contact			= ""  
 ENT.Purpose			= ""  

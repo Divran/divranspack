@@ -23,10 +23,10 @@ BULLET.Spread = 0.3
 -- Damage
 BULLET.DamageType = "PointDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 8
-BULLET.Radius = 60
-BULLET.RangeDamageMul = 0.8
+BULLET.Radius = nil
+BULLET.RangeDamageMul = nil
 BULLET.PlayerDamageRadius = 60
-BULLET.PlayerDamage = 50
+BULLET.PlayerDamage = 6
 
 -- Other
 BULLET.Reloadtime = 0.06

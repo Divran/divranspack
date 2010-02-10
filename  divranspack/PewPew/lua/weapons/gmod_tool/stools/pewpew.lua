@@ -48,7 +48,7 @@ if (SERVER) then
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
 			-- Update it
-			self.ent:SetUsedBullet( bullet )
+			traceent:SetUsedBullet( bullet )
 			ply:ChatPrint("PewPew Cannon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
@@ -84,7 +84,7 @@ if (SERVER) then
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
 			-- Update it
-			self.ent:SetUsedBullet( bullet )
+			traceent:SetUsedBullet( bullet )
 			ply:ChatPrint("PewPew Weapon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
@@ -123,13 +123,11 @@ else
 		CPanel:ClearControls()
 		CPanel:AddHeader()
 		CPanel:AddDefaultControls()
-		
 		CPanel:AddControl("Header", { Text = "#Tool_pewpew_name", Description = "#Tool_pewpew_desc" })
 		
 		local Ctype = {Label = "#Tool_turret_type", MenuButton = 0, Options={}}
 		for _, blt in pairs( pewpew.bullets ) do
 			if (blt.Name) then
-				--print("ADDED BULLET TO TOOL LIST: " .. blt.Name)
 				Ctype["Options"]["#" .. blt.Name]	= { pewpew_bulletname = blt.Name }
 			end
 		end

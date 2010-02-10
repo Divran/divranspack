@@ -37,10 +37,11 @@ function ENT:FireBullet()
 		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x/2 + bulletboxsize.x/2 + 50)
 		ent:SetPos( Pos )
 		-- Add random angle offset
-		local num = self.Bullet.Spread
+		local num = self.Bullet.Spread or 0
 		local randomang = Angle(0,0,0)
 		if (num) then
-			randomang = Angle( math.random(-num,num), math.random(-num,num), math.random(-num,num) )
+			print("random: " .. math.Rand(-num,num))
+			randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
 		end	
 		ent:SetAngles( self.Entity:GetAngles() + randomang )
 		-- Spawn
