@@ -1,38 +1,42 @@
--- Basic Cannon
+-- Railgun
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Cannon"
+BULLET.Name = "Railgun"
 
 -- Appearance
-BULLET.Model = "models/combatmodels/tankshell.mdl"
+BULLET.Model = "models/combatmodels/tankshell_120mm.mdl"
 BULLET.Material = nil
-BULLET.Color = nil
-BULLET.Trail = nil
+BULLET.Color = Color( 0, 255, 255, 255 )
+BULLET.Trail = { StartSize = 40,
+				 EndSize = 35,
+				 Length = 1,
+				 Texture = "trails/laser.vmt",
+				 Color = Color( 0, 255, 255, 255 ) }
 
 -- Effects / Sounds
-BULLET.FireSound = "arty/37mm.wav"
-BULLET.ExplosionSound = "weapons/explode3.wav"
-BULLET.FireEffect = "cannon_flare"
-BULLET.ExplosionEffect = "big_splosion"
+BULLET.FireSound = "LightDemon/Railgun.wav"
+BULLET.ExplosionSound = nil
+BULLET.FireEffect = nil
+BULLET.ExplosionEffect = "gcombat_explosion"
 
 -- Movement
-BULLET.Speed = 50
-BULLET.PitchChange = 0.2
-BULLET.RecoilForce = 500
-BULLET.Spread = 0
+BULLET.Speed = 90
+BULLET.PitchChange = 0.001
+BULLET.RecoilForce = 65
+BULLET.Spread = 0.15
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 250
-BULLET.Radius = 300
-BULLET.RangeDamageMul = 0.8
-BULLET.PlayerDamage = 150
-BULLET.PlayerDamageRadius = 300
+BULLET.Damage = 80
+BULLET.Radius = 50
+BULLET.RangeDamageMul = 0.5
+BULLET.PlayerDamageRadius = 58
+BULLET.PlayerDamage = 70
 
 -- Other
-BULLET.Reloadtime = 3.5
+BULLET.Reloadtime = 0.6
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)

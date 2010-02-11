@@ -20,9 +20,9 @@ function ENT:SetUsedBullet( BULLET )
 end
 
 function ENT:FireBullet()
-	if (self.FireOverride) then
+	if (self.Bullet.FireOverride) then
 		-- Allows you to override the fire function
-		self.Bullet:Fire()
+		self.Bullet:Fire( self )
 	else
 		-- Create Bullet
 		local ent = ents.Create( "pewpew_base_bullet" )
@@ -40,13 +40,26 @@ function ENT:FireBullet()
 		local num = self.Bullet.Spread or 0
 		local randomang = Angle(0,0,0)
 		if (num) then
-			print("random: " .. math.Rand(-num,num))
 			randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
 		end	
 		ent:SetAngles( self.Entity:GetAngles() + randomang )
 		-- Spawn
 		ent:Spawn()
 		ent:Activate()
+		
+		-- Trail
+		if (self.Bullet.Trail) then
+			local trail = self.Bullet.Trail
+			util.SpriteTrail( ent, 0, trail.Color, false, trail.StartSize, trail.EndSize, trail.Length, 1/(trail.StartSize+trail.EndSize)*0.5, trail.Texture )
+		end
+		-- Material
+		if (self.Bullet.Material) then
+			ent:SetMaterial( self.Bullet.Material )
+		end
+		-- Color
+		if (self.Bullet.Color) then
+			ent:SetColor( self.Bullet.Color )
+		end
 		
 		-- Recoil
 		if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
