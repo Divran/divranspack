@@ -8,7 +8,9 @@ end
 -- Returns the health of the entity
 e2function number entity:pewHealth()
 	if (!validPhysics(this)) then return 0 end
-	if (!this.pewpewHealth) then return 0 end
+	if (!this.pewpewHealth) then 
+		pewpew:SetHealth( this )
+	end
 	return this.pewpewHealth
 end
 

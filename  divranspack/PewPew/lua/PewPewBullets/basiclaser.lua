@@ -33,6 +33,7 @@ BULLET.PlayerDamage = nil
 
 -- Other
 BULLET.Reloadtime = 0.7
+BULLET.NumberOfSlices = 4
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -53,7 +54,7 @@ function BULLET:Fire( self )
 	local trace = util.TraceLine( tr )
 	
 	-- Deal damage
-	local HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, 4 )
+	local HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices )
 	
 	-- If the first trace didn't hit anything..
 	if (!HitPos) then
@@ -65,7 +66,7 @@ function BULLET:Fire( self )
 		trace = util.TraceLine( tr )
 		
 		-- Deal damage
-		HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, 4 )
+		HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices  )
 	end
 	
 	-- Effects

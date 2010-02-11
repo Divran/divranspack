@@ -34,6 +34,7 @@ BULLET.PlayerDamageRadius = 60
 
 -- Other
 BULLET.Reloadtime = 0.1
+BULLET.NumberOfSlices = nil
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon will run these instead. Use these functions to do stuff which is not possible with the above variables)

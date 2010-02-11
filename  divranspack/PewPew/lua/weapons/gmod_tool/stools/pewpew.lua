@@ -27,7 +27,7 @@ if (SERVER) then
 	function TOOL:CreateCannon( trace, bullet )
 		self.ent = ents.Create( "pewpew_base_cannon" )
 		if (!self.ent:IsValid()) then return end
-		self.ent:SetUsedBullet( bullet )
+		self.ent:SetOptions( bullet )
 		self.ent:SetModel( self.CannonModel )
 		self.ent:SetPos( trace.HitPos + trace.HitNormal * 4 )
 		self.ent:SetAngles( trace.HitNormal:Angle() + Angle( 90, 0, 0 ) )
@@ -48,7 +48,7 @@ if (SERVER) then
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
 			-- Update it
-			traceent:SetUsedBullet( bullet )
+			traceent:SetOptions( bullet )
 			ply:ChatPrint("PewPew Cannon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
@@ -84,7 +84,7 @@ if (SERVER) then
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
 			-- Update it
-			traceent:SetUsedBullet( bullet )
+			traceent:SetOptions( bullet )
 			ply:ChatPrint("PewPew Weapon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one

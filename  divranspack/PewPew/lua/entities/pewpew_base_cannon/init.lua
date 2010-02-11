@@ -15,8 +15,8 @@ function ENT:Initialize()
 	self.Firing = false
 end
 
-function ENT:SetUsedBullet( BULLET )
-		self.Bullet = BULLET
+function ENT:SetOptions( BULLET )
+	self.Bullet = BULLET
 end
 
 function ENT:FireBullet()
@@ -27,14 +27,15 @@ function ENT:FireBullet()
 		-- Create Bullet
 		local ent = ents.Create( "pewpew_base_bullet" )
 		if (!ent or !ent:IsValid()) then return end
+		
 		-- Set Model
 		ent:SetModel( self.Bullet.Model )
 		-- Set used bullet
-		ent:SetUsedBullet( self.Bullet )
+		ent:SetOptions( self.Bullet )
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x/2 + bulletboxsize.x/2 + 50)
+		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x/2 + bulletboxsize.x/2 + 10)
 		ent:SetPos( Pos )
 		-- Add random angle offset
 		local num = self.Bullet.Spread or 0
@@ -47,23 +48,9 @@ function ENT:FireBullet()
 		ent:Spawn()
 		ent:Activate()
 		
-		-- Trail
-		if (self.Bullet.Trail) then
-			local trail = self.Bullet.Trail
-			util.SpriteTrail( ent, 0, trail.Color, false, trail.StartSize, trail.EndSize, trail.Length, 1/(trail.StartSize+trail.EndSize)*0.5, trail.Texture )
-		end
-		-- Material
-		if (self.Bullet.Material) then
-			ent:SetMaterial( self.Bullet.Material )
-		end
-		-- Color
-		if (self.Bullet.Color) then
-			ent:SetColor( self.Bullet.Color )
-		end
-		
 		-- Recoil
 		if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
-			self.Entity:GetPhysicsObject():AddVelocity( self.Entity:GetUp() * -self.Bullet.RecoilForce )
+			ent:GetPhysicsObject():AddVelocity( self.Entity:GetUp() * -self.Bullet.RecoilForce )
 		end
 		
 		-- Sound

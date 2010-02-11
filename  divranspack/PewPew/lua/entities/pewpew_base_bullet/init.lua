@@ -12,10 +12,28 @@ function ENT:Initialize()
 		self.Entity:SetMoveType( MOVETYPE_NONE )
 		self.Entity:SetSolid( SOLID_VPHYSICS )    
 		self.FlightDirection = self.Entity:GetUp()
+		self.Exploded = false
+		
+		-- Trail
+		if (self.Bullet.Trail) then
+			local trail = self.Bullet.Trail
+			util.SpriteTrail( self.Entity, 0, trail.Color, false, trail.StartSize, trail.EndSize, trail.Length, 1/(trail.StartSize+trail.EndSize)*0.5, trail.Texture )
+		end
+		
+		-- Material
+		if (self.Bullet.Material) then
+			self.Entity:SetMaterial( self.Bullet.Material )
+		end
+		
+		-- Color
+		if (self.Bullet.Color) then
+			local C = self.Bullet.Color
+			self.Entity:SetColor( C.r, C.g, C.b, 255 )
+		end
 	end
 end   
 
-function ENT:SetUsedBullet( BULLET )
+function ENT:SetOptions( BULLET )
 	self.Bullet = BULLET
 end
 
@@ -36,7 +54,8 @@ function ENT:Think()
 		tr.filter = self.Entity
 		local trace = util.TraceLine( tr )
 		
-		if (trace.Hit) then	
+		if (trace.Hit and !self.Exploded) then	
+			self.Exploded = true
 			if (self.Bullet.ExplodeOverride) then
 				-- Allows you to override the Explode function
 				self.Bullet:Explode( self, trace )
@@ -55,9 +74,7 @@ function ENT:Think()
 					util.Effect( self.Bullet.ExplosionEffect, effectdata )
 				end
 				
-				-- Remove the bullet
-				self.Entity:Remove()
-								
+					
 				-- GCombat Damage
 				local damagetype = self.Bullet.DamageType
 				if (!damagetype) then return end
@@ -65,12 +82,17 @@ function ENT:Think()
 					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
 				elseif (damagetype == "PointDamage") then
 					pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
+				elseif (damagetype == "SliceDamage") then
+					pewpew:SliceDamage( trace, self.FlightDirection, Damage, self.Bullet.NumberOfSlices or 1 )
 				end
+				
+				-- Remove the bullet
+				self.Entity:Remove()
 			end
+		else			
+			-- Run more often!
+			self.Entity:NextThink( CurTime() )
+			return true
 		end
-		
-		-- Run more often!
-		self.Entity:NextThink( CurTime() )
-		return true
 	end
 end
