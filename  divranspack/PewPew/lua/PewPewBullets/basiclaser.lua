@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Laser"
+BULLET.AdminOnly = false
+BULLET.SuperAdminOnly = false
 
 -- Appearance
 BULLET.Model = nil
@@ -12,7 +14,7 @@ BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = "Lasers/Small/Laser.wav"
+BULLET.FireSound = {"Lasers/Small/Laser.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "ISSmallPulseBeam"
@@ -34,6 +36,8 @@ BULLET.PlayerDamage = nil
 -- Other
 BULLET.Reloadtime = 0.7
 BULLET.NumberOfSlices = 4
+BULLET.Ammo = 0
+BULLET.AmmoReloadtime = 0
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -70,15 +74,15 @@ function BULLET:Fire( self )
 	end
 	
 	-- Effects
-	self:EmitSound( self.Bullet.FireSound )
+	self:EmitSound( self.Bullet.FireSound[1] )
 	local effectdata = EffectData()
 	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 10000) )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 end
 
--- Initialize (Is called when the entity initializes)
-BULLET.InitOverride = false
+-- Initialize (Is called when the bullet initializes)
+BULLET.InitializeOverride = false
 function BULLET:InitializeFunc( self )   
 	-- Nothing
 end

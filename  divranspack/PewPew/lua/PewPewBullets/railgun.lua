@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Railgun"
+BULLET.AdminOnly = false
+BULLET.SuperAdminOnly = false
 
 -- Appearance
 BULLET.Model = "models/combatmodels/tankshell_120mm.mdl"
@@ -16,7 +18,7 @@ BULLET.Trail = { StartSize = 40,
 				 Color = Color( 0, 255, 255, 255 ) }
 
 -- Effects / Sounds
-BULLET.FireSound = "LightDemon/Railgun.wav"
+BULLET.FireSound = {"LightDemon/Railgun.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "gcombat_explosion"
@@ -38,6 +40,8 @@ BULLET.PlayerDamage = 70
 -- Other
 BULLET.Reloadtime = 0.6
 BULLET.NumberOfSlices = nil
+BULLET.Ammo = 0
+BULLET.AmmoReloadtime = 0
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -48,8 +52,8 @@ function BULLET:Fire( self )
 	-- Nothing
 end
 
--- Initialize (Is called when the entity initializes)
-BULLET.InitOverride = false
+-- Initialize (Is called when the bullet initializes)
+BULLET.InitializeOverride = false
 function BULLET:InitializeFunc( self )   
 	-- Nothing
 end

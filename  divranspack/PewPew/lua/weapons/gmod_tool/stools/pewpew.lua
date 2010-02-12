@@ -19,20 +19,21 @@ if (SERVER) then
 
 	
 	function TOOL:GetBulletName()
-		local ent = self:GetClientInfo("bulletname") or nil
-		if (!ent) then return end
-		return ent
+		local name = self:GetClientInfo("bulletname") or nil
+		if (!name) then return end
+		return name
 	end
 	
-	function TOOL:CreateCannon( trace, bullet )
-		self.ent = ents.Create( "pewpew_base_cannon" )
-		if (!self.ent:IsValid()) then return end
-		self.ent:SetOptions( bullet )
-		self.ent:SetModel( self.CannonModel )
-		self.ent:SetPos( trace.HitPos + trace.HitNormal * 4 )
-		self.ent:SetAngles( trace.HitNormal:Angle() + Angle( 90, 0, 0 ) )
-		self.ent:Spawn()
-		self.ent:Activate()
+	function TOOL:CreateCannon( Pos, Ang, Model, Bullet )
+		ent = ents.Create( "pewpew_base_cannon" )
+		if (!ent:IsValid()) then return end
+		ent:SetOptions(Bullet)
+		ent:SetPos( Pos )
+		ent:SetAngles( Ang )
+		ent:SetModel( Model )
+		ent:Spawn()
+		ent:Activate()
+		return ent
 	end
 	
 	function TOOL:LeftClick( trace )
@@ -52,16 +53,18 @@ if (SERVER) then
 			ply:ChatPrint("PewPew Cannon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
-			self:CreateCannon( trace, bullet )
-		
-			local weld = constraint.Weld( self.ent, trace.Entity, 0, trace.PhysicsBone, 0 )
-			local nocollide = constraint.NoCollide( self.ent, trace.Entity, 0, trace.PhysicsBone )
+			local ent = self:CreateCannon( trace.HitPos + trace.HitNormal * 4, trace.HitNormal:Angle() + Angle(90,0,0), self.CannonModel, bullet )
+			
+			if (!traceent:IsWorld() and !traceent:IsPlayer()) then
+				local weld = constraint.Weld( ent, trace.Entity, 0, trace.PhysicsBone, 0 )
+				local nocollide = constraint.NoCollide( ent, trace.Entity, 0, trace.PhysicsBone )
+			end
 				
-			ply:AddCount( "pewpew", self.ent )
-			ply:AddCleanup ( "pewpew", self.ent )
+			ply:AddCount("pewpew",ent)
+			ply:AddCleanup ( "pewpew", ent )
 
 			undo.Create( "pewpew" )
-				undo.AddEntity( self.ent )
+				undo.AddEntity( ent )
 				undo.AddEntity( weld )
 				undo.AddEntity( nocollide )
 				undo.SetPlayer( ply )
@@ -88,13 +91,13 @@ if (SERVER) then
 			ply:ChatPrint("PewPew Weapon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
-			self:CreateCannon( trace, bullet )
+			local ent = self:CreateCannon( trace.HitPos + trace.HitNormal * 4, trace.HitNormal:Angle() + Angle(90,0,0), self.CannonModel, bullet )
 				
-			ply:AddCount( "pewpew", self.ent )
-			ply:AddCleanup ( "pewpew", self.ent )
+			ply:AddCount("pewpew",ent)
+			ply:AddCleanup ( "pewpew", ent )
 
 			undo.Create( "pewpew" )
-				undo.AddEntity( self.ent )
+				undo.AddEntity( ent )
 				undo.SetPlayer( ply )
 			undo.Finish()
 				
@@ -109,7 +112,7 @@ if (SERVER) then
 				self:GetOwner():ChatPrint("GCombat Cannon model set to: " .. self.CannonModel)
 			end
 		end
-	end
+	end	
 else
 	language.Add( "Tool_pewpew_name", "PewTool" )
 	language.Add( "Tool_pewpew_desc", "Used to spawn PewPew weaponry." )

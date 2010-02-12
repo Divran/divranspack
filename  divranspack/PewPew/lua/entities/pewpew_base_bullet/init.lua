@@ -68,13 +68,23 @@ function ENT:Think()
 				-- Effects
 				if (self.Bullet.ExplosionEffect) then
 					local effectdata = EffectData()
-					effectdata:SetOrigin( trace.HitPos )
-					effectdata:SetStart( trace.HitPos )
+					effectdata:SetOrigin( trace.HitPos + trace.HitNormal * 5 )
+					effectdata:SetStart( trace.HitPos + trace.HitNormal * 5 )
 					effectdata:SetNormal( trace.HitNormal )
 					util.Effect( self.Bullet.ExplosionEffect, effectdata )
 				end
 				
-					
+				-- Sounds
+				if (self.Bullet.ExplosionSound) then
+					local soundpath = ""
+					if (table.Count(self.Bullet.ExplosionSound) > 1) then
+						soundpath = table.Random(self.Bullet.ExplosionSound)
+					else
+						soundpath = self.Bullet.ExplosionSound[1]
+					end
+					WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
+				end
+						
 				-- GCombat Damage
 				local damagetype = self.Bullet.DamageType
 				if (!damagetype) then return end

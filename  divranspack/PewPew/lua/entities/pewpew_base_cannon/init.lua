@@ -8,7 +8,7 @@ function ENT:Initialize()
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
 	self.Inputs = Wire_CreateInputs( self.Entity, { "Fire" } )
-	self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire" })
+	self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo" })
 	
 	self.CanFire = true
 	self.LastFired = 0
@@ -17,6 +17,9 @@ end
 
 function ENT:SetOptions( BULLET )
 	self.Bullet = BULLET
+	self.Ammo = self.Bullet.Ammo
+	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
 
 function ENT:FireBullet()
@@ -34,8 +37,8 @@ function ENT:FireBullet()
 		ent:SetOptions( self.Bullet )
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x/2 + bulletboxsize.x/2 + 10)
+		--local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
+		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x * (2/3) + 10)
 		ent:SetPos( Pos )
 		-- Add random angle offset
 		local num = self.Bullet.Spread or 0
@@ -55,7 +58,13 @@ function ENT:FireBullet()
 		
 		-- Sound
 		if (self.Bullet.FireSound) then
-			self:EmitSound( self.Bullet.FireSound )
+			local soundpath = ""
+			if (table.Count(self.Bullet.FireSound) > 1) then
+				soundpath = table.Random(self.Bullet.FireSound)
+			else
+				soundpath = self.Bullet.FireSound[1]
+			end
+			self:EmitSound( soundpath )
 		end
 		
 		-- Effect
@@ -65,24 +74,47 @@ function ENT:FireBullet()
 			effectdata:SetNormal( self:GetUp() )
 			util.Effect( self.Bullet.FireEffect, effectdata )
 		end
+		
+		self.Ammo = self.Ammo - 1
+		Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	end
 end
 
 function ENT:Think()
-	if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then
-		self.CanFire = true
-		if (self.Firing) then
-			self.LastFired = CurTime()
+	if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then -- if you can fire
+		if (self.Ammo <= 0 and self.Bullet.Ammo > 0) then -- check for ammo
+			-- if we don't have any ammo left...
 			self.CanFire = false
-			self:FireBullet()
+			Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+			if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
+				self.Ammo = self.Bullet.Ammo
+				Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+				self.CanFire = true
+				if (self.Firing) then 
+					self:FireBullet()
+				else
+					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+				end
+			end
 		else
-			Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+			-- if we DO have ammo left
+			self.CanFire = true
+			if (self.Firing) then
+				self.LastFired = CurTime()
+				self.CanFire = false
+				self:FireBullet()
+			else
+				Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+			end
 		end
 	end
 	if (self.Bullet.Reloadtime < 0.5) then
 		-- Run more often!
 		self.Entity:NextThink( CurTime() )
 		return true
+	end
+	if (self.Bullet.Ammo != -1) then
+
 	end
 end
 
@@ -101,7 +133,36 @@ function ENT:TriggerInput(iname, value)
 		end
 		return true
 	end
-
 end
  
- 
+-- Dupe support! Thanks to Free Fall
+function ENT:BuildDupeInfo()
+	local info = self.BaseClass.BuildDupeInfo(self) or {}
+	if (self.Bullet) then
+		info.BulletName = self.Bullet.Name
+	end
+	return info
+end
+
+function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
+	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
+	if ( !ply:CheckLimit( "pewpew" ) ) then return false end
+	if (info.BulletName) then
+		local bullet = pewpew:GetBullet( info.BulletName )
+		if (bullet.AdminOnly and !ply:IsAdmin()) then 
+			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+			return false
+		end
+		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
+			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+			return false
+		end
+		if (bullet) then
+			self:SetOptions( bullet )
+		else
+			self.SetOptions( pewpew.bullets[1] )
+			ply:ChatPrint("PewPew Bullet not found! Using the bullet '" .. pewpew.bullets[1].Name .. "' instead to prevent errors.")
+		end
+	end
+	ply:AddCount("pewpew",ent)
+end

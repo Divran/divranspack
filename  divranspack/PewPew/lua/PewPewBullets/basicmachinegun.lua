@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Machinegun"
+BULLET.AdminOnly = false
+BULLET.SuperAdminOnly = false
 
 -- Appearance
 BULLET.Model = "models/combatmodels/tankshell_25mm.mdl"
@@ -13,7 +15,7 @@ BULLET.Trail = nil
 					
 
 -- Effects / Sounds
-BULLET.FireSound = "arty/20mmauto.wav"
+BULLET.FireSound = {"arty/20mmauto.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = "muzzleflash"
 BULLET.ExplosionEffect = "mghit"
@@ -35,6 +37,8 @@ BULLET.PlayerDamageRadius = 60
 -- Other
 BULLET.Reloadtime = 0.1
 BULLET.NumberOfSlices = nil
+BULLET.Ammo = 100
+BULLET.AmmoReloadtime = 10
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -45,8 +49,8 @@ function BULLET:Fire( self )
 	-- Nothing
 end
 
--- Initialize (Is called when the entity initializes)
-BULLET.InitOverride = false
+-- Initialize (Is called when the bullet initializes)
+BULLET.InitializeOverride = false
 function BULLET:InitializeFunc( self )   
 	-- Nothing
 end

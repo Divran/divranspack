@@ -3,7 +3,7 @@
 
 -- Load all the bullet files
 function pewpew:LoadBullets()
-	pewpew.bullets = {}
+	self.bullets = {}
 	
 	local bulletlist = file.FindInLua("PewPewBullets/*.lua")
 	for _, blt in ipairs( bulletlist ) do
@@ -14,6 +14,7 @@ end
 
 -- Add the bullets to the bullet list
 function pewpew:AddBullet( bullet )
+	print("Added PewPew Bullet: " .. bullet.Name)
 	table.insert( self.bullets, bullet )
 end
 
@@ -24,4 +25,5 @@ function pewpew:GetBullet( BulletName )
 			return blt
 		end
 	end
+	return nil
 end
