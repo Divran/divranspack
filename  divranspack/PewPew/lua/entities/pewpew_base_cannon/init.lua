@@ -37,8 +37,8 @@ function ENT:FireBullet()
 		ent:SetOptions( self.Bullet )
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-		--local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x * (2/3) + 10)
+		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
+		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.z/2 + bulletboxsize.z/2 + 10)
 		ent:SetPos( Pos )
 		-- Add random angle offset
 		local num = self.Bullet.Spread or 0
@@ -53,7 +53,7 @@ function ENT:FireBullet()
 		
 		-- Recoil
 		if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
-			ent:GetPhysicsObject():AddVelocity( self.Entity:GetUp() * -self.Bullet.RecoilForce )
+			self.Entity:GetPhysicsObject():AddVelocity( self.Entity:GetUp() * -self.Bullet.RecoilForce )
 		end
 		
 		-- Sound
@@ -92,6 +92,7 @@ function ENT:Think()
 				self.CanFire = true
 				if (self.Firing) then 
 					self:FireBullet()
+					self.CanFire = false
 				else
 					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 				end
@@ -112,9 +113,6 @@ function ENT:Think()
 		-- Run more often!
 		self.Entity:NextThink( CurTime() )
 		return true
-	end
-	if (self.Bullet.Ammo != -1) then
-
 	end
 end
 
@@ -146,15 +144,20 @@ end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
-	if ( !ply:CheckLimit( "pewpew" ) ) then return false end
+	if ( !ply:CheckLimit( "pewpew" ) ) then 
+		self:Remove()
+		return false
+	end
 	if (info.BulletName) then
 		local bullet = pewpew:GetBullet( info.BulletName )
 		if (bullet.AdminOnly and !ply:IsAdmin()) then 
 			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+			self:Remove()
 			return false
 		end
 		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
 			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+			self:Remove()
 			return false
 		end
 		if (bullet) then

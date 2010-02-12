@@ -28,7 +28,7 @@ BULLET.Spread = 0.3
 
 -- Damage
 BULLET.DamageType = "PointDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 40
+BULLET.Damage = 25
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.PlayerDamage = 10

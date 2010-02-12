@@ -15,6 +15,7 @@ cleanup.Register("pewpew")
 
 
 if (SERVER) then
+	AddCSLuaFile("pewpew.lua")
 	CreateConVar("sbox_maxpewpew", 10)
 
 	
@@ -44,6 +45,15 @@ if (SERVER) then
 		
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
 		if (!bullet) then return end
+		
+		if (bullet.AdminOnly and !ply:IsAdmin()) then 
+			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+			return false
+		end
+		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
+			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+			return false
+		end
 		
 		-- If the trace hit an entity
 		local traceent = trace.Entity
@@ -82,6 +92,15 @@ if (SERVER) then
 		
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
 		if (!bullet) then return end
+		
+		if (bullet.AdminOnly and !ply:IsAdmin()) then 
+			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+			return false
+		end
+		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
+			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+			return false
+		end
 		
 		-- If the trace hit an entity
 		local traceent = trace.Entity
@@ -122,6 +141,7 @@ else
 	language.Add( "Cleaned_pewpew", "Cleaned up all PewPew Weapons" )
 	language.Add( "SBoxLimit_pewpew", "You've reached the PewPew Weapon limit!" )
 	
+	
 	function TOOL.BuildCPanel( CPanel )
 		CPanel:ClearControls()
 		CPanel:AddHeader()
@@ -137,5 +157,5 @@ else
 		
 		CPanel:AddControl("ComboBox", Ctype )
 	end
-
 end
+

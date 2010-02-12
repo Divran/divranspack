@@ -1,43 +1,43 @@
--- Basic Missile
+-- Missile Nuke
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Missile"
-BULLET.AdminOnly = false
+BULLET.Name = "Missile Nuke"
+BULLET.AdminOnly = true
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/props_phx/amraam.mdl"
+BULLET.Model = "models/combatmodels/tankshell.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
 BULLET.FireSound = {"arty/rocket.wav"}
-BULLET.ExplosionSound = {"weapons/explode3.wav","weapons/explode4.wav","weapons/explode5.wav"}
+BULLET.ExplosionSound = { "ambient/explosions/citadel_end_explosion1.wav", "ambient/explosions/citadel_end_explosion2.wav" }
 BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "v2splode"
+BULLET.ExplosionEffect = "breachsplode"
 
 -- Movement
 BULLET.Speed = 30
 BULLET.PitchChange = 0
 BULLET.RecoilForce = 0
-BULLET.Spread = 1.5
+BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 200
-BULLET.Radius = 400
-BULLET.RangeDamageMul = 0.5
-BULLET.PlayerDamage = 150
-BULLET.PlayerDamageRadius = 400
+BULLET.Damage = 5000
+BULLET.Radius = 7000
+BULLET.RangeDamageMul = 0.6
+BULLET.PlayerDamage = 5000
+BULLET.PlayerDamageRadius = 5000
 
 -- Other
-BULLET.Reloadtime = 0.3
+BULLET.Reloadtime = 11
 BULLET.NumberOfSlices = nil
-BULLET.Ammo = 6
-BULLET.AmmoReloadtime = 6
+BULLET.Ammo = 0
+BULLET.AmmoReloadtime = 0
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -48,7 +48,7 @@ function BULLET:Fire( self )
 	-- Nothing
 end
 
--- Initialize (Is called when the bullet initializes)
+-- Initialize (Is called when the entity initializes)
 BULLET.InitializeOverride = true
 function BULLET:InitializeFunc( self )   
 	self.flightvector = self.Entity:GetUp()

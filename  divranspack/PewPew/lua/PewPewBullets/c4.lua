@@ -1,55 +1,71 @@
--- Railgun
+-- C4
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Railgun"
+BULLET.Name = "C4"
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/combatmodels/tankshell_120mm.mdl"
+BULLET.Model = nil
 BULLET.Material = nil
-BULLET.Color = Color( 0, 255, 255 )
-BULLET.Trail = { StartSize = 40,
-				 EndSize = 35,
-				 Length = 1,
-				 Texture = "trails/laser.vmt",
-				 Color = Color( 0, 255, 255, 255 ) }
+BULLET.Color = nil
+BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"LightDemon/Railgun.wav"}
+BULLET.FireSound = {"weapons/explode1.wav","weapons/explode2.wav"}
 BULLET.ExplosionSound = nil
-BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "gcombat_explosion"
+BULLET.FireEffect = "dirtyxplo"
+BULLET.ExplosionEffect = nil
 
 -- Movement
-BULLET.Speed = 90
-BULLET.PitchChange = 0.007
-BULLET.RecoilForce = 65
-BULLET.Spread = 0.15
+BULLET.Speed = nil
+BULLET.PitchChange = nil
+BULLET.RecoilForce = nil
+BULLET.Spread = nil
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 100
-BULLET.Radius = 75
-BULLET.RangeDamageMul = 0.5
-BULLET.PlayerDamageRadius = 58
-BULLET.PlayerDamage = 70
+BULLET.Damage = 2500
+BULLET.Radius = 350
+BULLET.RangeDamageMul = 0.8
+BULLET.PlayerDamage = 500
+BULLET.PlayerDamageRadius = 350
 
 -- Other
-BULLET.Reloadtime = 0.4
+BULLET.Reloadtime = 1
 BULLET.NumberOfSlices = nil
 BULLET.Ammo = 0
-BULLET.AmmoReloadtime = 0
+BULLET.AmmoReloadtime = nil
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = false
+BULLET.FireOverride = true
 function BULLET:Fire( self )
-	-- Nothing
+	local Pos = self.Entity:GetPos()
+	local Norm = self.Entity:GetUp()
+	
+	-- Sound
+	soundpath = table.Random(self.Bullet.FireSound)
+	self:EmitSound( soundpath )
+		
+	-- Effect
+	local effectdata = EffectData()
+	effectdata:SetOrigin( Pos )
+	effectdata:SetNormal( Norm )
+	util.Effect( self.Bullet.FireEffect, effectdata )
+	
+	-- Damage
+	util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+	
+	-- Still here?
+	if (self.Entity:IsValid()) then
+		self.Entity:Remove()
+	end
 end
 
 -- Initialize (Is called when the bullet initializes)

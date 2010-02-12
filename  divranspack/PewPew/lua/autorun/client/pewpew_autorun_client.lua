@@ -1,4 +1,4 @@
--- Gcombat Autorun
+-- PewPew Autorun
 -- Initialize variables
 pewpew = {}
 

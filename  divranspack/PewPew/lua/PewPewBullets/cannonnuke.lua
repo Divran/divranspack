@@ -1,44 +1,40 @@
--- Railgun
+-- Cannon Nuke
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Railgun"
-BULLET.AdminOnly = false
+BULLET.Name = "Cannon Nuke"
+BULLET.AdminOnly = true
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/combatmodels/tankshell_120mm.mdl"
+BULLET.Model = "models/combatmodels/tankshell.mdl"
 BULLET.Material = nil
-BULLET.Color = Color( 0, 255, 255 )
-BULLET.Trail = { StartSize = 40,
-				 EndSize = 35,
-				 Length = 1,
-				 Texture = "trails/laser.vmt",
-				 Color = Color( 0, 255, 255, 255 ) }
+BULLET.Color = nil
+BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"LightDemon/Railgun.wav"}
-BULLET.ExplosionSound = nil
-BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "gcombat_explosion"
+BULLET.FireSound = { "arty/arty.wav" }
+BULLET.ExplosionSound = { "ambient/explosions/citadel_end_explosion1.wav", "ambient/explosions/citadel_end_explosion2.wav" }
+BULLET.FireEffect = "artyfire"
+BULLET.ExplosionEffect = "breachsplode"
 
 -- Movement
-BULLET.Speed = 90
-BULLET.PitchChange = 0.007
-BULLET.RecoilForce = 65
-BULLET.Spread = 0.15
+BULLET.Speed = 60
+BULLET.PitchChange = 0.2
+BULLET.RecoilForce = 1000
+BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 100
-BULLET.Radius = 75
-BULLET.RangeDamageMul = 0.5
-BULLET.PlayerDamageRadius = 58
-BULLET.PlayerDamage = 70
+BULLET.Damage = 5000
+BULLET.Radius = 7000
+BULLET.RangeDamageMul = 0.6
+BULLET.PlayerDamage = 5000
+BULLET.PlayerDamageRadius = 5000
 
 -- Other
-BULLET.Reloadtime = 0.4
+BULLET.Reloadtime = 11
 BULLET.NumberOfSlices = nil
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
@@ -52,7 +48,7 @@ function BULLET:Fire( self )
 	-- Nothing
 end
 
--- Initialize (Is called when the bullet initializes)
+-- Initialize (Is called when the entity initializes)
 BULLET.InitializeOverride = false
 function BULLET:InitializeFunc( self )   
 	-- Nothing

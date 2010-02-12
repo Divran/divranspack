@@ -30,7 +30,7 @@ end
 
 -- Point Damage - Deals damage to 1 single entity
 function pewpew:PointDamage( TargetEntity, Damage )
-	self:DealBaseDamage( TargetEntity, Damage )
+	self:DealDamageBase( TargetEntity, Damage )
 	-- Might change this later...
 end
 
