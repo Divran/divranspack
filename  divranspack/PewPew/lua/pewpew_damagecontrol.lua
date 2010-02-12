@@ -30,10 +30,8 @@ end
 
 -- Point Damage - Deals damage to 1 single entity
 function pewpew:PointDamage( TargetEntity, Damage )
-		if (!self.PewPewDamage) then return end
-	if (!self:CheckValid( TargetEntity )) then return end
-	if (!Damage or Damage <= 0) then return end
-	self:DealDamageBase( TargetEntity, Damage )
+	self:DealBaseDamage( TargetEntity, Damage )
+	-- Might change this later...
 end
 
 -- Slice damage - (Deals damage to a number of entities in a line. It is stopped by the world)
@@ -68,7 +66,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	-- Check for errors
 	if (!self:CheckValid( TargetEntity )) then return end
 	if (!self:CheckAllowed( TargetEntity )) then return end
-	if (!Damage) then return end
+	if (!Damage or Damage == 0) then return end
 	if (!TargetEntity.pewpewHealth) then
 		self:SetHealth( TargetEntity )
 	end
