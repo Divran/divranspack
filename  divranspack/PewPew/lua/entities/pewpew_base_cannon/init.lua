@@ -13,10 +13,13 @@ function ENT:Initialize()
 	self.CanFire = true
 	self.LastFired = 0
 	self.Firing = false
+	
+	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
 
 function ENT:SetOptions( BULLET )
-	self.Bullet = BULLET
+ 	self.Bullet = BULLET
 	self.Ammo = self.Bullet.Ammo
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
@@ -35,6 +38,7 @@ function ENT:FireBullet()
 		ent:SetModel( self.Bullet.Model )
 		-- Set used bullet
 		ent:SetOptions( self.Bullet )
+		ent:SetCannon( self )
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
@@ -57,7 +61,7 @@ function ENT:FireBullet()
 		end
 		
 		-- Sound
-		if (self.Bullet.FireSound) then
+ 		if (self.Bullet.FireSound) then
 			local soundpath = ""
 			if (table.Count(self.Bullet.FireSound) > 1) then
 				soundpath = table.Random(self.Bullet.FireSound)
@@ -145,25 +149,25 @@ end
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
 	if ( !ply:CheckLimit( "pewpew" ) ) then 
-		self:Remove()
+		ent:Remove()
 		return false
 	end
 	if (info.BulletName) then
 		local bullet = pewpew:GetBullet( info.BulletName )
 		if (bullet.AdminOnly and !ply:IsAdmin()) then 
 			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
-			self:Remove()
+			ent:Remove()
 			return false
 		end
 		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
 			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
-			self:Remove()
+			ent:Remove()
 			return false
 		end
 		if (bullet) then
 			self:SetOptions( bullet )
 		else
-			self.SetOptions( pewpew.bullets[1] )
+			self:SetOptions( pewpew.bullets[1] )
 			ply:ChatPrint("PewPew Bullet not found! Using the bullet '" .. pewpew.bullets[1].Name .. "' instead to prevent errors.")
 		end
 	end

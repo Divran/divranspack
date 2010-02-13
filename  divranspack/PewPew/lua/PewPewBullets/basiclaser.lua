@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Laser"
+BULLET.Author = "Divran"
+BULLET.Description = "Fires a laser beam which slices through and damages 4 props."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -30,12 +32,12 @@ BULLET.DamageType = nil -- Look in gcombat_damagecontrol.lua for available damag
 BULLET.Damage = 85
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
+BULLET.NumberOfSlices = 4
 BULLET.PlayerDamageRadius = nil
 BULLET.PlayerDamage = nil
 
--- Other
+-- Reloading/Ammo
 BULLET.Reloadtime = 0.7
-BULLET.NumberOfSlices = 4
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -45,7 +47,6 @@ BULLET.AmmoReloadtime = 0
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-
 	-- Get the start position
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 	local startpos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.x / 2 + 10)
@@ -98,6 +99,30 @@ BULLET.ExplodeOverride = false
 function BULLET:Explode( self, trace )
 	-- Nothing
 end
+
+-- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
+BULLET.PhysicsCollideOverride = false
+function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+	-- Nothing
+end
+
+-- Client side overrides:
+
+BULLET.CLInitializeOverride = false
+function BULLET:CLInitializeFunc()
+	-- Nothing
+end
+
+BULLET.CLThinkOverride = false
+function BULLET:CLThinkFunc()
+	-- Nothing
+end
+
+BULLET.CLDrawOverride = false
+function BULLET:CLDrawFunc()
+	-- Nothing
+end
+
 
 
 pewpew:AddBullet( BULLET )

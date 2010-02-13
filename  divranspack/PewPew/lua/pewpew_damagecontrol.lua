@@ -3,7 +3,7 @@
 ------------------------------------------------------------------------------------------------------------
 
 -- Entity types in the blacklist will not be harmed by PewPew weaponry.
-pewpew.DamageBlacklist = { "gmod_wire" }
+pewpew.DamageBlacklist = { "gmod_wire", "gmod_ghost" }
 -- Entity types in the whitelist will ALWAYS be harmed by PewPew weaponry, even if they are in the blacklist as well.
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
@@ -114,10 +114,18 @@ function pewpew:SetCustomHealth( ent, Health )
 	ent.pewpewHealth = math.abs( Health )
 end
 
--- Returns the health of the entity
+-- Returns the health of the entity without setting it
 function pewpew:GetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
-	return ent.pewpewHealth or 0
+	if (ent.pewpewHealth) then
+		return ent.pewpewHealth
+	else
+		local phys = ent:GetPhysicsObject()
+		if (!phys) then return end
+		local mass = phys:GetMass() or 0
+		local boxsize = ent:OBBMaxs() - ent:OBBMins()
+		return (mass / 5 + boxsize:Length())
+	end
 end
 
 ------------------------------------------------------------------------------------------------------------

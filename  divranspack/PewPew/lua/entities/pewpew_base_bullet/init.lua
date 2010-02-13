@@ -7,10 +7,9 @@ function ENT:Initialize()
 		-- Allows you to override the Initialize function
 		self.Bullet:InitializeFunc( self )
 	else
-		self.flightvector = self.Entity:GetUp()
 		self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
 		self.Entity:SetMoveType( MOVETYPE_NONE )
-		self.Entity:SetSolid( SOLID_VPHYSICS )    
+		self.Entity:SetSolid( SOLID_NONE )    
 		self.FlightDirection = self.Entity:GetUp()
 		self.Exploded = false
 		
@@ -35,12 +34,18 @@ end
 
 function ENT:SetOptions( BULLET )
 	self.Bullet = BULLET
+	
+	self.Entity:SetNetworkedString("BulletName", self.Bullet.Name)
+end
+
+function ENT:SetCannon( Cannon )
+	self.Cannon = Cannon
 end
 
 function ENT:Think()
 	if (self.Bullet.ThinkOverride) then
 		-- Allows you to override the think function
-		self.Bullet:ThinkFunc( self )
+		return self.Bullet:ThinkFunc( self )
 	else
 		-- Make it fly
 		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
@@ -84,7 +89,7 @@ function ENT:Think()
 					end
 					WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
 				end
-						
+					
 				-- GCombat Damage
 				local damagetype = self.Bullet.DamageType
 				if (!damagetype) then return end
@@ -104,5 +109,11 @@ function ENT:Think()
 			self.Entity:NextThink( CurTime() )
 			return true
 		end
+	end
+end
+
+function ENT:PhysicsCollide(CollisionData, PhysObj)
+	if (self.Bullet.PhysicsCollideOverride) then
+		self.Bullet.PhysicsCollideFunc(self, CollisionData, PhysObj)
 	end
 end

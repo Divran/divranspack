@@ -8,10 +8,7 @@ end
 -- Returns the health of the entity
 e2function number entity:pewHealth()
 	if (!validPhysics(this)) then return 0 end
-	if (!this.pewpewHealth) then 
-		pewpew:SetHealth( this )
-	end
-	return this.pewpewHealth
+	return pewpew:GetHealth( this ) or 0
 end
 
 -- Returns the name of the bullet of the cannon
@@ -90,4 +87,26 @@ e2function string entity:pewDamageType()
 	if (!validPhysics(this)) then return "" end
 	if (this:GetClass() != "pewpew_base_cannon") then return "" end
 	return this.Bullet.DamageType or ""
+end
+
+e2function string entity:pewAuthor()
+	if (!validPhysics(this)) then return "" end
+	if (this:GetClass() != "pewpew_base_cannon") then return "" end
+	return this.Bullet.Author or ""
+end
+
+e2function string entity:pewDescription()
+	if (!validPhysics(this)) then return "" end
+	if (this:GetClass() != "pewpew_base_cannon") then return "" end
+	return this.Bullet.Description or ""
+end
+
+e2function number entity:pewCanFire()
+	if (!validPhysics(this)) then return "" end
+	if (this:GetClass() != "pewpew_base_cannon") then return "" end
+	local ret = 0
+	if (this.CanFire) then
+		ret = 1
+	end
+	return ret
 end

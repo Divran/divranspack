@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Railgun"
+BULLET.Author = "Divran"
+BULLET.Description = "Fires fast moving rounds which are almost not affected by gravity at all."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -34,12 +36,12 @@ BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for avail
 BULLET.Damage = 100
 BULLET.Radius = 75
 BULLET.RangeDamageMul = 0.5
+BULLET.NumberOfSlices = nil
 BULLET.PlayerDamageRadius = 58
 BULLET.PlayerDamage = 70
 
--- Other
+-- Reload/Ammo
 BULLET.Reloadtime = 0.4
-BULLET.NumberOfSlices = nil
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -70,5 +72,27 @@ function BULLET:Explode( self, trace )
 	-- Nothing
 end
 
+-- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
+BULLET.PhysicsCollideOverride = false
+function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+	-- Nothing
+end
+
+-- Client side overrides:
+
+BULLET.CLInitializeOverride = false
+function BULLET:CLInitializeFunc()
+	-- Nothing
+end
+
+BULLET.CLThinkOverride = false
+function BULLET:CLThinkFunc()
+	-- Nothing
+end
+
+BULLET.CLDrawOverride = false
+function BULLET:CLDrawFunc()
+	-- Nothing
+end
 
 pewpew:AddBullet( BULLET )

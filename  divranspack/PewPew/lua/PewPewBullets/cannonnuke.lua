@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Cannon Nuke"
+BULLET.Author = "Divran"
+BULLET.Description = "BLAAAAAARGH"
 BULLET.AdminOnly = true
 BULLET.SuperAdminOnly = false
 
@@ -30,12 +32,12 @@ BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for avail
 BULLET.Damage = 9001
 BULLET.Radius = 7000
 BULLET.RangeDamageMul = 0.6
+BULLET.NumberOfSlices = nil
 BULLET.PlayerDamage = 5000
 BULLET.PlayerDamageRadius = 5000
 
--- Other
+-- Reloading/Ammo
 BULLET.Reloadtime = 11
-BULLET.NumberOfSlices = nil
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -66,5 +68,27 @@ function BULLET:Explode( self, trace )
 	-- Nothing
 end
 
+-- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
+BULLET.PhysicsCollideOverride = false
+function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+	-- Nothing
+end
+
+-- Client side overrides:
+
+BULLET.CLInitializeOverride = false
+function BULLET:CLInitializeFunc()
+	-- Nothing
+end
+
+BULLET.CLThinkOverride = false
+function BULLET:CLThinkFunc()
+	-- Nothing
+end
+
+BULLET.CLDrawOverride = false
+function BULLET:CLDrawFunc()
+	-- Nothing
+end
 
 pewpew:AddBullet( BULLET )

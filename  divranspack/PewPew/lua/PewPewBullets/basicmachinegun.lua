@@ -4,6 +4,8 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Machinegun"
+BULLET.Author = "Divran"
+BULLET.Description = "Rapid fire machinegun with a large magazine."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -21,8 +23,8 @@ BULLET.FireEffect = "muzzleflash"
 BULLET.ExplosionEffect = "mghit"
 
 -- Movement
-BULLET.Speed = 65
-BULLET.PitchChange = 0.15
+BULLET.Speed = 70
+BULLET.PitchChange = 0.2
 BULLET.RecoilForce = 30
 BULLET.Spread = 0.3
 
@@ -31,12 +33,12 @@ BULLET.DamageType = "PointDamage" -- Look in gcombat_damagecontrol.lua for avail
 BULLET.Damage = 25
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
+BULLET.NumberOfSlices = nil
 BULLET.PlayerDamage = 10
 BULLET.PlayerDamageRadius = 60
 
--- Other
+-- Reloading/Ammo
 BULLET.Reloadtime = 0.1
-BULLET.NumberOfSlices = nil
 BULLET.Ammo = 100
 BULLET.AmmoReloadtime = 10
 
@@ -64,6 +66,29 @@ end
 -- Explode (Is called when the bullet explodes) Note: this will not run if you override the think function (unless you call it from there as well)
 BULLET.ExplodeOverride = false
 function BULLET:Explode( self, trace )
+	-- Nothing
+end
+
+-- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
+BULLET.PhysicsCollideOverride = false
+function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+	-- Nothing
+end
+
+-- Client side overrides:
+
+BULLET.CLInitializeOverride = false
+function BULLET:CLInitializeFunc()
+	-- Nothing
+end
+
+BULLET.CLThinkOverride = false
+function BULLET:CLThinkFunc()
+	-- Nothing
+end
+
+BULLET.CLDrawOverride = false
+function BULLET:CLDrawFunc()
 	-- Nothing
 end
 
