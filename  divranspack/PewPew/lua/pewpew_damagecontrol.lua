@@ -3,7 +3,7 @@
 ------------------------------------------------------------------------------------------------------------
 
 -- Entity types in the blacklist will not be harmed by PewPew weaponry.
-pewpew.DamageBlacklist = { "gmod_wire", "gmod_ghost" }
+pewpew.DamageBlacklist = { "pewpew_base_bullet", "gmod_wire", "gmod_ghost" }
 -- Entity types in the whitelist will ALWAYS be harmed by PewPew weaponry, even if they are in the blacklist as well.
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
@@ -11,19 +11,27 @@ pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_gr
 pewpew.PewPewDamage = true
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
-function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul )
+function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
 		if (!self.PewPewDamage) then return end
+	if (!Radius or Radius <= 0) then return end
+	if (!Damage or Damage <= 0) then return end
 	local ents = ents.FindInSphere( Position, Radius )
 	if (!ents or table.Count(ents) == 0) then return end
-	if (!Damage or Damage <= 0) then return end
-	if (!Radius or Radius <= 0) then return end
 	local dmg = 0
 	local distance = 0
 	for _, ent in pairs( ents ) do
 		if (self:CheckValid( ent )) then 
-			distance = Position:Distance( ent:GetPos() )
-			dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-			self:DealDamageBase( ent, dmg )
+			if (IgnoreEnt) then
+				if (ent != IgnoreEnt) then
+					distance = Position:Distance( ent:GetPos() )
+					dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
+					self:DealDamageBase( ent, dmg )
+				end
+			else
+				distance = Position:Distance( ent:GetPos() )
+				dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
+				self:DealDamageBase( ent, dmg )
+			end
 		end
 	end
 end
@@ -80,6 +88,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	end
 	-- Deal damage
 	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
+	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
 	self:CheckIfDead( TargetEntity )
 end
 
@@ -92,8 +101,10 @@ function pewpew:SetHealth( ent )
 	if (!phys) then return end
 	local mass = phys:GetMass() or 0
 	local boxsize = ent:OBBMaxs() - ent:OBBMins()
-	ent.pewpewHealth = mass / 5 + boxsize:Length()
+	local health = mass / 5 + boxsize:Length()
+	ent.pewpewHealth = health
 	ent.MaxMass = mass
+	ent:SetNWInt("pewpewHealth",health)
 end
 
 -- Add to the existing health
@@ -103,6 +114,7 @@ function pewpew:AddHealth( ent, Health )
 		self:SetHealth( TargetEntity )
 	end
 	ent.pewpewHealth = ent.pewpewHealth + math.abs(Health)
+	ent:SetNWInt("pewpewHealth",ent.pewpewHealth)
 end
 
 -- Set health to anything you want
@@ -112,6 +124,7 @@ function pewpew:SetCustomHealth( ent, Health )
 		self:SetHealth( TargetEntity )
 	end
 	ent.pewpewHealth = math.abs( Health )
+	ent:SetNWInt("pewpewHealth",ent.pewpewHealth)
 end
 
 -- Returns the health of the entity without setting it
@@ -135,9 +148,8 @@ function pewpew:CheckIfDead( ent )
 	if (ent.pewpewHealth < 0) then
 		local effectdata = EffectData()
 		effectdata:SetOrigin( ent:GetPos() )
-		effectdata:SetStart( ent:GetPos() )
-		effectdata:SetNormal( Vector(0,0,1) )
-		util.Effect( "spawneffect", effectdata )
+		effectdata:SetScale( (ent:OBBMaxs() - ent:OBBMins()):Length() )
+		util.Effect( "pewpew_deatheffect", effectdata )
 		ent:Remove()
 	end
 end

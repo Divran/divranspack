@@ -5,7 +5,7 @@ local BULLET = {}
 -- General Information
 BULLET.Name = "C4"
 BULLET.Author = "Divran"
-BULLET.Description = "C4. What more do you want?"
+BULLET.Description = "C4. High damage, low radius."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -29,12 +29,12 @@ BULLET.Spread = nil
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 2500
-BULLET.Radius = 350
+BULLET.Damage = 3000
+BULLET.Radius = 250
 BULLET.RangeDamageMul = 0.8
 BULLET.NumberOfSlices = nil
 BULLET.PlayerDamage = 500
-BULLET.PlayerDamageRadius = 350
+BULLET.PlayerDamageRadius = 250
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 1
@@ -62,7 +62,7 @@ function BULLET:Fire( self )
 	
 	-- Damage
 	util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
-	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity )
 	
 	-- Still here?
 	if (self.Entity:IsValid()) then

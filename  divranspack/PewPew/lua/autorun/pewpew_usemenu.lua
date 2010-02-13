@@ -7,17 +7,25 @@ if (CLIENT) then
 		pewpew_frame:SetSize( 400, 300 )
 		pewpew_frame:SetTitle( "PewPew Cannon Information" )
 		pewpew_frame:SetVisible( false )
-		pewpew_frame:SetDraggable( false )
+		pewpew_frame:SetDraggable( true )
+		pewpew_frame:SetSizable( true )
 		pewpew_frame:ShowCloseButton( true )
 		pewpew_frame:SetDeleteOnClose( false )
 		pewpew_frame:MakePopup()
+		
 
 		pewpew_list = vgui.Create( "DListView", pewpew_frame )
 		pewpew_list:SetPos( 2, 24 )
-		pewpew_list:SetSize( 396, 270 )
+		pewpew_list:SetSize( 400 - 4, 300 - 26 )
 		local a = pewpew_list:AddColumn( "" )
 		a:SetWide(50)
 		local b = pewpew_list:AddColumn( "" )
+		
+		function pewpew_frame:Think()
+			if (pewpew_frame:IsActive()) then
+				pewpew_list:SetSize( pewpew_frame:GetWide() - 4, pewpew_frame:GetTall() - 26 )
+			end
+		end
 	end
 	timer.Simple( 0.5, CreateMenu )
 	
@@ -45,7 +53,7 @@ if (CLIENT) then
 			pewpew_list:Clear()
 			SetTable( Bullet )
 			for _, value in ipairs( list ) do
-				pewpew_list:AddLine( value[1], tostring(value[2]) )
+				pewpew_list:AddLine( value[1], tostring(value[2]) or "- none -" )
 			end
 			pewpew_frame:SetVisible( true )
 		end

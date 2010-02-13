@@ -18,9 +18,10 @@ function ENT:Initialize()
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
 
-function ENT:SetOptions( BULLET )
+function ENT:SetOptions( BULLET, ply )
  	self.Bullet = BULLET
 	self.Ammo = self.Bullet.Ammo
+	self.Owner = ply
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
@@ -42,7 +43,7 @@ function ENT:FireBullet()
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-		local Pos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.z/2 + bulletboxsize.z/2 + 10)
+		local Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z/2 + bulletboxsize.z/2)
 		ent:SetPos( Pos )
 		-- Add random angle offset
 		local num = self.Bullet.Spread or 0
@@ -95,8 +96,9 @@ function ENT:Think()
 				Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 				self.CanFire = true
 				if (self.Firing) then 
-					self:FireBullet()
+					self.LastFired = CurTime()
 					self.CanFire = false
+					self:FireBullet()
 				else
 					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 				end
@@ -167,8 +169,16 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 		if (bullet) then
 			self:SetOptions( bullet )
 		else
-			self:SetOptions( pewpew.bullets[1] )
-			ply:ChatPrint("PewPew Bullet not found! Using the bullet '" .. pewpew.bullets[1].Name .. "' instead to prevent errors.")
+			local blt = {
+				Name = "Dummy bullet",
+				Reloadtime = 1,
+				Ammo = 0,
+				AmmoReloadtime = 0,
+				FireOverride = true,
+				Fire = function(self) self.Owner:ChatPrint("You must select a bullet to fire.") end
+			}
+			self:SetOptions( blt, ply )
+			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found!.")
 		end
 	end
 	ply:AddCount("pewpew",ent)

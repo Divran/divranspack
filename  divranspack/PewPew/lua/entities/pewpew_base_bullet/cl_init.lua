@@ -2,7 +2,7 @@ include('shared.lua')
 
 function ENT:Draw()
 	if (self.Bullet and self.Bullet.CLDrawOverride) then
-		self.Bullet.CLDrawFunc()
+		self.Bullet.CLDrawFunc(self)
 	else
 		self.Entity:DrawModel()
 	end

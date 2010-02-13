@@ -1,49 +1,45 @@
--- Railgun
+-- Basic Cannon
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Railgun"
+BULLET.Name = "Bomb Rack"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires fast moving rounds which are almost not affected by gravity at all."
+BULLET.Description = "Drops several bombs straight down onto your enemy."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/combatmodels/tankshell_120mm.mdl"
+BULLET.Model = "models/props_c17/canister_propane01a.mdl"
 BULLET.Material = nil
-BULLET.Color = Color( 0, 255, 255 )
-BULLET.Trail = { StartSize = 40,
-				 EndSize = 35,
-				 Length = 1,
-				 Texture = "trails/laser.vmt",
-				 Color = Color( 0, 255, 255, 255 ) }
+BULLET.Color = nil
+BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"LightDemon/Railgun.wav"}
-BULLET.ExplosionSound = nil
+BULLET.FireSound = {"npc/attack_helicopter/aheli_mine_drop1.wav"}
+BULLET.ExplosionSound = {"weapons/explode3.wav","weapons/explode4.wav","weapons/explode5.wav"}
 BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "gcombat_explosion"
+BULLET.ExplosionEffect = "athesplode"
 
 -- Movement
-BULLET.Speed = 90
-BULLET.PitchChange = 0.007
-BULLET.RecoilForce = 65
-BULLET.Spread = 0.15
+BULLET.Speed = 5
+BULLET.PitchChange = 0.5
+BULLET.RecoilForce = 0
+BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 100
-BULLET.Radius = 75
-BULLET.RangeDamageMul = 0.9
+BULLET.Damage = 650
+BULLET.Radius = 500
+BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil
-BULLET.PlayerDamageRadius = 58
-BULLET.PlayerDamage = 70
+BULLET.PlayerDamage = 600
+BULLET.PlayerDamageRadius = 600
 
--- Reload/Ammo
-BULLET.Reloadtime = 0.4
-BULLET.Ammo = 0
-BULLET.AmmoReloadtime = 0
+-- Reloading/Ammo
+BULLET.Reloadtime = 0.5
+BULLET.Ammo = 5
+BULLET.AmmoReloadtime = 8
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)

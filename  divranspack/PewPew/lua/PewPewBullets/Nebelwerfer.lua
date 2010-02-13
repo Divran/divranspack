@@ -22,7 +22,7 @@ BULLET.FireEffect = "cannon_flare"
 BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
-BULLET.Speed = 65
+BULLET.Speed = 50
 BULLET.PitchChange = nil -- Invalid in this context
 BULLET.RecoilForce = 500
 BULLET.Spread = 2
@@ -30,11 +30,11 @@ BULLET.Spread = 2
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 100
-BULLET.Radius = 500
+BULLET.Radius = 800
 BULLET.RangeDamageMul = 0.3
 BULLET.NumberOfSlices = nil
 BULLET.PlayerDamage = 80
-BULLET.PlayerDamageRadius = 300
+BULLET.PlayerDamageRadius = 500
 
 -- Reload/Ammo
 BULLET.Reloadtime = 0.3
@@ -52,7 +52,7 @@ end
 
 -- Initialize (Is called when the entity initializes)
 BULLET.InitializeOverride = true
-function BULLET:InitializeFunc( self )
+function BULLET:InitializeFunc(self)
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -77,6 +77,23 @@ function BULLET:ThinkFunc( self )
 		self:SetNetworkedBool("Burning", false)
 	end
 	
+	if (not self.Burning and self.Entity:GetVelocity():Length() < 1) then
+		util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
+		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
+		
+		if (self.Bullet.ExplosionEffect) then
+			local effectdata = EffectData()
+			effectdata:SetOrigin(self:GetPos())
+			effectdata:SetStart(self:GetPos())
+			effectdata:SetNormal(self.Entity:GetUp())
+			util.Effect(self.Bullet.ExplosionEffect, effectdata)
+		end
+		
+		self.Entity:EmitSound("ambient/explosions/explode_" .. math.random(1,4) .. ".wav", 500, 100)
+		
+		self:Remove()
+	end
+	
 	if (self.Burning) then
 		local phys = self.Entity:GetPhysicsObject()
 		if (phys:IsValid()) then
@@ -98,7 +115,7 @@ end
 BULLET.PhysicsCollideOverride = true
 function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
 	if (not (self.Cannon:IsValid() and PhysObj == self.Cannon:GetPhysicsObject()) and not self.Burning) then
-		util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
+		util.BlastDamage(self.Entity, self.Entity, CollisionData.HitPos, self.Bullet.Damage, self.Bullet.Radius)
 		pewpew:BlastDamage(CollisionData.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
 		
 		if (self.Bullet.ExplosionEffect) then

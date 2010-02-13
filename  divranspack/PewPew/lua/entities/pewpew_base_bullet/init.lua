@@ -94,6 +94,10 @@ function ENT:Think()
 				local damagetype = self.Bullet.DamageType
 				if (!damagetype) then return end
 				if (damagetype == "BlastDamage") then
+					if (trace.Entity and trace.Entity:IsValid()) then
+						pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
+						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+					end
 					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
 				elseif (damagetype == "PointDamage") then
 					pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
@@ -101,6 +105,7 @@ function ENT:Think()
 					pewpew:SliceDamage( trace, self.FlightDirection, Damage, self.Bullet.NumberOfSlices or 1 )
 				end
 				
+				self.Entity:SetPos( trace.HitPos )
 				-- Remove the bullet
 				self.Entity:Remove()
 			end
