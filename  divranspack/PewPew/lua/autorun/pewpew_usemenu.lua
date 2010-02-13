@@ -3,29 +3,22 @@
 if (CLIENT) then
 	local function CreateMenu()
 		pewpew_frame = vgui.Create("DFrame")
-		pewpew_frame:SetPos( ScrW()/2-430,ScrH()/2-150 )
-		pewpew_frame:SetSize( 400, 300 )
+		pewpew_frame:SetPos( ScrW()/2-400,ScrH()/2+155 )
+		pewpew_frame:SetSize( 800, 300 )
 		pewpew_frame:SetTitle( "PewPew Cannon Information" )
 		pewpew_frame:SetVisible( false )
 		pewpew_frame:SetDraggable( true )
-		pewpew_frame:SetSizable( true )
 		pewpew_frame:ShowCloseButton( true )
 		pewpew_frame:SetDeleteOnClose( false )
+		pewpew_frame:SetScreenLock( true )
 		pewpew_frame:MakePopup()
 		
-
 		pewpew_list = vgui.Create( "DListView", pewpew_frame )
-		pewpew_list:SetPos( 2, 24 )
-		pewpew_list:SetSize( 400 - 4, 300 - 26 )
+		pewpew_list:StretchToParent( 2, 23, 2, 2 )
 		local a = pewpew_list:AddColumn( "" )
-		a:SetWide(50)
-		local b = pewpew_list:AddColumn( "" )
-		
-		function pewpew_frame:Think()
-			if (pewpew_frame:IsActive()) then
-				pewpew_list:SetSize( pewpew_frame:GetWide() - 4, pewpew_frame:GetTall() - 26 )
-			end
-		end
+		a:SetWide(pewpew_frame:GetWide()*(1.5/8))
+		local b = pewpew_list:AddColumn( "" )	
+		b:SetWide(pewpew_frame:GetWide()*(6.5/8))
 	end
 	timer.Simple( 0.5, CreateMenu )
 	
@@ -62,7 +55,7 @@ else
 	hook.Add( "PlayerUse", "PewPewPlayerUse", function( ply, ent )
 		if (!ply.LastUse) then ply.LastUse = 0 end
 		if (ply.LastUse > CurTime()) then return end
-		ply.LastUse = CurTime() + 3
+		ply.LastUse = CurTime() + 2
 		if (ent:GetClass() == "pewpew_base_cannon") then
 			if (ent.Bullet) then
 				umsg.Start( "PewPew_OpenMenu", ply )
