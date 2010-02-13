@@ -30,11 +30,11 @@ BULLET.Spread = nil
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 3000
-BULLET.Radius = 250
+BULLET.Radius = 350
 BULLET.RangeDamageMul = 0.8
 BULLET.NumberOfSlices = nil
 BULLET.PlayerDamage = 500
-BULLET.PlayerDamageRadius = 250
+BULLET.PlayerDamageRadius = 350
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 1
