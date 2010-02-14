@@ -3,9 +3,10 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Missile Launcher"
+BULLET.Name = "Basic Rocket Launcher"
+BULLET.Category = "Rockets"
 BULLET.Author = "Divran"
-BULLET.Description = "Missile launcher with 6 missiles."
+BULLET.Description = "Rocket launcher with 6 rockets."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -77,7 +78,6 @@ function BULLET:InitializeFunc( self )
 	end
 	
 	local trail = ents.Create("env_fire_trail")
-	--trail:SetPos( self.Entity:LocalToWorld(Vector(-75,0,9)) )
 	trail:SetPos( self.Entity:GetPos() - self.Entity:GetUp() * 20 )
 	trail:Spawn()
 	trail:SetParent( self.Entity )

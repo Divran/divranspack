@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Cannon"
+BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
 BULLET.Description = "Aim away from face."
 BULLET.AdminOnly = false

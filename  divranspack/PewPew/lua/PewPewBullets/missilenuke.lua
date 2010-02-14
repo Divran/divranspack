@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Missile Nuke"
+BULLET.Category = "AdminOnly"
 BULLET.Author = "Divran"
 BULLET.Description = "BLAAAAAARGH"
 BULLET.AdminOnly = true

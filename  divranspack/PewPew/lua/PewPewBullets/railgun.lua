@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Railgun"
+BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
 BULLET.Description = "Fires fast moving rounds which are almost not affected by gravity at all."
 BULLET.AdminOnly = false

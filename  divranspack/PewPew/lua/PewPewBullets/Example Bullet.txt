@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Example"
+BULLET.Category = "Cannons" -- This is the weapon Category. This does not work yet, but I recommend changing it anyway.
 BULLET.Author = "Divran"
 BULLET.Description = "Aim away from face."
 BULLET.AdminOnly = false

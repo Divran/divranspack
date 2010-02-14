@@ -68,6 +68,8 @@ function pewpew:SliceDamage( trace, direction, Damage, NumberOfSlices )
 	return currenttrace.HitPos
 end
 
+------------------------------------------------------------------------------------------------------------
+
 -- Base code for dealing damage
 function pewpew:DealDamageBase( TargetEntity, Damage )
 		if (!self.PewPewDamage) then return end
@@ -86,10 +88,24 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	if (TargetEntity.pewpewHealth > mass / 5 + boxsize:Length()) then
 		TargetEntity.pewpewHealth = (mass / 5 + boxsize:Length()) * (mass/TargetEntity.MaxMass)
 	end
+	-- Check if the entity has a core
+	if (TargetEntity.Core and self:CheckValid(TargetEntity.Core)) then
+		self:DamageCore( TargetEntity.Core, Damage )
+		return
+	end
 	-- Deal damage
 	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
 	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
 	self:CheckIfDead( TargetEntity )
+end
+
+-- Dealing damage to cores
+function pewpew:DamageCore( ent, Damage )
+	if (!self:CheckValid( ent )) then return end
+	if (ent:GetClass() != "pewpew_core") then return end
+	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage)
+	ent:SetNWInt("pewpewCoreHealth",ent.pewpewCoreHealth)
+	self:CheckIfDeadCore( ent )
 end
 
 ------------------------------------------------------------------------------------------------------------
@@ -107,30 +123,18 @@ function pewpew:SetHealth( ent )
 	ent:SetNWInt("pewpewHealth",health)
 end
 
--- Add to the existing health
-function pewpew:AddHealth( ent, Health )
-	if (!self:CheckValid( ent )) then return end
-	if (!ent.pewpewHealth) then
-		self:SetHealth( TargetEntity )
-	end
-	ent.pewpewHealth = ent.pewpewHealth + math.abs(Health)
-	ent:SetNWInt("pewpewHealth",ent.pewpewHealth)
-end
-
--- Set health to anything you want
-function pewpew:SetCustomHealth( ent, Health )
-	if (!self:CheckValid( ent )) then return end
-	if (!ent.pewpewHealth) then
-		self:SetHealth( TargetEntity )
-	end
-	ent.pewpewHealth = math.abs( Health )
-	ent:SetNWInt("pewpewHealth",ent.pewpewHealth)
-end
-
 -- Returns the health of the entity without setting it
 function pewpew:GetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
 	if (ent.pewpewHealth) then
+		-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
+		local phys = ent:GetPhysicsObject()
+		if (!phys) then return end
+		local mass = phys:GetMass() or 0
+		local boxsize = ent:OBBMaxs() - ent:OBBMins()
+		if (ent.pewpewHealth > mass / 5 + boxsize:Length()) then
+			return (mass / 5 + boxsize:Length()) * (mass/ent.MaxMass)
+		end
 		return ent.pewpewHealth
 	else
 		local phys = ent:GetPhysicsObject()
@@ -145,13 +149,19 @@ end
 
 -- Check if the entity should be removed
 function pewpew:CheckIfDead( ent )
-	if (ent.pewpewHealth < 0) then
+	if (ent.pewpewHealth <= 0) then
 		local effectdata = EffectData()
 		effectdata:SetOrigin( ent:GetPos() )
 		effectdata:SetScale( (ent:OBBMaxs() - ent:OBBMins()):Length() )
 		util.Effect( "pewpew_deatheffect", effectdata )
 		ent:Remove()
 	end
+end
+
+function pewpew:CheckIfDeadCore( ent )
+	if (ent.pewpewCoreHealth <= 0) then
+		ent:RemoveAllProps()
+	end	
 end
 
 function pewpew:CheckValid( entity ) -- Note: this function is copied from E2Lib

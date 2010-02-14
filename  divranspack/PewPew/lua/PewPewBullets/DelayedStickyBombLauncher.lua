@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Delayed Sticky-Bomb Launcher"
+BULLET.Category = "Cannons"
 BULLET.Author = "Free Fall"
 BULLET.Description = "Fires a bomb that will stick to whatever it hits and explodes short time after"
 BULLET.AdminOnly = false
@@ -73,7 +74,7 @@ function BULLET:ThinkFunc( self )
 	end
 	
 	if (self.Sticked and CurTime() >= self.StickBlow) then
-		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage) then
+		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.pewpewDamage) then
 			util.BlastDamage(self.Entity, self.Entity, self:GetPos(), self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
 		end
 		

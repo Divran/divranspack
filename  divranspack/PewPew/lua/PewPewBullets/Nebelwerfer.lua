@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Nebelwerfer"
+BULLET.Category = "Cannons"
 BULLET.Author = "Free Fall"
 BULLET.Description = "Fires smoking artillery rounds."
 BULLET.AdminOnly = false
@@ -36,7 +37,7 @@ BULLET.NumberOfSlices = nil
 BULLET.PlayerDamage = 80
 BULLET.PlayerDamageRadius = 500
 
--- Reload/Ammo
+-- Reloading/Ammo
 BULLET.Reloadtime = 0.3
 BULLET.Ammo = 6
 BULLET.AmmoReloadtime = 6
@@ -78,7 +79,9 @@ function BULLET:ThinkFunc( self )
 	end
 	
 	if (not self.Burning and self.Entity:GetVelocity():Length() < 1) then
-		util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
+		if (pewpew.pewpewDamage) then
+			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
+		end
 		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
 		
 		if (self.Bullet.ExplosionEffect) then

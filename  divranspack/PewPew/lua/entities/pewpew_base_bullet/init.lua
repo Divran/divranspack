@@ -32,14 +32,10 @@ function ENT:Initialize()
 	end
 end   
 
-function ENT:SetOptions( BULLET )
+function ENT:SetOptions( BULLET, Cannon )
 	self.Bullet = BULLET
-	
-	self.Entity:SetNetworkedString("BulletName", self.Bullet.Name)
-end
-
-function ENT:SetCannon( Cannon )
 	self.Cannon = Cannon
+	self.Entity:SetNetworkedString("BulletName", self.Bullet.Name)
 end
 
 function ENT:Think()
@@ -66,7 +62,7 @@ function ENT:Think()
 				self.Bullet:Explode( self, trace )
 			else
 				-- Player Damage
-				if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage) then
+				if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.pewpewDamage) then
 					util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 				end
 				
@@ -97,8 +93,9 @@ function ENT:Think()
 					if (trace.Entity and trace.Entity:IsValid()) then
 						pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
 						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+					else
+						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
 					end
-					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
 				elseif (damagetype == "PointDamage") then
 					pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
 				elseif (damagetype == "SliceDamage") then

@@ -1,76 +1,57 @@
--- C4
+-- Basic Cannon
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "C4"
-BULLET.Category = "Explosives"
+BULLET.Name = "50 cal machinegun"
+BULLET.Category = "Machineguns"
 BULLET.Author = "Divran"
-BULLET.Description = "C4. High damage, low radius."
+BULLET.Description = "50 caliber machinegun."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = nil
+BULLET.Model = "models/combatmodels/tankshell_25mm.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
 
+
+
 -- Effects / Sounds
-BULLET.FireSound = {"weapons/explode1.wav","weapons/explode2.wav"}
+BULLET.FireSound = {"arty/50cal.wav"}
 BULLET.ExplosionSound = nil
-BULLET.FireEffect = "dirtyxplo"
-BULLET.ExplosionEffect = nil
+BULLET.FireEffect = "muzzleflash"
+BULLET.ExplosionEffect = "mghit"
 
 -- Movement
-BULLET.Speed = nil
-BULLET.PitchChange = nil
-BULLET.RecoilForce = nil
-BULLET.Spread = nil
+BULLET.Speed = 90
+BULLET.PitchChange = 0.15
+BULLET.RecoilForce = 50
+BULLET.Spread = 0.4
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 3000
-BULLET.Radius = 350
-BULLET.RangeDamageMul = 0.8
+BULLET.DamageType = "PointDamage"
+BULLET.Damage = 70
+BULLET.Radius = nil
+BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = nil
-BULLET.PlayerDamage = 500
-BULLET.PlayerDamageRadius = 350
+BULLET.PlayerDamage = 35
+BULLET.PlayerDamageRadius = 50
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 1
-BULLET.Ammo = 0
-BULLET.AmmoReloadtime = nil
+BULLET.Reloadtime = 0.2
+
+BULLET.Ammo = 70
+BULLET.AmmoReloadtime = 9
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
+BULLET.FireOverride = false
 function BULLET:Fire( self )
-	local Pos = self.Entity:GetPos()
-	local Norm = self.Entity:GetUp()
-	
-	-- Sound
-	soundpath = table.Random(self.Bullet.FireSound)
-	self:EmitSound( soundpath )
-		
-	-- Effect
-	local effectdata = EffectData()
-	effectdata:SetOrigin( Pos )
-	effectdata:SetNormal( Norm )
-	util.Effect( self.Bullet.FireEffect, effectdata )
-	
-	-- Damage
-	if (pewpew.pewpewDamage) then
-		util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
-	end
-	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity )
-	
-	-- Still here?
-	if (self.Entity:IsValid()) then
-		self.Entity:Remove()
-	end
+	-- Nothing
 end
 
 -- Initialize (Is called when the bullet initializes)

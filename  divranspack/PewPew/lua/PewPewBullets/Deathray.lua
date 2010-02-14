@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Deathray"
+BULLET.Category = "Lasers"
 BULLET.Author = "Free Fall"
 BULLET.Description = "Combine laser and lightning. What do you get?"
 BULLET.AdminOnly = false
@@ -64,7 +65,7 @@ function BULLET:Fire( self )
 	ent:Spawn()
 	ent:Activate()
 	
-	if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage) then
+	if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.pewpewDamage) then
 		util.BlastDamage(self.Entity, self.Entity, trace.HitPos, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
 	end
 	
@@ -114,7 +115,7 @@ function BULLET:ThinkFunc( self )
 			
 			self:SetNetworkedEntity("LaserTarget", ent)
 			
-			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage) then
+			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.pewpewDamage) then
 				util.BlastDamage(self.Entity, self.Entity, trace.HitPos, self.Bullet.PlayerDamageRadius / 2, self.Bullet.PlayerDamage / 6)
 			end
 			pewpew:BlastDamage(trace.HitPos, self.Bullet.Radius / 2, self.Bullet.Damage / 6, self.Bullet.RangeDamageMul)

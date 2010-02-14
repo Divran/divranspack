@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Machinegun"
+BULLET.Category = "Machineguns"
 BULLET.Author = "Divran"
 BULLET.Description = "Rapid fire machinegun with a large magazine."
 BULLET.AdminOnly = false
@@ -26,11 +27,11 @@ BULLET.ExplosionEffect = "mghit"
 BULLET.Speed = 70
 BULLET.PitchChange = 0.2
 BULLET.RecoilForce = 30
-BULLET.Spread = 0.3
+BULLET.Spread = 0.2
 
 -- Damage
-BULLET.DamageType = "PointDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 25
+BULLET.DamageType = "PointDamage"
+BULLET.Damage = 45
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = nil

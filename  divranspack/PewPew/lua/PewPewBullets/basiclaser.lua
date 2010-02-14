@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Basic Laser"
+BULLET.Category = "Lasers"
 BULLET.Author = "Divran"
 BULLET.Description = "Fires a laser beam which slices through and damages 4 props."
 BULLET.AdminOnly = false

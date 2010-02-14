@@ -1,17 +1,17 @@
--- Bomb Rack
+-- Helicopter Bomb
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Bomb Rack"
+BULLET.Name = "Helicopter Bomb"
 BULLET.Category = "Explosives"
 BULLET.Author = "Divran"
-BULLET.Description = "Drops several bombs straight down onto your enemy."
+BULLET.Description = "Drops a bomb very much like the one the attack helicopter drops in HL2."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/props_phx/mk-82.mdl"
+BULLET.Model = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
@@ -20,7 +20,7 @@ BULLET.Trail = nil
 BULLET.FireSound = {"npc/attack_helicopter/aheli_mine_drop1.wav"}
 BULLET.ExplosionSound = {"weapons/explode3.wav","weapons/explode4.wav","weapons/explode5.wav"}
 BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "athesplode"
+BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
 BULLET.Speed = nil
@@ -30,17 +30,17 @@ BULLET.Spread = nil
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 650
-BULLET.Radius = 500
+BULLET.Damage = 600
+BULLET.Radius = 800
 BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil
-BULLET.PlayerDamage = 600
-BULLET.PlayerDamageRadius = 600
+BULLET.PlayerDamage = 500
+BULLET.PlayerDamageRadius = 500
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.8
-BULLET.Ammo = 5
-BULLET.AmmoReloadtime = 8
+BULLET.Reloadtime = 3
+BULLET.Ammo = 0
+BULLET.AmmoReloadtime = 0
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -61,25 +61,23 @@ function BULLET:InitializeFunc(self)
 	
 	constraint.NoCollide(self.Entity, self.Cannon.Entity, 0, 0)
 	
-	self.Entity:SetPos( self.Entity:GetPos() + self.Entity:GetUp() * 40 )
 	self.Entity:NextThink(CurTime())
 	
 	local phys = self.Entity:GetPhysicsObject()
 	if (phys:IsValid()) then
-		phys:SetVelocity(self.Cannon:GetVelocity()+self.Cannon:GetUp()*50)
+		phys:SetVelocity(self.Cannon:GetVelocity())
 	end
 	
+	self.Entity.BombSound = CreateSound(self.Entity,Sound("npc/attack_helicopter/aheli_mine_seek_loop1.wav"))
+	self.Entity.BombSound:Play()
 	self.Timer = CurTime() + 50
-	self.Collided = false
+	self.Collided = 0
 end
 
 -- Think (Is called a lot of times :p)
 BULLET.ThinkOverride = true
 function BULLET:ThinkFunc( self )
-	local vel = self:GetVelocity() -- For some reason setting the angle every tick makes it move REALLY slowly, so I used this hacky method of angling it
-	self:SetAngles( vel:GetNormal():Angle() )
-	self.Entity:GetPhysicsObject():SetVelocity( vel )
-	if (self.Collided == true or CurTime() > self.Timer) then
+	if (CurTime() > self.Timer) then
 		if (pewpew.pewpewDamage) then
 			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
@@ -104,6 +102,7 @@ function BULLET:ThinkFunc( self )
 			WorldSound( soundpath, self.Entity:GetPos(),100,100)
 		end
 		
+		self.Entity.BombSound:Stop()
 		self:Remove()
 	end
 end
@@ -111,14 +110,19 @@ end
 -- Explode (Is called when the bullet explodes) Note: this will not run if you override the think function (unless you call it from there as well)
 BULLET.ExplodeOverride = false
 function BULLET:Explode( self, trace )
-	-- Nothing
+	
 end
 
 -- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
 BULLET.PhysicsCollideOverride = true
 function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
-	if (self.Collided == false) then
-		self.Collided = true
+	if (CollisionData.HitEntity:IsWorld() and self.Collided == 0) then
+		self.Timer = CurTime() + 8
+		self.Collided = 1
+	end
+	if (!CollisionData.HitEntity:IsWorld() and (self.Collided == 0 or self.Collided == 1)) then
+		self.Timer = CurTime() + 0.1
+		self.Collided = 2
 	end
 end
 

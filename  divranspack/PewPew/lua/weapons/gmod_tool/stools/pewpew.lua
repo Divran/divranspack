@@ -89,6 +89,7 @@ if (SERVER) then
 		else
 			-- else create a new one
 			local ent = self:CreateCannon( ply, trace, model, bullet )
+			if (!ent) then return end
 			
 			if (!traceent:IsWorld() and !traceent:IsPlayer()) then
 				local weld = constraint.Weld( ent, trace.Entity, 0, trace.PhysicsBone, 0 )
@@ -145,7 +146,8 @@ if (SERVER) then
 		else
 			-- else create a new one
 			local ent = self:CreateCannon( ply, trace, model, bullet )
-				
+			if (!ent) then return end	
+			
 			ply:AddCount("pewpew",ent)
 			ply:AddCleanup ( "pewpew", ent )
 
@@ -161,8 +163,7 @@ if (SERVER) then
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
 			if (trace.Entity and ValidEntity(trace.Entity)) then
-				self:GetOwner():ConCommand("pewpew_model" .. trace.Entity:GetModel())
-				--self.CannonModel = trace.Entity:GetModel()
+				self:GetOwner():ConCommand("pewpew_model " .. trace.Entity:GetModel())
 				self:GetOwner():ChatPrint("GCombat Cannon model set to: " .. trace.Entity:GetModel())
 			end
 		end
@@ -226,9 +227,8 @@ else
 	function TOOL:UpdateGhostCannon( ent, player )
 		if (!ent or !ent:IsValid()) then return end
 		local trace = player:GetEyeTrace()
-		if (!trace.Hit) then return end
 		
-		if ((trace.Entity and trace.Entity:GetClass() == "pewpew_base_cannon") or trace.Entity:IsPlayer()) then
+		if (!trace.Hit or (trace.Entity and trace.Entity:GetClass() == "pewpew_base_cannon") or trace.Entity:IsPlayer()) then
 			ent:SetNoDraw( true )
 			return
 		end

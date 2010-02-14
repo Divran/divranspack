@@ -4,6 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Warhead"
+BULLET.Category = "Explosives"
 BULLET.Author = "Divran"
 BULLET.Description = "Warhead. Low damage, high radius."
 BULLET.AdminOnly = false
@@ -61,7 +62,9 @@ function BULLET:Fire( self )
 	util.Effect( self.Bullet.FireEffect, effectdata )
 	
 	-- Damage
-	util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+	if (pewpew.pewpewDamage) then
+		util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+	end
 	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity )
 	
 	-- Still here?
