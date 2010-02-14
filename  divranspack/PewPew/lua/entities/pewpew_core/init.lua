@@ -45,12 +45,9 @@ function ENT:Think()
 	end
 	
 	local hp = self.pewpewCoreHealth
-	-- Calculate their total health
-	--for key, ent in pairs( self.Props ) do
 	for key=1, table.Count( self.Props ) do
 		local ent = self.Props[key]
 		local health = self.PropHealth[key] or 0
-		print("KEY: " .. tostring(key) .. " ENT: " .. tostring(ent) .. " HEALTH: " .. tostring(health) )
 		if (ent and pewpew:CheckValid(ent)) then
 			-- If one of them has a valid core, self destruct.
 			if (ent.Core and pewpew:CheckValid(ent.Core) and ent != self.Entity and ent.Core != self) then
