@@ -1,49 +1,50 @@
--- Laser Machinegun
+-- Burst Machinegun
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Laser Machinegun"
-BULLET.Category = "Lasers"
+BULLET.Name = "Burst Machinegun"
+BULLET.Category = "Machineguns"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires small laser bolts extremely fast."
+BULLET.Description = "Fires 5 shots in quick succession followed by a brief pause."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/PenisColada/redlaser_small.mdl"
+BULLET.Model = "models/combatmodels/tankshell_25mm.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
+					
 
 -- Effects / Sounds
-BULLET.FireSound = {"Lasers/SPulse/PulseLaser.wav"}
+BULLET.FireSound = {"arty/20mm.wav"}
 BULLET.ExplosionSound = nil
-BULLET.FireEffect = nil
-BULLET.ExplosionEffect = nil
+BULLET.FireEffect = "muzzleflash"
+BULLET.ExplosionEffect = "mghit"
 
 -- Movement
-BULLET.Speed = 90
-BULLET.PitchChange = 0.01
-BULLET.RecoilForce = 10
-BULLET.Spread = 0.4
+BULLET.Speed = 100
+BULLET.PitchChange = 0.05
+BULLET.RecoilForce = 55
+BULLET.Spread = 0.1
 
 -- Damage
 BULLET.DamageType = "PointDamage"
-BULLET.Damage = 25
+BULLET.Damage = 125
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = nil
-BULLET.PlayerDamage = 45
-BULLET.PlayerDamageRadius = 40
+BULLET.PlayerDamage = 150
+BULLET.PlayerDamageRadius = 60
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.07
-BULLET.Ammo = 0
-BULLET.AmmoReloadtime = 0
+BULLET.Reloadtime = 0.08
+BULLET.Ammo = 5
+BULLET.AmmoReloadtime = 0.8
 
 -- Custom Functions 
--- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
+-- (If you set the override var to true, the cannon will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = false

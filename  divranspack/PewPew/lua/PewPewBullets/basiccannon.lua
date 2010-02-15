@@ -30,7 +30,7 @@ BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 250
+BULLET.Damage = 400
 BULLET.Radius = 800
 BULLET.RangeDamageMul = 0.3
 BULLET.NumberOfSlices = nil

@@ -1,46 +1,46 @@
--- Laser Machinegun
+-- Red Laser
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Laser Machinegun"
+BULLET.Name = "Red Star Wars Laser"
 BULLET.Category = "Lasers"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires small laser bolts extremely fast."
+BULLET.Description = "The red Star Wars laser."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/PenisColada/redlaser_small.mdl"
+BULLET.Model = "models/PenisColada/redlaser.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"Lasers/SPulse/PulseLaser.wav"}
+BULLET.FireSound = {"starwars/red.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = nil
 BULLET.ExplosionEffect = nil
 
 -- Movement
-BULLET.Speed = 90
+BULLET.Speed = 85
 BULLET.PitchChange = 0.01
-BULLET.RecoilForce = 10
-BULLET.Spread = 0.4
+BULLET.RecoilForce = 0
+BULLET.Spread = 0.05
 
 -- Damage
 BULLET.DamageType = "PointDamage"
-BULLET.Damage = 25
+BULLET.Damage = 280
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = nil
-BULLET.PlayerDamage = 45
-BULLET.PlayerDamageRadius = 40
+BULLET.PlayerDamage = 125
+BULLET.PlayerDamageRadius = 75
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.07
-BULLET.Ammo = 0
-BULLET.AmmoReloadtime = 0
+BULLET.Reloadtime = 0.35
+BULLET.Ammo = 3
+BULLET.AmmoReloadtime = 1
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)

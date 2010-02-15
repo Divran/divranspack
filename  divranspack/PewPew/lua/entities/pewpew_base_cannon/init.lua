@@ -7,7 +7,7 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
-	self.Inputs = Wire_CreateInputs( self.Entity, { "Fire" } )
+	self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
 	self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo" })
 	
 	self.CanFire = true
@@ -79,8 +79,10 @@ function ENT:FireBullet()
 			util.Effect( self.Bullet.FireEffect, effectdata )
 		end
 		
-		self.Ammo = self.Ammo - 1
-		Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+		if (self.Bullet.Ammo and self.Bullet.Ammo > 0) then
+			self.Ammo = self.Ammo - 1
+			Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+		end
 	end
 end
 
@@ -135,7 +137,20 @@ function ENT:TriggerInput(iname, value)
 			self:FireBullet()
 		end
 		return true
+	elseif (iname == "Reload") then
+		if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
+			if (value != 0) then
+				if (self.Ammo and self.Ammo > 0) then
+					self.Ammo = 0
+					self.LastFired = CurTime() + self.Bullet.Reloadtime
+					self.CanFire = false					
+					Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+					Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+				end
+			end
+		end
 	end
+				
 end
  
 -- Dupe support! Thanks to Free Fall
@@ -155,29 +170,29 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 	end
 	if (info.BulletName) then
 		local bullet = pewpew:GetBullet( info.BulletName )
-		if (bullet.AdminOnly and !ply:IsAdmin()) then 
-			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
-			ent:Remove()
-			return false
-		end
-		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
-			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
-			ent:Remove()
-			return false
-		end
 		if (bullet) then
+			if (bullet.AdminOnly and !ply:IsAdmin()) then 
+				ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+				ent:Remove()
+				return false
+			end
+			if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
+				ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+				ent:Remove()
+				return false
+			end
 			self:SetOptions( bullet )
 		else
 			local blt = {
 				Name = "Dummy bullet",
-				Reloadtime = 1,
+				Reloadtime = 2,
 				Ammo = 0,
 				AmmoReloadtime = 0,
-				FireOverride = true,
-				Fire = function(self) self.Owner:ChatPrint("You must select a bullet to fire.") end
+				FireOverride = true
 			}
+			function blt:Fire(self) self.Owner:ChatPrint("You must update this cannon with a valid bullet before you can fire.") end
 			self:SetOptions( blt, ply )
-			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found!.")
+			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
 		end
 	end
 	ply:AddCount("pewpew",ent)
