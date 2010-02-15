@@ -1,44 +1,45 @@
--- Basic Laser
+-- Basic Cannon
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Laser"
+BULLET.Name = "Laser Machinegun"
 BULLET.Category = "Lasers"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires a laser beam which slices through and damages 4 props."
+BULLET.Description = "Fires small laser bolts very quickly."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = nil
+BULLET.Model = "models/PenisColada/redlaser.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"Lasers/Small/Laser.wav"}
+BULLET.FireSound = {"Lasers/SPulse/PulseLaser.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "ISSmallPulseBeam"
+BULLET.ExplosionEffect = nil
 
 -- Movement
-BULLET.Speed = nil
-BULLET.PitchChange = nil
-BULLET.RecoilForce = nil
-BULLET.Spread = nil
+BULLET.Speed = 90
+BULLET.PitchChange = 0.025
+BULLET.RecoilForce = 10
+BULLET.Spread = 0.4
 
 -- Damage
-BULLET.DamageType = nil -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 85
+BULLET.DamageType = "PointDamage"
+BULLET.Damage = 25
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
-BULLET.NumberOfSlices = 4
-BULLET.PlayerDamageRadius = nil
-BULLET.PlayerDamage = nil
+BULLET.NumberOfSlices = nil
+BULLET.PlayerDamage = 45
+BULLET.PlayerDamageRadius = 40
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.7
+BULLET.Reloadtime = 0.07
+
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -46,41 +47,9 @@ BULLET.AmmoReloadtime = 0
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
+BULLET.FireOverride = false
 function BULLET:Fire( self )
-	-- Get the start position
-	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.z / 2 + 10)
-	
-	-- Start a trace
-	local tr = {}
-	tr.start = startpos
-	tr.endpos = self.Entity:GetUp() * 10000
-	tr.filter = self.Entity
-	local trace = util.TraceLine( tr )
-	
-	-- Deal damage
-	local HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices )
-	
-	-- If the first trace didn't hit anything..
-	if (!HitPos) then
-		-- Start a new trace
-		tr = {}
-		local startpos2 = startpos + self.Entity:GetUp() * 10000
-		tr.start = startpos2
-		tr.endpos = startpos2 + self.Entity:GetUp() * 10000
-		trace = util.TraceLine( tr )
-		
-		-- Deal damage
-		HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices  )
-	end
-	
-	-- Effects
-	self:EmitSound( self.Bullet.FireSound[1] )
-	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 10000) )
-	effectdata:SetStart( startpos )
-	util.Effect( self.Bullet.ExplosionEffect, effectdata )
+	-- Nothing
 end
 
 -- Initialize (Is called when the bullet initializes)
@@ -123,7 +92,5 @@ BULLET.CLDrawOverride = false
 function BULLET:CLDrawFunc()
 	-- Nothing
 end
-
-
 
 pewpew:AddBullet( BULLET )

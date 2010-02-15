@@ -2,7 +2,7 @@
 -- Initialize variables
 pewpew = {}
 
-AddCSLuaFile("autorun/pewpew_usemenu.lua")
+AddCSLuaFile("autorun/pewpew_menu.lua")
 AddCSLuaFile("autorun/client/pewpew_autorun_client.lua")
 AddCSLuaFile("pewpew_damagecontrol.lua")
 include("pewpew_damagecontrol.lua")

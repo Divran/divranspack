@@ -42,8 +42,8 @@ if (CLIENT) then
 		list[15] = 	{"AmmoReloadtime", 		Bullet.AmmoReloadtime}
 	end
 	
-	usermessage.Hook( "PewPew_OpenMenu", function( um )
-		local Bullet = pewpew:GetBullet( um:ReadString() )
+	local function OpenUseMenu( bulletname )
+		local Bullet = pewpew:GetBullet( bulletname )
 		if (Bullet) then
 			pewpew_list:Clear()
 			SetTable( Bullet )
@@ -52,6 +52,14 @@ if (CLIENT) then
 			end
 			pewpew_frame:SetVisible( true )
 		end
+	end
+	
+	concommand.Add("PewPew_UseMenu", function( ply, cmd, arg )
+		OpenUseMenu( arg[1] )
+	end)
+	
+	usermessage.Hook( "PewPew_OpenMenu", function( um )
+		OpenUseMenu( um:ReadString() )
 	end)
 	
 	-- Weapons Menu
@@ -68,9 +76,14 @@ if (CLIENT) then
 		pewpew_weaponframe:SetScreenLock( true )
 		pewpew_weaponframe:MakePopup()
 		
+		local label = vgui.Create("DLabel", pewpew_weaponframe)
+		label:SetText("Left click to select, right click for info.")
+		label:SetPos( 6, 23 )
+		label:SizeToContents()
+		
 		-- Panel List 1
 		local list1 = vgui.Create("DPanelList", pewpew_weaponframe)
-		list1:StretchToParent( 4, 25, 4, 4 )
+		list1:StretchToParent( 4, 40, 4, 4 )
 		list1:SetAutoSize( false )
 		list1:SetSpacing( 2 )
 		list1:EnableHorizontal( false ) 
@@ -100,8 +113,12 @@ if (CLIENT) then
 				-- Set bullet, change weapon, and close menu
 				btn.DoClick = function()
 					RunConsoleCommand("pewpew_bulletname", value2)
-					RunConsoleCommand("gmod_tool pewpew")
+					RunConsoleCommand("gmod_tool", "pewpew")
 					pewpew_weaponframe:SetVisible( false )
+					pewpew_frame:SetVisible( false )
+				end
+				btn.DoRightClick = function()
+					RunConsoleCommand("PewPew_UseMenu", value2)
 				end
 				list:AddItem( btn )
 			end

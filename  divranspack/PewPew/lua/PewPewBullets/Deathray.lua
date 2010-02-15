@@ -18,7 +18,7 @@ BULLET.Trail = nil
 
 -- Effects / Sounds
 BULLET.FireSound = "npc/strider/fire.wav"
-BULLET.FireEffect = "cannon_flare"
+BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "big_splosion"
 BULLET.ExplosionSound = nil
 
@@ -79,6 +79,11 @@ function BULLET:Fire( self )
 	effectdata:SetOrigin(trace.HitPos)
 	effectdata:SetStart(self.Entity:GetPos() +  self.Entity:GetUp() * 50)
 	util.Effect( "Deathbeam", effectdata )
+	
+	local effectdata = EffectData()
+	effectdata:SetOrigin(trace.HitPos)
+	effectdata:SetStart(trace.HitPos +  trace.Normal * 10)
+	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 end
 
 -- Initialize (Is called when the bullet initializes)

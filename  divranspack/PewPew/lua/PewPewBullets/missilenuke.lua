@@ -11,8 +11,8 @@ BULLET.AdminOnly = true
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/combatmodels/tankshell.mdl"
-BULLET.Material = nil
+BULLET.Model = "models/aamissile.mdl"
+BULLET.Material = "phoenix_storms/gear"
 BULLET.Color = nil
 BULLET.Trail = nil
 

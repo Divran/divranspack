@@ -3,11 +3,11 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Laser"
-BULLET.Category = "Lasers"
+BULLET.Name = "Laser Nuke"
+BULLET.Category = "AdminOnly"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires a laser beam which slices through and damages 4 props."
-BULLET.AdminOnly = false
+BULLET.Description = "BLAAAAAARGH"
+BULLET.AdminOnly = true
 BULLET.SuperAdminOnly = false
 
 -- Appearance
@@ -17,10 +17,10 @@ BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"Lasers/Small/Laser.wav"}
-BULLET.ExplosionSound = nil
-BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "ISSmallPulseBeam"
+BULLET.FireSound = {"npc/strider/fire.wav"}
+BULLET.ExplosionSound = { "ambient/explosions/citadel_end_explosion1.wav", "ambient/explosions/citadel_end_explosion2.wav" }
+BULLET.FireEffect = "Deathbeam2"
+BULLET.ExplosionEffect = "breachsplode"
 
 -- Movement
 BULLET.Speed = nil
@@ -29,16 +29,16 @@ BULLET.RecoilForce = nil
 BULLET.Spread = nil
 
 -- Damage
-BULLET.DamageType = nil -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 85
-BULLET.Radius = nil
-BULLET.RangeDamageMul = nil
-BULLET.NumberOfSlices = 4
-BULLET.PlayerDamageRadius = nil
-BULLET.PlayerDamage = nil
+BULLET.DamageType = nil -- custom
+BULLET.Damage = 9001
+BULLET.Radius = 7000
+BULLET.RangeDamageMul = 0.6
+BULLET.NumberOfSlices = nil
+BULLET.PlayerDamage = 5000
+BULLET.PlayerDamageRadius = 5000
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.7
+BULLET.Reloadtime = 11
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -60,10 +60,10 @@ function BULLET:Fire( self )
 	local trace = util.TraceLine( tr )
 	
 	-- Deal damage
-	local HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices )
+	local HitPos = trace.HitPos
 	
 	-- If the first trace didn't hit anything..
-	if (!HitPos) then
+	if (!trace.Hit) then
 		-- Start a new trace
 		tr = {}
 		local startpos2 = startpos + self.Entity:GetUp() * 10000
@@ -72,7 +72,7 @@ function BULLET:Fire( self )
 		trace = util.TraceLine( tr )
 		
 		-- Deal damage
-		HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices  )
+		HitPos = trace.HitPos
 	end
 	
 	-- Effects
@@ -81,6 +81,32 @@ function BULLET:Fire( self )
 	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 10000) )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
+	
+	local effectdata = EffectData()
+	effectdata:SetOrigin( HitPos )
+	effectdata:SetStart( startpos )
+	util.Effect( self.Bullet.FireEffect, effectdata )
+	
+	-- Sounds
+	if (self.Bullet.ExplosionSound) then
+		local soundpath = ""
+		if (table.Count(self.Bullet.ExplosionSound) > 1) then
+			soundpath = table.Random(self.Bullet.ExplosionSound)
+		else
+			soundpath = self.Bullet.ExplosionSound[1]
+		end
+		WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
+	end
+	
+	if (pewpew.PewPewDamage) then
+		if (trace.Entity and trace.Entity:IsValid()) then
+			pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+		else
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+		end
+		util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+	end
 end
 
 -- Initialize (Is called when the bullet initializes)
