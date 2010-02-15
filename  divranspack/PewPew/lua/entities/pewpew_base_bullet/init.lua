@@ -62,7 +62,7 @@ function ENT:Think()
 				self.Bullet:Explode( self, trace )
 			else
 				-- Player Damage
-				if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.pewpewDamage) then
+				if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
 					util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 				end
 				

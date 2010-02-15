@@ -221,6 +221,12 @@ else
 		end
 		
 		CPanel:AddControl("ComboBox", Ctype )
+		
+		CPanel:AddControl( "Button", {
+			Label = "#PewPew Weapon Menu", 
+			Description = "#Open the weapons menu to select weapons.",
+			Text = "#PewPew Weapon Menu",
+			Command = "pewpew_weaponmenu"} )
 	end
 
 	-- Ghost functions (Thanks to Grocel for making the base. I changed it a bit)

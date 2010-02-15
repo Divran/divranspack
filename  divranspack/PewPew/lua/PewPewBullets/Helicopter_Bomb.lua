@@ -78,7 +78,7 @@ end
 BULLET.ThinkOverride = true
 function BULLET:ThinkFunc( self )
 	if (CurTime() > self.Timer) then
-		if (pewpew.pewpewDamage) then
+		if (pewpew.PewPewDamage) then
 			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
 		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)

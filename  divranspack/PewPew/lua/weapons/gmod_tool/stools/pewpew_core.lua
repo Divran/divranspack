@@ -9,7 +9,20 @@ TOOL.ClientConVar[ "model" ] = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 
 cleanup.Register("pewpew_cores")
 
-local PewPewModels = { 	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {} }
+local PewPewModels = { 	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {},
+						["models/props_combine/combine_interface001.mdl"] = {}, 
+						["models/props_combine/combine_interface002.mdl"] = {},
+						["models/props_combine/combine_interface003.mdl"] = {},
+						["models/props_combine/breenconsole.mdl"] = {},
+						["models/props_lab/reciever01b.mdl"] = {},
+						["models/props_lab/reciever01a.mdl"] = {},
+						["models/props_lab/reciever_cart.mdl"] = {},
+						["models/props_lab/securitybank.mdl"] = {},
+						["models/props_lab/servers.mdl"] = {},
+						["models/props_lab/workspace002.mdl"] = {},
+						["models/props_lab/workspace003.mdl"] = {},
+						["models/props_lab/workspace004.mdl"] = {},
+						["models/props_combine/weaponstripper.mdl"] = {} }
 
 
 -- This needs to be shared...

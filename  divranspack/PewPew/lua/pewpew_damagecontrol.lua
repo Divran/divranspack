@@ -126,21 +126,18 @@ end
 -- Returns the health of the entity without setting it
 function pewpew:GetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
+	if (!self:CheckAllowed( ent )) then return 0 end
+	local phys = ent:GetPhysicsObject()
+	if (!phys) then return end
+	local mass = phys:GetMass() or 0
+	local boxsize = ent:OBBMaxs() - ent:OBBMins()
 	if (ent.pewpewHealth) then
 		-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
-		local phys = ent:GetPhysicsObject()
-		if (!phys) then return end
-		local mass = phys:GetMass() or 0
-		local boxsize = ent:OBBMaxs() - ent:OBBMins()
 		if (ent.pewpewHealth > mass / 5 + boxsize:Length()) then
 			return (mass / 5 + boxsize:Length()) * (mass/ent.MaxMass)
 		end
 		return ent.pewpewHealth
 	else
-		local phys = ent:GetPhysicsObject()
-		if (!phys) then return end
-		local mass = phys:GetMass() or 0
-		local boxsize = ent:OBBMaxs() - ent:OBBMins()
 		return (mass / 5 + boxsize:Length())
 	end
 end
@@ -164,7 +161,7 @@ function pewpew:CheckIfDeadCore( ent )
 	end	
 end
 
-function pewpew:CheckValid( entity ) -- Note: this function is copied from E2Lib
+function pewpew:CheckValid( entity ) -- Note: this function is mostly copied from E2Lib, then edited
 	if (entity):IsValid() then
 		if entity:IsWorld() then return false end
 		if entity:GetMoveType() ~= MOVETYPE_VPHYSICS then return false end

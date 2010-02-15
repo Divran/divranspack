@@ -62,7 +62,7 @@ function BULLET:Fire( self )
 	util.Effect( self.Bullet.FireEffect, effectdata )
 	
 	-- Damage
-	if (pewpew.pewpewDamage) then
+	if (pewpew.PewPewDamage) then
 		util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 	end
 	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity )
