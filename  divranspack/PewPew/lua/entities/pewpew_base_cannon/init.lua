@@ -124,33 +124,36 @@ function ENT:Think()
 end
 
 function ENT:TriggerInput(iname, value)
-	if (iname == "Fire") then
-		if (value != 0) then
-			self.Firing = true
-		else
-			self.Firing = false
-		end
-		if (value != 0 and self.CanFire == true) then
-			self.LastFired = CurTime()
-			self.CanFire = false
-			Wire_TriggerOutput(self.Entity, "Can Fire", 0)
-			self:FireBullet()
-		end
-		return true
-	elseif (iname == "Reload") then
-		if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
+	if (self.Bullet.WireInputOverride) then
+		self.Bullet:WireInput( iname, value )
+	else
+		if (iname == "Fire") then
 			if (value != 0) then
-				if (self.Ammo and self.Ammo > 0) then
-					self.Ammo = 0
-					self.LastFired = CurTime() + self.Bullet.Reloadtime
-					self.CanFire = false					
-					Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-					Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+				self.Firing = true
+			else
+				self.Firing = false
+			end
+			if (value != 0 and self.CanFire == true) then
+				self.LastFired = CurTime()
+				self.CanFire = false
+				Wire_TriggerOutput(self.Entity, "Can Fire", 0)
+				self:FireBullet()
+			end
+			return true
+		elseif (iname == "Reload") then
+			if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
+				if (value != 0) then
+					if (self.Ammo and self.Ammo > 0) then
+						self.Ammo = 0
+						self.LastFired = CurTime() + self.Bullet.Reloadtime
+						self.CanFire = false					
+						Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+						Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+					end
 				end
 			end
 		end
-	end
-				
+	end		
 end
  
 -- Dupe support! Thanks to Free Fall

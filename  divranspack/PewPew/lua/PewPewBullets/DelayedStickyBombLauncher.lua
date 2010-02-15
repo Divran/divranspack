@@ -38,6 +38,15 @@ BULLET.Reloadtime = 3.5
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
+-- Overrides
+
+-- Wire Input
+BULLET.WireInputOverride = false
+function BULLET:WireInput( inputname, value )
+	-- Nothing
+end
+
+
 BULLET.FireOverride = false
 
 BULLET.InitializeOverride = true

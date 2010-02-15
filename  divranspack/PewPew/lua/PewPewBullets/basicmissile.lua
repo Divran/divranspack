@@ -45,6 +45,12 @@ BULLET.AmmoReloadtime = 8
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
+-- Wire Input
+BULLET.WireInputOverride = false
+function BULLET:WireInput( inputname, value )
+	-- Nothing
+end
+
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = false
 function BULLET:Fire( self )
