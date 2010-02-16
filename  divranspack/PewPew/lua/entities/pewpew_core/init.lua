@@ -12,8 +12,8 @@ function ENT:Initialize()
 	self.Props = {}
 	self.PropHealth = {}
 	self.pewpewCoreHealth = 1
+	self.pewpewCoreMaxHealth = 1
 	self.Entity.Core = self
-	--table.insert( self.Props, {self.Entity, pewpew:GetHealth( self.Entity ) } )
 	
 	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpewCoreHealth )
 	
@@ -74,6 +74,21 @@ function ENT:Think()
 		end
 	end
 	self.pewpewCoreHealth = hp
+	
+	-- Calculate Max health
+	hp = 0
+	for _, ent in pairs( self.Props ) do
+		hp = hp + pewpew:GetHealth( ent )
+	end
+	self.pewpewCoreMaxHealth = hp
+	
+	-- Set NW ints
+	if (!self.Entity:GetNWInt("pewpewMaxHealth") or self.Entity:GetNWInt("pewpewMaxHealth") != self.pewpewCoreMaxHealth) then
+		self.Entity:SetNWInt("pewpewMaxHealth", self.pewpewCoreMaxHealth)
+	end
+	if (!self.Entity:GetNWInt("pewpewHealth") or self.Entity:GetNWInt("pewpewHealth") != self.pewpewCoreHealth) then
+		self.Entity:SetNWInt("pewpewHealth", self.pewpewCoreHealth)
+	end
 	
 	-- Wire Output
 	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpewCoreHealth or 0 )

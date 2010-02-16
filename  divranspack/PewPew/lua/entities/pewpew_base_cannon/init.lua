@@ -18,12 +18,14 @@ function ENT:Initialize()
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
 
-function ENT:SetOptions( BULLET, ply )
+function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
  	self.Bullet = BULLET
 	self.Ammo = self.Bullet.Ammo
 	self.Owner = ply
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+	self.FireKey = firekey
+	self.ReloadKey = reloadkey
 end
 
 function ENT:FireBullet()
@@ -123,38 +125,65 @@ function ENT:Think()
 	end
 end
 
+local function InputChange( self, name, value )
+	if (name == "Fire") then
+		if (value != 0) then
+			self.Firing = true
+		else
+			self.Firing = false
+		end
+		if (value != 0 and self.CanFire == true) then
+			self.LastFired = CurTime()
+			self.CanFire = false
+			Wire_TriggerOutput(self.Entity, "Can Fire", 0)
+			self:FireBullet()
+		end
+		return true
+	elseif (name == "Reload") then
+		if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
+			if (value != 0) then
+				if (self.Ammo and self.Ammo > 0) then
+					self.Ammo = 0
+					self.LastFired = CurTime() + self.Bullet.Reloadtime
+					self.CanFire = false					
+					Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+					Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+				end
+			end
+		end
+	end
+end
+
+-- Wiring
 function ENT:TriggerInput(iname, value)
 	if (self.Bullet.WireInputOverride) then
 		self.Bullet:WireInput( iname, value )
 	else
-		if (iname == "Fire") then
-			if (value != 0) then
-				self.Firing = true
-			else
-				self.Firing = false
-			end
-			if (value != 0 and self.CanFire == true) then
-				self.LastFired = CurTime()
-				self.CanFire = false
-				Wire_TriggerOutput(self.Entity, "Can Fire", 0)
-				self:FireBullet()
-			end
-			return true
-		elseif (iname == "Reload") then
-			if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
-				if (value != 0) then
-					if (self.Ammo and self.Ammo > 0) then
-						self.Ammo = 0
-						self.LastFired = CurTime() + self.Bullet.Reloadtime
-						self.CanFire = false					
-						Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-						Wire_TriggerOutput( self.Entity, "Ammo", 0 )
-					end
-				end
-			end
-		end
-	end		
+		InputChange( self, iname, value )
+	end
 end
+
+-- Numpad
+local function NumpadOn( ply, ent )
+	InputChange( ents.GetByIndex(ent), "Fire", 1 )
+end
+
+local function NumpadOff( ply, ent )
+	InputChange( ents.GetByIndex(ent), "Fire", 0 )
+end
+
+local function NumpadReloadOn( ply, ent )
+	InputChange( ents.GetByIndex(ent), "Reload", 1 )
+end
+
+local function NumpadReloadOff( ply, ent )
+	InputChange( ents.GetByIndex(ent), "Reload", 0 )
+end
+
+numpad.Register( "PewPew_Cannon_Fire_On", NumpadOn )
+numpad.Register( "PewPew_Cannon_Fire_Off", NumpadOff )
+numpad.Register( "PewPew_Cannon_Reload_On", NumpadReloadOn )
+numpad.Register( "PewPew_Cannon_Reload_Off", NumpadReloadOff )
  
 -- Dupe support! Thanks to Free Fall
 function ENT:BuildDupeInfo()
@@ -162,6 +191,8 @@ function ENT:BuildDupeInfo()
 	if (self.Bullet) then
 		info.BulletName = self.Bullet.Name
 	end
+	info.FireKey = self.FireKey
+	info.ReloadKey = self.ReloadKey
 	return info
 end
 
@@ -184,7 +215,7 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 				ent:Remove()
 				return false
 			end
-			self:SetOptions( bullet )
+			self:SetOptions( bullet, ply, info.FireKey or "1", info.ReloadKey or "2")
 		else
 			local blt = {
 				Name = "Dummy bullet",
@@ -194,7 +225,7 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 				FireOverride = true
 			}
 			function blt:Fire(self) self.Owner:ChatPrint("You must update this cannon with a valid bullet before you can fire.") end
-			self:SetOptions( blt, ply )
+			self:SetOptions( blt, ply, info.FireKey or "1", info.ReloadKey or "2" )
 			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
 		end
 	end

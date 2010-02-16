@@ -39,7 +39,6 @@ BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 3.5
-
 BULLET.Ammo = 0 -- If you set this to 0, it will have infinite ammo
 BULLET.AmmoReloadtime = 0
 

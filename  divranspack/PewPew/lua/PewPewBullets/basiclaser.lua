@@ -61,7 +61,7 @@ function BULLET:Fire( self )
 	-- Start a trace
 	local tr = {}
 	tr.start = startpos
-	tr.endpos = self.Entity:GetUp() * 10000
+	tr.endpos = self.Entity:GetUp() * 7000
 	tr.filter = self.Entity
 	local trace = util.TraceLine( tr )
 	
@@ -72,9 +72,9 @@ function BULLET:Fire( self )
 	if (!HitPos) then
 		-- Start a new trace
 		tr = {}
-		local startpos2 = startpos + self.Entity:GetUp() * 10000
+		local startpos2 = startpos + self.Entity:GetUp() * 7000
 		tr.start = startpos2
-		tr.endpos = startpos2 + self.Entity:GetUp() * 10000
+		tr.endpos = startpos2 + self.Entity:GetUp() * 7000
 		trace = util.TraceLine( tr )
 		
 		-- Deal damage
@@ -84,7 +84,7 @@ function BULLET:Fire( self )
 	-- Effects
 	self:EmitSound( self.Bullet.FireSound[1] )
 	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 10000) )
+	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 7000) )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 end

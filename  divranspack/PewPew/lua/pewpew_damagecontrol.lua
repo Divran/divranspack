@@ -1,6 +1,8 @@
 -- Pewpew Damage Control
 -- These functions take care of damage
+
 ------------------------------------------------------------------------------------------------------------
+-- Deal Damage
 
 -- Entity types in the blacklist will not be harmed by PewPew weaponry.
 pewpew.DamageBlacklist = { "pewpew_base_bullet", "gmod_wire", "gmod_ghost" }
@@ -69,6 +71,7 @@ function pewpew:SliceDamage( trace, direction, Damage, NumberOfSlices )
 end
 
 ------------------------------------------------------------------------------------------------------------
+-- Base Code
 
 -- Base code for dealing damage
 function pewpew:DealDamageBase( TargetEntity, Damage )
@@ -82,7 +85,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	end
 	-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
 	local phys = TargetEntity:GetPhysicsObject()
-	if (!phys) then return end
+	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
 	local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
 	if (TargetEntity.pewpewHealth > mass / 5 + boxsize:Length()) then
@@ -99,36 +102,87 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	self:CheckIfDead( TargetEntity )
 end
 
+------------------------------------------------------------------------------------------------------------
+-- Core
+
 -- Dealing damage to cores
 function pewpew:DamageCore( ent, Damage )
 	if (!self:CheckValid( ent )) then return end
 	if (ent:GetClass() != "pewpew_core") then return end
 	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage)
-	ent:SetNWInt("pewpewCoreHealth",ent.pewpewCoreHealth)
+	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth)
+	-- Wire Output
+	Wire_TriggerOutput( ent, "Total Health", ent.pewpewCoreHealth or 0 )
 	self:CheckIfDeadCore( ent )
 end
 
+-- Repairs the entity by the set amount
+function pewpew:RepairCoreHealth( ent, amount )
+	-- Check for errors
+	if (!self:CheckValid( ent )) then return end
+	if (ent:GetClass() != "pewpew_core") then return end
+	if (!ent.pewpewCoreHealth or !ent.pewpewCoreMaxHealth) then return end
+	if (!amount or amount == 0) then return end
+	-- Add health
+	ent.pewpewCoreHealth = math.Clamp(ent.pewpewCoreHealth+math.abs(amount),0,ent.pewpewCoreMaxHealth)
+	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth or 0)
+		-- Wire Output
+	Wire_TriggerOutput( ent, "Total Health", ent.pewpewCoreHealth or 0 )
+end
+
+function pewpew:CheckIfDeadCore( ent )
+	if (ent.pewpewCoreHealth <= 0) then
+		ent:RemoveAllProps()
+	end	
+end
+
 ------------------------------------------------------------------------------------------------------------
+-- Health
 
 -- Set the health of a spawned entity
 function pewpew:SetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
 	local phys = ent:GetPhysicsObject()
-	if (!phys) then return end
+	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
 	local boxsize = ent:OBBMaxs() - ent:OBBMins()
 	local health = mass / 5 + boxsize:Length()
 	ent.pewpewHealth = health
 	ent.MaxMass = mass
 	ent:SetNWInt("pewpewHealth",health)
+	ent:SetNWInt("pewpewMaxHealth",health)
+end
+
+-- Repairs the entity by the set amount
+function pewpew:RepairHealth( ent, amount )
+	-- Check for errors
+	if (!self:CheckValid( ent )) then return end
+	if (!self:CheckAllowed( ent )) then return end
+	if (!ent.pewpewHealth or !ent.MaxMass) then return end
+	if (!amount or amount == 0) then return end
+	-- Get the max allowed health
+	local phys = ent:GetPhysicsObject()
+	if (!phys:IsValid()) then return end
+	local mass = phys:GetMass() or 0
+	local boxsize = ent:OBBMaxs() - ent:OBBMins()
+	local maxhealth = (mass / 5 + boxsize:Length())
+	-- Add health
+	ent.pewpewHealth = math.Clamp(ent.pewpewHealth+math.abs(amount),0,maxhealth)
+	-- Make the health changeable again with weight tool
+	if (ent.pewpewHealth == maxhealth) then
+		ent.pewpewHealth = nil
+		ent.MaxMass = nil
+	end
+	ent:SetNWInt("pewpewHealth",ent.pewpewHealth or 0)
+	ent:SetNWInt("pewpewMaxHealth",maxhealth or 0)
 end
 
 -- Returns the health of the entity without setting it
 function pewpew:GetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
-	if (!self:CheckAllowed( ent )) then return 0 end
+	if (!self:CheckAllowed( ent )) then return end
 	local phys = ent:GetPhysicsObject()
-	if (!phys) then return end
+	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
 	local boxsize = ent:OBBMaxs() - ent:OBBMins()
 	if (ent.pewpewHealth) then
@@ -143,6 +197,7 @@ function pewpew:GetHealth( ent )
 end
 
 ------------------------------------------------------------------------------------------------------------
+-- Checks
 
 -- Check if the entity should be removed
 function pewpew:CheckIfDead( ent )
@@ -152,20 +207,6 @@ function pewpew:CheckIfDead( ent )
 		effectdata:SetScale( (ent:OBBMaxs() - ent:OBBMins()):Length() )
 		util.Effect( "pewpew_deatheffect", effectdata )
 		ent:Remove()
-	end
-end
-
-function pewpew:CheckIfDeadCore( ent )
-	if (ent.pewpewCoreHealth <= 0) then
-		ent:RemoveAllProps()
-	end	
-end
-
-function pewpew:CheckValid( entity ) -- Note: this function is mostly copied from E2Lib, then edited
-	if (entity):IsValid() then
-		if entity:IsWorld() then return false end
-		if entity:GetMoveType() ~= MOVETYPE_VPHYSICS then return false end
-		return entity:GetPhysicsObject():IsValid()
 	end
 end
 
@@ -179,7 +220,16 @@ function pewpew:CheckAllowed( entity )
 	return true
 end
 
+function pewpew:CheckValid( entity ) -- Note: this function is mostly copied from E2Lib, then edited
+	if (entity):IsValid() then
+		if entity:IsWorld() then return false end
+		if entity:GetMoveType() ~= MOVETYPE_VPHYSICS then return false end
+		return entity:GetPhysicsObject():IsValid()
+	end
+end
+
 ------------------------------------------------------------------------------------------------------------
+-- Toggle Damage
 
 local function ToggleDamage( ply, command, arg )
 	if ( !ply or !ply:IsValid() ) then return end
@@ -197,7 +247,3 @@ local function ToggleDamage( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_ToggleDamage", ToggleDamage)
-
-hook.Add("PlayerInitialSpawn", "PewPewPlayerInit", function( ply )
-	ply.PewPewDamage = true
-end)

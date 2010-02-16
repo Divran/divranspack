@@ -1,5 +1,5 @@
--- PewTool
--- This is the tool used to spawn all PewPew weapons
+-- Pew Core
+-- This tool spawns PewPew Cores
 
 TOOL.Category = "PewPew"
 TOOL.Name = "PewPew Core"

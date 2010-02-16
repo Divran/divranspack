@@ -85,7 +85,7 @@ if (CLIENT) then
 		local list1 = vgui.Create("DPanelList", pewpew_weaponframe)
 		list1:StretchToParent( 4, 40, 4, 4 )
 		list1:SetAutoSize( false )
-		list1:SetSpacing( 2 )
+		list1:SetSpacing( 1 )
 		list1:EnableHorizontal( false ) 
 		list1:EnableVerticalScrollbar( true )
 
@@ -108,7 +108,7 @@ if (CLIENT) then
 			for key2, value2 in pairs( pewpew.Categories[key] ) do
 				-- Create a button for each list
 				local btn = vgui.Create("DButton")
-				btn:SetSize( 50, 20 )
+				btn:SetSize( 48, 20 )
 				btn:SetText( value2 )
 				-- Set bullet, change weapon, and close menu
 				btn.DoClick = function()

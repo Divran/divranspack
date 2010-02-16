@@ -7,6 +7,8 @@ TOOL.Mode = "pewpew"
 TOOL.ent = {}
 TOOL.ClientConVar[ "bulletname" ] = ""
 TOOL.ClientConVar[ "model" ] = "models/combatmodels/tank_gun.mdl"
+TOOL.ClientConVar[ "fire_key" ] = "1"
+TOOL.ClientConVar[ "reload_key" ] = "2"
 
 cleanup.Register("pewpew")
 
@@ -41,13 +43,23 @@ if (SERVER) then
 		return name
 	end
 	
-	function TOOL:CreateCannon( ply, trace, Model, Bullet )
+	function TOOL:CreateCannon( ply, trace, Model, Bullet, fire, reload )
 		local ent = ents.Create( "pewpew_base_cannon" )
 		if (!ent:IsValid()) then return end
-		ent:SetOptions( Bullet, ply )
+		
+		-- Pos/Model/Angle
 		ent:SetModel( Model )
 		ent:SetPos( trace.HitPos - trace.HitNormal * ent:OBBMins().z )
 		ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
+		
+		-- Numpad
+		numpad.OnDown( 	 ply, 	fire, 	"PewPew_Cannon_Fire_On", 	ent:EntIndex() )
+		numpad.OnUp( 	 ply, 	fire, 	"PewPew_Cannon_Fire_Off", 	ent:EntIndex() )
+		numpad.OnDown( 	 ply, 	reload, 	"PewPew_Cannon_Reload_On", 	ent:EntIndex() )
+		numpad.OnUp( 	 ply, 	reload, 	"PewPew_Cannon_Reload_Off", 	ent:EntIndex() )
+		
+		ent:SetOptions( Bullet, ply, fire, reload )
+		
 		ent:Spawn()
 		ent:Activate()
 		return ent
@@ -76,6 +88,10 @@ if (SERVER) then
 		local model = self:GetCannonModel()
 		if (!model) then return end
 		
+		-- Numpad buttons
+		local fire = self:GetClientNumber( "fire_key" )
+		local reload = self:GetClientNumber( "reload_key" )
+		
 		-- If the trace hit an entity
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
@@ -84,11 +100,12 @@ if (SERVER) then
 				return
 			end
 			-- Update it
-			traceent:SetOptions( bullet, ply )
+			traceent:SetOptions( bullet, ply, fire, reload )
 			ply:ChatPrint("PewPew Cannon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
-			local ent = self:CreateCannon( ply, trace, model, bullet )
+			
+			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload )
 			if (!ent) then return end
 			
 			if (!traceent:IsWorld() and !traceent:IsPlayer()) then
@@ -133,6 +150,10 @@ if (SERVER) then
 		local model = self:GetCannonModel()
 		if (!model) then return end
 		
+		-- Numpad buttons
+		local fire = self:GetClientNumber( "fire_key" )
+		local reload = self:GetClientNumber( "reload_key" )
+		
 		-- If the trace hit an entity
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
@@ -141,11 +162,11 @@ if (SERVER) then
 				return
 			end
 			-- Update it
-			traceent:SetOptions( bullet, ply )
+			traceent:SetOptions( bullet, ply, fire, reload )
 			ply:ChatPrint("PewPew Weapon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
-			local ent = self:CreateCannon( ply, trace, model, bullet )
+			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload )
 			if (!ent) then return end	
 			
 			ply:AddCount("pewpew",ent)
@@ -227,6 +248,9 @@ else
 			Description = "#Open the weapons menu to select weapons.",
 			Text = "#PewPew Weapon Menu",
 			Command = "pewpew_weaponmenu"} )
+			
+		CPanel:AddControl( "Numpad", { Label = "#Fire", Command = "pewpew_fire_key", ButtonSize = 22 } )
+		CPanel:AddControl( "Numpad", { Label = "#Reload", Command = "pewpew_reload_key", ButtonSize = 22 } )
 	end
 
 	-- Ghost functions (Thanks to Grocel for making the base. I changed it a bit)
