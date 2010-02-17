@@ -77,6 +77,20 @@ e2function number entity:pewDamageRadius()
 	return this.Bullet.Radius or 0
 end
 
+-- Returns the number of slices
+e2function number entity:pewNumberOfSlices()
+	if (!validPhysics(this)) then return 0 end
+	if (this:GetClass() != "pewpew_base_cannon") then return 0 end
+	return this.Bullet.NumberOfSlices or 0
+end
+
+-- Returns the max slice distance
+e2function number entity:pewSliceDistance()
+	if (!validPhysics(this)) then return 0 end
+	if (this:GetClass() != "pewpew_base_cannon") then return 0 end
+	return this.Bullet.SliceDistance or 0
+end
+
 -- Returns the reload time
 e2function number entity:pewReloadTime()
 	if (!validPhysics(this)) then return 0 end

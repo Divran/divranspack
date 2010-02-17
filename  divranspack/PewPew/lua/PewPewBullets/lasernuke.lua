@@ -29,7 +29,7 @@ BULLET.RecoilForce = nil
 BULLET.Spread = nil
 
 -- Damage
-BULLET.DamageType = nil -- custom
+BULLET.DamageType = "BlastDamage" -- custom
 BULLET.Damage = 9001
 BULLET.Radius = 7000
 BULLET.RangeDamageMul = 0.6

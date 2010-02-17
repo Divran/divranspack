@@ -29,7 +29,7 @@ BULLET.RecoilForce = nil
 BULLET.Spread = nil
 
 -- Damage
-BULLET.DamageType = nil -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "SliceDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 85
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
