@@ -34,6 +34,7 @@ BULLET.Damage = 9001
 BULLET.Radius = 7000
 BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil
+BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 5000
 BULLET.PlayerDamageRadius = 5000
 
@@ -61,30 +62,16 @@ function BULLET:Fire( self )
 	-- Start a trace
 	local tr = {}
 	tr.start = startpos
-	tr.endpos = self.Entity:GetUp() * 7000
+	tr.endpos = self.Entity:GetUp() * 50000
 	tr.filter = self.Entity
 	local trace = util.TraceLine( tr )
 	
-	-- Deal damage
 	local HitPos = trace.HitPos
-	
-	-- If the first trace didn't hit anything..
-	if (!trace.Hit) then
-		-- Start a new trace
-		tr = {}
-		local startpos2 = startpos + self.Entity:GetUp() * 7000
-		tr.start = startpos2
-		tr.endpos = startpos2 + self.Entity:GetUp() * 7000
-		trace = util.TraceLine( tr )
-		
-		-- Deal damage
-		HitPos = trace.HitPos
-	end
 	
 	-- Effects
 	self:EmitSound( self.Bullet.FireSound[1] )
 	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 7000) )
+	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 50000) )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 	

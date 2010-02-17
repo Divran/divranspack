@@ -34,6 +34,7 @@ BULLET.Damage = 650
 BULLET.Radius = 500
 BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil
+BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 600
 BULLET.PlayerDamageRadius = 600
 

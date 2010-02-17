@@ -3,8 +3,6 @@
 
 TOOL.Category = "PewPew"
 TOOL.Name = "PewPew Core"
-TOOL.Mode = "pewpew_core"
-TOOL.ent = {}
 TOOL.ClientConVar[ "model" ] = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 
 cleanup.Register("pewpew_cores")

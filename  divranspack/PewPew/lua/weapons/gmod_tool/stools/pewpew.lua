@@ -3,8 +3,6 @@
 
 TOOL.Category = "PewPew"
 TOOL.Name = "PewPew"
-TOOL.Mode = "pewpew"
-TOOL.ent = {}
 TOOL.ClientConVar[ "bulletname" ] = ""
 TOOL.ClientConVar[ "model" ] = "models/combatmodels/tank_gun.mdl"
 TOOL.ClientConVar[ "fire_key" ] = "1"
@@ -51,12 +49,6 @@ if (SERVER) then
 		ent:SetModel( Model )
 		ent:SetPos( trace.HitPos - trace.HitNormal * ent:OBBMins().z )
 		ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
-		
-		-- Numpad
-		numpad.OnDown( 	 ply, 	fire, 	"PewPew_Cannon_Fire_On", 	ent:EntIndex() )
-		numpad.OnUp( 	 ply, 	fire, 	"PewPew_Cannon_Fire_Off", 	ent:EntIndex() )
-		numpad.OnDown( 	 ply, 	reload, 	"PewPew_Cannon_Reload_On", 	ent:EntIndex() )
-		numpad.OnUp( 	 ply, 	reload, 	"PewPew_Cannon_Reload_Off", 	ent:EntIndex() )
 		
 		ent:SetOptions( Bullet, ply, fire, reload )
 		

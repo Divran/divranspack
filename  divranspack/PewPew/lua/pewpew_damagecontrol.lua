@@ -38,13 +38,56 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 	end
 end
 
--- Point Damage - Deals damage to 1 single entity
+-- Point Damage - (Deals damage to 1 single entity)
 function pewpew:PointDamage( TargetEntity, Damage )
 	self:DealDamageBase( TargetEntity, Damage )
 	-- Might change this later...
 end
 
 -- Slice damage - (Deals damage to a number of entities in a line. It is stopped by the world)
+function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange )
+		-- Check dmg
+		if (!self.PewPewDamage) then return nil end
+	local OldPos = StartPos
+	-- First trace
+	local tr = {}
+	tr.start = StartPos
+	tr.endpos = StartPos + Direction * MaxRange
+	local trace = util.TraceLine( tr )
+	-- Check world
+	if (!trace.Hit) then return nil end
+	if (trace.HitWorld) then return trace.HitPos end
+	-- Get ent
+	local HitEnt = trace.Entity
+	-- Loop
+	for I=1, NumberOfSlices do
+		-- Check world
+		if (OldPos) then
+			if (!trace.Hit) then return OldPos end
+			-- Check distance
+			if (StartPos:Distance(OldPos) > MaxRange) then return OldPos end
+		end
+		if (HitEnt and self:CheckValid( HitEnt )) then
+			-- Deal damage
+			self:DealDamageBase( HitEnt, Damage )
+			-- New trace
+			tr = {}
+			tr.start = OldPos
+			tr.endpos = OldPos + Direction * MaxRange
+			tr.filter = HitEnt
+			if (I == NumberOfSlices) then local ret = trace.HitPos end
+			trace = util.TraceLine( tr )
+			OldPos = trace.HitPos
+			HitEnt = trace.Entity
+			-- Check world
+			if (trace.HitWorld) then return trace.HitPos end
+		end
+	end
+	return ret
+end
+		
+
+--[[ Old function
 function pewpew:SliceDamage( trace, direction, Damage, NumberOfSlices )
 		if (!self.PewPewDamage) then return nil end
 	if (!trace.Hit) then return nil end
@@ -68,7 +111,7 @@ function pewpew:SliceDamage( trace, direction, Damage, NumberOfSlices )
 		self:DealDamageBase( currenttrace.Entity, Damage )
 	end
 	return currenttrace.HitPos
-end
+end ]]
 
 ------------------------------------------------------------------------------------------------------------
 -- Base Code

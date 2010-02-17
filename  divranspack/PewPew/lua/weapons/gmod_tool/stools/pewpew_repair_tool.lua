@@ -3,10 +3,10 @@
 
 TOOL.Category = "PewPew"
 TOOL.Name = "Repair Tool"
-TOOL.Mode = "pewpew_repair"
+TOOL.ent = {}
 						
 if (SERVER) then
-	AddCSLuaFile("repair_tool.lua")
+	AddCSLuaFile("pewpew_repair_tool.lua")
 	TOOL.Timer = 0
 	
 	function TOOL:Think()
@@ -33,12 +33,11 @@ if (SERVER) then
 		end
 	end
 else
-	language.Add( "Tool_repair_tool_name", "PewPew Repair Tool" )
-	language.Add( "Tool_repair_tool_desc", "Used to repair entities." )
-	language.Add( "Tool_repair_tool_0", "Primary: Hold to repair an entity, Reload: Toggle Health Vision." )
+	language.Add( "Tool_pewpew_repair_tool_name", "PewPew Repair Tool" )
+	language.Add( "Tool_pewpew_repair_tool_desc", "Used to repair entities." )
+	language.Add( "Tool_pewpew_repair_tool_0", "Primary: Hold to repair an entity, Reload: Toggle Health Vision." )
 	
 	TOOL.HealthVision = true
-	TOOL.Entities = {}
 	TOOL.ReloadTimer = 0
 	
 	function TOOL:Reload()
@@ -82,7 +81,7 @@ else
 				surface.SetFont("ScoreboardText")
 				local length = surface.GetTextSize(txt)
 				-- Draw string
-				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 30, 50, 30, math.Clamp(745-dist,0,255) ), Color( 200, 200, 200, math.Clamp(745-dist,0,255) ) )
+				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(745-dist,0,255) ), Color( 200, 200, 200, math.Clamp(745-dist,0,255) ) )
 			end
 		end
 	end

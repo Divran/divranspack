@@ -14,18 +14,43 @@ function ENT:Initialize()
 	self.LastFired = 0
 	self.Firing = false
 	
+	self.Ammo = self.Bullet.Ammo
+	
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
 
 function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
  	self.Bullet = BULLET
-	self.Ammo = self.Bullet.Ammo
 	self.Owner = ply
-	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
-	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+	
+	-- Too much ammo?
+	if (self.Ammo) then
+		if (self.Ammo > self.Bullet.Ammo) then self.Ammo = self.Bullet.Ammo end
+	end
+	
+	-- Remove old numpads (if there are any)
+	if (self.FireDown) then
+		numpad.Remove( self.FireDown )
+	end
+	if (self.FireUp) then
+		numpad.Remove( self.FireUp )
+	end
+	if (self.ReloadDown) then
+		numpad.Remove( self.ReloadDown )
+	end
+	if (self.ReloadUp) then
+		numpad.Remove( self.ReloadUp )
+	end
+	
 	self.FireKey = firekey
 	self.ReloadKey = reloadkey
+	
+	-- Create new numpads
+	self.FireDown = numpad.OnDown( 	 ply, 	firekey, 	"PewPew_Cannon_Fire_On", 	self )
+	self.FireUp = numpad.OnUp( 	 ply, 	firekey, 	"PewPew_Cannon_Fire_Off", 	self )
+	self.ReloadDown = numpad.OnDown( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_On", 	self )
+	self.ReloadUp =	numpad.OnUp( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_Off", 	self )
 end
 
 function ENT:FireBullet()
@@ -140,14 +165,16 @@ local function InputChange( self, name, value )
 		end
 		return true
 	elseif (name == "Reload") then
-		if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
-			if (value != 0) then
-				if (self.Ammo and self.Ammo > 0) then
-					self.Ammo = 0
-					self.LastFired = CurTime() + self.Bullet.Reloadtime
-					self.CanFire = false					
-					Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-					Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+		if (self.Ammo and self.Ammo > 0 and self.Ammo < self.Bullet.Ammo) then
+			if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
+				if (value != 0) then
+					if (self.Ammo and self.Ammo > 0) then
+						self.Ammo = 0
+						self.LastFired = CurTime() + self.Bullet.Reloadtime
+						self.CanFire = false					
+						Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+						Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+					end
 				end
 			end
 		end
@@ -164,20 +191,20 @@ function ENT:TriggerInput(iname, value)
 end
 
 -- Numpad
-local function NumpadOn( ply, ent )
-	InputChange( ents.GetByIndex(ent), "Fire", 1 )
+local function NumpadOn( ply, self )
+	InputChange( self, "Fire", 1 )
 end
 
-local function NumpadOff( ply, ent )
-	InputChange( ents.GetByIndex(ent), "Fire", 0 )
+local function NumpadOff( ply, self )
+	InputChange( self, "Fire", 0 )
 end
 
-local function NumpadReloadOn( ply, ent )
-	InputChange( ents.GetByIndex(ent), "Reload", 1 )
+local function NumpadReloadOn( ply, self )
+	InputChange( self, "Reload", 1 )
 end
 
-local function NumpadReloadOff( ply, ent )
-	InputChange( ents.GetByIndex(ent), "Reload", 0 )
+local function NumpadReloadOff( ply, self )
+	InputChange( self, "Reload", 0 )
 end
 
 numpad.Register( "PewPew_Cannon_Fire_On", NumpadOn )

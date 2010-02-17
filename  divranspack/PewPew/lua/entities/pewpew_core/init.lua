@@ -7,7 +7,7 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
-	self.Outputs = Wire_CreateOutputs( self.Entity, { "Total Health" })
+	self.Outputs = Wire_CreateOutputs( self.Entity, { "Health", "Total Health" })
 	
 	self.Props = {}
 	self.PropHealth = {}
@@ -15,7 +15,8 @@ function ENT:Initialize()
 	self.pewpewCoreMaxHealth = 1
 	self.Entity.Core = self
 	
-	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpewCoreHealth )
+	Wire_TriggerOutput( self.Entity, "Health", self.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpewCoreMaxHealth or 0 )
 	
 	self.Entity:NextThink( CurTime() + 1 )
 	return true
@@ -91,7 +92,8 @@ function ENT:Think()
 	end
 	
 	-- Wire Output
-	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( self.Entity, "Health", self.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpewCoreMaxHealth or 0 )
 	
 	-- Run again in 1 second
 	self.Entity:NextThink( CurTime() + 1 )

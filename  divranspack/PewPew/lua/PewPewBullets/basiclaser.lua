@@ -34,6 +34,7 @@ BULLET.Damage = 85
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = 4
+BULLET.SliceDistance = 50000
 BULLET.PlayerDamageRadius = nil
 BULLET.PlayerDamage = nil
 
@@ -56,37 +57,20 @@ BULLET.FireOverride = true
 function BULLET:Fire( self )
 	-- Get the start position
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.z / 2 + 10)
-	
-	-- Start a trace
-	local tr = {}
-	tr.start = startpos
-	tr.endpos = self.Entity:GetUp() * 7000
-	tr.filter = self.Entity
-	local trace = util.TraceLine( tr )
+	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 10)
 	
 	-- Deal damage
-	local HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices )
-	
-	-- If the first trace didn't hit anything..
-	if (!HitPos) then
-		-- Start a new trace
-		tr = {}
-		local startpos2 = startpos + self.Entity:GetUp() * 7000
-		tr.start = startpos2
-		tr.endpos = startpos2 + self.Entity:GetUp() * 7000
-		trace = util.TraceLine( tr )
-		
-		-- Deal damage
-		HitPos = pewpew:SliceDamage( trace, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices  )
-	end
+	local HitPos = pewpew:SliceDamage( startpos, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance )
 	
 	-- Effects
 	self:EmitSound( self.Bullet.FireSound[1] )
-	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 7000) )
-	effectdata:SetStart( startpos )
-	util.Effect( self.Bullet.ExplosionEffect, effectdata )
+	
+	if (HitPos) then
+		local effectdata = EffectData()
+		effectdata:SetOrigin( HitPos )
+		effectdata:SetStart( startpos )
+		util.Effect( self.Bullet.ExplosionEffect, effectdata )
+	end
 end
 
 -- Initialize (Is called when the bullet initializes)
