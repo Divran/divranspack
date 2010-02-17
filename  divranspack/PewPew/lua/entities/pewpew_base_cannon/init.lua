@@ -14,8 +14,6 @@ function ENT:Initialize()
 	self.LastFired = 0
 	self.Firing = false
 	
-	self.Ammo = self.Bullet.Ammo
-	
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 end
@@ -23,6 +21,11 @@ end
 function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
  	self.Bullet = BULLET
 	self.Owner = ply
+	
+	-- No ammo at all?
+	if (!self.Ammo) then
+		self.Ammo = self.Bullet.Ammo
+	end
 	
 	-- Too much ammo?
 	if (self.Ammo) then
@@ -43,14 +46,17 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 		numpad.Remove( self.ReloadUp )
 	end
 	
-	self.FireKey = firekey
-	self.ReloadKey = reloadkey
-	
 	-- Create new numpads
-	self.FireDown = numpad.OnDown( 	 ply, 	firekey, 	"PewPew_Cannon_Fire_On", 	self )
-	self.FireUp = numpad.OnUp( 	 ply, 	firekey, 	"PewPew_Cannon_Fire_Off", 	self )
-	self.ReloadDown = numpad.OnDown( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_On", 	self )
-	self.ReloadUp =	numpad.OnUp( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_Off", 	self )
+	if (firekey) then
+		self.FireKey = firekey
+		self.FireDown = numpad.OnDown( 	 ply, 	firekey, 	"PewPew_Cannon_Fire_On", 	self )
+		self.FireUp = numpad.OnUp( 	 ply, 	firekey, 	"PewPew_Cannon_Fire_Off", 	self )
+	end
+	if (reloadkey) then
+		self.ReloadKey = reloadkey
+		self.ReloadDown = numpad.OnDown( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_On", 	self )
+		self.ReloadUp =	numpad.OnUp( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_Off", 	self )
+	end
 end
 
 function ENT:FireBullet()
@@ -252,7 +258,7 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 				FireOverride = true
 			}
 			function blt:Fire(self) self.Owner:ChatPrint("You must update this cannon with a valid bullet before you can fire.") end
-			self:SetOptions( blt, ply, info.FireKey or "1", info.ReloadKey or "2" )
+			self:SetOptions( blt, ply, info.FireKey, info.ReloadKey )
 			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
 		end
 	end

@@ -85,33 +85,6 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 	end
 	return ret
 end
-		
-
---[[ Old function
-function pewpew:SliceDamage( trace, direction, Damage, NumberOfSlices )
-		if (!self.PewPewDamage) then return nil end
-	if (!trace.Hit) then return nil end
-	if (trace.HitWorld) then return trace.HitPos end
-	local ent=nil
-	local tr = {}
-	local currenttrace = trace
-	for I=1, NumberOfSlices - 1 do
-		ent = currenttrace.Entity
-		if (currenttrace.HitWorld) then return currenttrace.HitPos end
-		if (self:CheckValid( ent )) then
-			self:DealDamageBase( ent, Damage )
-			tr = {}
-			tr.start = currenttrace.HitPos
-			tr.endpos = currenttrace.HitPos + direction * 5000
-			tr.filter = ent
-			currenttrace = util.TraceLine( tr )
-		end
-	end
-	if (currenttrace.Hit and self:CheckValid( currenttrace.Entity )) then
-		self:DealDamageBase( currenttrace.Entity, Damage )
-	end
-	return currenttrace.HitPos
-end ]]
 
 ------------------------------------------------------------------------------------------------------------
 -- Base Code
