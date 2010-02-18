@@ -225,20 +225,25 @@ numpad.Register( "PewPew_Cannon_Reload_Off", NumpadReloadOff )
 function ENT:Use( User, caller )
 	if (!self.UseDelay) then self.UseDelay = 0 end
 	if (!self.Using) then self.Using = false end
-	if (!self.ResetUse) then self.ResetUse = 0 end
+	
+	-- Was it a long time ago?
+	if (self.Using and self.UseDelay + 1 < CurTime()) then
+		self.Using = false
+	end
+	
+	-- Check the delay
 	if (self.UseDelay < CurTime()) then
+		-- If the player is not holding use yet
 		if (!self.Using) then
 			self.UseDelay = CurTime() + 2
-			self.ResetUse = CurTime() + 4
 			self.Using = true
 			User:ChatPrint("Hold down your use key for 2 seconds to see info about this PewPew Weapon.")
-		else
+		else -- if the player has held use for 2 seconds
 			self.UseDelay = CurTime() + 1
 			self.Using = false
 			User:ConCommand("PewPew_UseMenu " .. self.Bullet.Name)
 		end
 	end
-	if (self.ResetUse < CurTime() and self.Using) then self.Using = false end
 end
 -- Dupe support! Thanks to Free Fall
 function ENT:BuildDupeInfo()

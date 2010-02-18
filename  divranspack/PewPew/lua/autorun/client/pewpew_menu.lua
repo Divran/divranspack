@@ -57,9 +57,6 @@ end
 
 concommand.Add("PewPew_UseMenu", function( ply, cmd, arg )
 	OpenUseMenu( table.concat(arg, " ") )
-	print("Ply: " .. tostring(ply))
-	print("Cmd: " .. cmd)
-	print("Arg: " .. table.concat(arg, " "))
 end)
 
 -- Weapons Menu
