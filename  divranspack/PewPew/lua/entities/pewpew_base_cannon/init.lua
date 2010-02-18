@@ -60,6 +60,9 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 end
 
 function ENT:FireBullet()
+	-- Is shooting disabled?
+	if (!pewpew.PewPewFiring) then return end
+	
 	if (self.Bullet.FireOverride) then
 		-- Allows you to override the fire function
 		self.Bullet:Fire( self )

@@ -25,7 +25,7 @@ if (SERVER) then
 					local effectdata = EffectData()
 					effectdata:SetOrigin( trace.HitPos )
 					effectdata:SetAngle( trace.HitNormal:Angle() )
-					util.Effect( "MetalSpark", effectdata )
+					util.Effect( "Sparks", effectdata )
 					-- Run slower!
 					self.Timer = CurTime() + 0.1
 				end
@@ -81,7 +81,7 @@ else
 				surface.SetFont("ScoreboardText")
 				local length = surface.GetTextSize(txt)
 				-- Draw string
-				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(745-dist,0,255) ), Color( 200, 200, 200, math.Clamp(745-dist,0,255) ) )
+				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(745-dist,0,255) ), Color( 50, 50, 50, math.Clamp(745-dist,0,255) ) )
 			end
 		end
 	end

@@ -32,3 +32,39 @@ function pewpew:GetBullet( BulletName )
 	end
 	return nil
 end
+
+------------------------------------------------------------------------------------------------------------
+-- Toggle Damage
+
+local function ToggleDamage( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	pewpew.PewPewDamage = !pewpew.PewPewDamage
+	if (pewpew.PewPewDamage) then
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Damage and it is now ON!")
+		end
+	else
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Damage and it is now OFF!")
+		end
+	end
+end
+concommand.Add("PewPew_ToggleDamage", ToggleDamage)
+
+-- Toggle Firing
+local function ToggleFiring( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	pewpew.PewPewFiring = !pewpew.PewPewFiring
+	if (pewpew.PewPewFiring) then
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Firing and it is now ON!")
+		end
+	else
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Firing and it is now OFF!")
+		end
+	end
+end
+concommand.Add("PewPew_ToggleFiring", ToggleFiring)

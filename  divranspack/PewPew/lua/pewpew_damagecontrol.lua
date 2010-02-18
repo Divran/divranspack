@@ -11,6 +11,7 @@ pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_gr
 
 -- Serverwide Damage toggle
 pewpew.PewPewDamage = true
+pewpew.PewPewFiring = true
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
@@ -128,7 +129,7 @@ function pewpew:DamageCore( ent, Damage )
 	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage)
 	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth)
 	-- Wire Output
-	Wire_TriggerOutput( ent, "Total Health", ent.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( ent, "Health", ent.pewpewCoreHealth or 0 )
 	self:CheckIfDeadCore( ent )
 end
 
@@ -143,7 +144,7 @@ function pewpew:RepairCoreHealth( ent, amount )
 	ent.pewpewCoreHealth = math.Clamp(ent.pewpewCoreHealth+math.abs(amount),0,ent.pewpewCoreMaxHealth)
 	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth or 0)
 		-- Wire Output
-	Wire_TriggerOutput( ent, "Total Health", ent.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( ent, "Health", ent.pewpewCoreHealth or 0 )
 end
 
 function pewpew:CheckIfDeadCore( ent )
@@ -245,21 +246,3 @@ function pewpew:CheckValid( entity ) -- Note: this function is mostly copied fro
 end
 
 ------------------------------------------------------------------------------------------------------------
--- Toggle Damage
-
-local function ToggleDamage( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if (ply:IsAdmin()) then
-		pewpew.PewPewDamage = !pewpew.PewPewDamage
-		if (pewpew.PewPewDamage) then
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( ply:Nick() .. " has toggled PewPew Damage and it is now ON!")
-			end
-		else
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( ply:Nick() .. " has toggled PewPew Damage and it is now OFF!")
-			end
-		end
-	end
-end
-concommand.Add("PewPew_ToggleDamage", ToggleDamage)

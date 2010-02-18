@@ -46,18 +46,6 @@ BULLET.AmmoReloadtime = 6
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
--- Wire Input
-BULLET.WireInputOverride = false
-function BULLET:WireInput( inputname, value )
-	-- Nothing
-end
-
--- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = false
-function BULLET:Fire( self )
-	-- Nothing
-end
-
 -- Initialize (Is called when the entity initializes)
 BULLET.InitializeOverride = true
 function BULLET:InitializeFunc(self)
@@ -115,12 +103,6 @@ function BULLET:ThinkFunc( self )
 	end
 end
 
--- Explode (Is called when the bullet explodes) Note: this will not run if you override the think function (unless you call it from there as well)
-BULLET.ExplodeOverride = false
-function BULLET:Explode( self, trace )
-	
-end
-
 -- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
 BULLET.PhysicsCollideOverride = true
 function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
@@ -140,13 +122,6 @@ function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
 		
 		self:Remove()
 	end
-end
-
--- Client side overrides:
-
-BULLET.CLInitializeOverride = true
-function BULLET:CLInitializeFunc()
-	self.ParticleEmitter = ParticleEmitter(Vector(0,0,0))
 end
 
 BULLET.CLThinkOverride = true
@@ -189,11 +164,6 @@ function BULLET:CLThinkFunc()
 	
 	self.Entity:NextThink(CurTime())
 	return true
-end
-
-BULLET.CLDrawOverride = false
-function BULLET:CLDrawFunc()
-	
 end
 
 pewpew:AddBullet( BULLET )
