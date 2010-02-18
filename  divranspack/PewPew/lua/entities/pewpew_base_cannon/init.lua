@@ -225,9 +225,11 @@ numpad.Register( "PewPew_Cannon_Reload_Off", NumpadReloadOff )
 function ENT:Use( User, caller )
 	if (!self.UseDelay) then self.UseDelay = 0 end
 	if (!self.Using) then self.Using = false end
+	if (!self.ResetUse) then self.ResetUse = 0 end
 	if (self.UseDelay < CurTime()) then
 		if (!self.Using) then
 			self.UseDelay = CurTime() + 2
+			self.ResetUse = CurTime() + 4
 			self.Using = true
 			User:ChatPrint("Hold down your use key for 2 seconds to see info about this PewPew Weapon.")
 		else
@@ -236,6 +238,7 @@ function ENT:Use( User, caller )
 			User:ConCommand("PewPew_UseMenu " .. self.Bullet.Name)
 		end
 	end
+	if (self.ResetUse < CurTime() and self.Using) then self.Using = false end
 end
 -- Dupe support! Thanks to Free Fall
 function ENT:BuildDupeInfo()
