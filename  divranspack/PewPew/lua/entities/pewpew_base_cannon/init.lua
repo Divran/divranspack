@@ -84,7 +84,7 @@ function ENT:FireBullet()
 		local num = self.Bullet.Spread or 0
 		local randomang = Angle(0,0,0)
 		if (num) then
-			randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
+			randomang = Angle( math.Rand(-num,num) * 4, math.Rand(-num,num), 0 )
 		end	
 		ent:SetAngles( self.Entity:GetAngles() + randomang )
 		-- Spawn
@@ -201,18 +201,22 @@ end
 
 -- Numpad
 local function NumpadOn( ply, self )
+	if (!pewpew.PewPewNumpads) then return end
 	InputChange( self, "Fire", 1 )
 end
 
 local function NumpadOff( ply, self )
+	if (!pewpew.PewPewNumpads) then return end
 	InputChange( self, "Fire", 0 )
 end
 
 local function NumpadReloadOn( ply, self )
+	if (!pewpew.PewPewNumpads) then return end
 	InputChange( self, "Reload", 1 )
 end
 
 local function NumpadReloadOff( ply, self )
+	if (!pewpew.PewPewNumpads) then return end
 	InputChange( self, "Reload", 0 )
 end
 

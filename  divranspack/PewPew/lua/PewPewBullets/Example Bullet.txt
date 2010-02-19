@@ -35,6 +35,7 @@ BULLET.Radius = 800
 BULLET.RangeDamageMul = 0.3 -- This is only used with "BlastDamage". It determines how much less damage it deals depending on the distance from the center of the blast.
 BULLET.NumberOfSlices = nil -- this is only used with "SliceDamage". It determines how many props in a line you want to deal damage to.
 BULLET.SliceDistance = nil -- This is only used with "SliceDamage". It determines the total maximum range the trace will travel.
+BULLET.Duration = nil -- This is only used with "EMPDamage". It determines how long the target entities will be disabled.
 BULLET.PlayerDamage = 150
 BULLET.PlayerDamageRadius = 300
 

@@ -3,8 +3,8 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Cannon"
-BULLET.Category = "Cannons"
+BULLET.Name = "Basic Artillery"
+BULLET.Category = "Artilleries"
 BULLET.Author = "Divran"
 BULLET.Description = "Aim away from face."
 BULLET.AdminOnly = false
@@ -17,21 +17,21 @@ BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"arty/37mm.wav"}
+BULLET.FireSound = {"arty/cannon.wav"}
 BULLET.ExplosionSound = {"weapons/explode1.wav","weapons/explode2.wav"}
-BULLET.FireEffect = "cannon_flare"
+BULLET.FireEffect = "artyfire"
 BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
-BULLET.Speed = 50
+BULLET.Speed = 65
 BULLET.PitchChange = 0.2
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 400
-BULLET.Radius = 800
+BULLET.Damage = 1000
+BULLET.Radius = 1000
 BULLET.RangeDamageMul = 0.3
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
@@ -39,7 +39,7 @@ BULLET.PlayerDamage = 150
 BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 3.5
+BULLET.Reloadtime = 7.5
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 

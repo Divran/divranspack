@@ -4,7 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Delayed Sticky-Bomb Launcher"
-BULLET.Category = "Cannons"
+BULLET.Category = "Other"
 BULLET.Author = "Free Fall"
 BULLET.Description = "Fires a bomb that will stick to whatever it hits and explodes short time after"
 BULLET.AdminOnly = false

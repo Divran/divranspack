@@ -99,7 +99,9 @@ function ENT:Think()
 				elseif (damagetype == "PointDamage") then
 					pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
 				elseif (damagetype == "SliceDamage") then
-					pewpew:SliceDamage( self.Entity:GetPos(), self.FlightDirection, Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50 )
+					pewpew:SliceDamage( trace.HitPos, self.FlightDirection, Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50 )
+				elseif (damagetype == "EMPDamage") then
+					pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
 				end
 				
 				self.Entity:SetPos( trace.HitPos )

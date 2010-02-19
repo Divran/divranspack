@@ -1,12 +1,12 @@
 "AddonInfo"
 {
-	"name"		"Gcombat New"
+	"name"		"PewPew"
 	"version"	"1"
 	"up_date"	""
 	"author_name"	"Divran"
 	"author_email"	""
 	"author_url"	""
 	
-	"info"		"A complete remake from scratch of Gcombat"
+	"info"		"PewPew"
 	"override"	"0"
 }

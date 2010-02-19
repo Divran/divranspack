@@ -126,7 +126,7 @@ local function CreateMenu2()
 end
 timer.Simple(0.5, CreateMenu2)
 
-concommand.Add("pewpew_weaponmenu", function( ply, cmd, arg )
+concommand.Add("PewPew_WeaponMenu", function( ply, cmd, arg )
 	-- Open weapons menu and close Q menu and Context menu
 	pewpew_weaponframe:SetVisible( true )	
 	RunConsoleCommand("-menu")

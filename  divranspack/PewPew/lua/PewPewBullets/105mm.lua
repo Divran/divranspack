@@ -3,10 +3,10 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Cannon"
+BULLET.Name = "105mm Cannon"
 BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
-BULLET.Description = "Aim away from face."
+BULLET.Description = "Slow rate of fire, high damage."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -17,29 +17,29 @@ BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"arty/37mm.wav"}
+BULLET.FireSound = {"arty/105mm.wav"}
 BULLET.ExplosionSound = {"weapons/explode1.wav","weapons/explode2.wav"}
 BULLET.FireEffect = "cannon_flare"
 BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
-BULLET.Speed = 50
-BULLET.PitchChange = 0.2
+BULLET.Speed = 145
+BULLET.PitchChange = 0.1
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 
 -- Damage
-BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 400
+BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.Damage = 800
 BULLET.Radius = 800
-BULLET.RangeDamageMul = 0.3
+BULLET.RangeDamageMul = 0.8
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
-BULLET.PlayerDamage = 150
-BULLET.PlayerDamageRadius = 300
+BULLET.PlayerDamage = 400
+BULLET.PlayerDamageRadius = 800
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 3.5
+BULLET.Reloadtime = 8
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 

@@ -4,7 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Nebelwerfer"
-BULLET.Category = "Cannons"
+BULLET.Category = "Artilleries"
 BULLET.Author = "Free Fall"
 BULLET.Description = "Fires smoking artillery rounds."
 BULLET.AdminOnly = false
@@ -122,6 +122,11 @@ function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
 		
 		self:Remove()
 	end
+end
+
+BULLET.CLInitializeOverride = true
+function BULLET:CLInitializeFunc()
+	self.ParticleEmitter = ParticleEmitter(Vector(0,0,0))
 end
 
 BULLET.CLThinkOverride = true

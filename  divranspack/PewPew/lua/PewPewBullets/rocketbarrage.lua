@@ -3,10 +3,10 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Rocket Launcher"
-BULLET.Category = "Rockets"
+BULLET.Name = "Rocket Barrage"
+BULLET.Category = "Artilleries"
 BULLET.Author = "Divran"
-BULLET.Description = "Rocket launcher with 6 rockets."
+BULLET.Description = "Fires dozens of rockets in an arc which cover a large area."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -20,27 +20,27 @@ BULLET.Trail = nil
 BULLET.FireSound = {"arty/rocket.wav"}
 BULLET.ExplosionSound = {"weapons/explode3.wav","weapons/explode4.wav","weapons/explode5.wav"}
 BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "atapsplode"
+BULLET.ExplosionEffect = "v2splode"
 
 -- Movement
-BULLET.Speed = 30
-BULLET.PitchChange = 0
+BULLET.Speed = 60
+BULLET.PitchChange = 0.2
 BULLET.RecoilForce = 0
-BULLET.Spread = 1.5
+BULLET.Spread = 5
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 180
-BULLET.Radius = 300
+BULLET.Damage = 150
+BULLET.Radius = 200
 BULLET.RangeDamageMul = 0.5
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
-BULLET.PlayerDamage = 150
-BULLET.PlayerDamageRadius = 400
+BULLET.PlayerDamage = 100
+BULLET.PlayerDamageRadius = 100
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.3
-BULLET.Ammo = 6
+BULLET.Reloadtime = 0.2
+BULLET.Ammo = 16
 BULLET.AmmoReloadtime = 8
 
 -- Custom Functions 

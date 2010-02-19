@@ -12,6 +12,7 @@ pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_gr
 -- Serverwide Damage toggle
 pewpew.PewPewDamage = true
 pewpew.PewPewFiring = true
+pewpew.PewPewNumpads = true
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
@@ -85,6 +86,56 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 		end
 	end
 	return ret
+end
+
+
+-- EMPDamage - (Electro Magnetic Pulse. Disables all wiring within the radius for the duration)
+function pewpew:EMPDamage( Position, Radius, Duration )
+	print("EMP Damage")
+		-- Check damage
+		if (!self.PewPewDamage) then return end
+	-- Check for errors
+	if (!Position or !Radius or !Duration) then return end
+	
+	-- Find all entities in the radius
+	local ents = ents.FindInSphere( Position, Radius )
+	--print("Found " .. table.Count(ents) .. " entities")
+	
+	local ents2 = {}
+	-- Loop through all found entities
+	for _, ent in pairs(ents) do
+		--print("A NEW ENTITY.")
+		if (ent.TriggerInput) then
+			--print("THE ENTITY DOES HAVE INPUTS")
+			local tbl = {}
+			-- Loop through all the inputs on the entity
+			for key, _ in pairs( ent.Inputs ) do
+				local value = ent.Inputs[key].Value
+				--print("INPUT ON ENTITY: KEY: " .. key .. " VALUE: " .. value)
+				table.insert( tbl, { key, value } ) 
+			end
+			table.insert( ents2, { ent, tbl } )
+		end
+	end
+	
+	-- Start a new timer which will block inputs
+	timer.Create( "PewPew_EMPDamage_" .. CurTime(), 0, 0, function( ents )
+		for _, tbl in pairs( ents ) do
+			local ent = tbl[1]
+			if (ent and ent:IsValid()) then
+				--print("BLOCKING ENTITY INPUTS: " .. tostring(ent))
+				for _, input in pairs( tbl[2] ) do
+					ent:TriggerInput( input[1], input[2] )
+					--print("BLOCKED INPUT: KEY: " .. input[1] .. " VALUE: " .. input[2] )
+				end
+			end
+		end
+	end, ents2 )
+	
+	-- Start a new timer which will remove the previous timer after the duration
+	timer.Create( "PewPew_EMPStopDamage_" .. CurTime(), Duration, 1, function( UniqueID )
+		timer.Remove( UniqueID )
+	end, "PewPew_EMPDamage_" .. CurTime() )
 end
 
 ------------------------------------------------------------------------------------------------------------
@@ -280,3 +331,21 @@ local function ToggleFiring( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_ToggleFiring", ToggleFiring)
+
+-- Toggle Numpads
+local function ToggleNumpads( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	pewpew.PewPewNumpads = !pewpew.PewPewNumpads
+	if (pewpew.PewPewNumpads) then
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Numpad Inputs and they are now ON!")
+		end
+	else
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Numpad Inputs and they are now OFF!")
+		end
+	end
+end
+concommand.Add("PewPew_ToggleNumpads", ToggleNumpads)
+		

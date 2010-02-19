@@ -33,7 +33,7 @@ end
 						
 if (SERVER) then
 	AddCSLuaFile("pewpew.lua")
-	CreateConVar("sbox_maxpewpew", 10)
+	CreateConVar("sbox_maxpewpew", 6)
 	
 	function TOOL:GetBulletName()
 		local name = self:GetClientInfo("bulletname") or nil
@@ -42,6 +42,7 @@ if (SERVER) then
 	end
 	
 	function TOOL:CreateCannon( ply, trace, Model, Bullet, fire, reload )
+		if (!ply:CheckLimit("pewpew")) then return end
 		local ent = ents.Create( "pewpew_base_cannon" )
 		if (!ent:IsValid()) then return end
 		
@@ -60,7 +61,6 @@ if (SERVER) then
 	function TOOL:LeftClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
-		if (!ply:CheckLimit("pewpew")) then return end
 		
 		-- Get the bullet
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
@@ -122,7 +122,6 @@ if (SERVER) then
 	function TOOL:RightClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
-		if (!ply:CheckLimit("pewpew")) then return end
 		
 		-- Get the bullet
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
@@ -239,7 +238,7 @@ else
 			Label = "#PewPew Weapon Menu", 
 			Description = "#Open the weapons menu to select weapons.",
 			Text = "#PewPew Weapon Menu",
-			Command = "pewpew_weaponmenu"} )
+			Command = "PewPew_WeaponMenu"} )
 			
 		CPanel:AddControl( "Numpad", { Label = "#Fire", Command = "pewpew_fire_key", ButtonSize = 22 } )
 		CPanel:AddControl( "Numpad", { Label = "#Reload", Command = "pewpew_reload_key", ButtonSize = 22 } )

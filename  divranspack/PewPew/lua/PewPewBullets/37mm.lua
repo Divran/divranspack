@@ -3,10 +3,10 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Cannon"
+BULLET.Name = "37mm Cannon"
 BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
-BULLET.Description = "Aim away from face."
+BULLET.Description = "Rapid fire, low damage."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -20,26 +20,26 @@ BULLET.Trail = nil
 BULLET.FireSound = {"arty/37mm.wav"}
 BULLET.ExplosionSound = {"weapons/explode1.wav","weapons/explode2.wav"}
 BULLET.FireEffect = "cannon_flare"
-BULLET.ExplosionEffect = "big_splosion"
+BULLET.ExplosionEffect = "HEATsplode"
 
 -- Movement
-BULLET.Speed = 50
-BULLET.PitchChange = 0.2
-BULLET.RecoilForce = 500
+BULLET.Speed = 100
+BULLET.PitchChange = 0.1
+BULLET.RecoilForce = 100
 BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 400
-BULLET.Radius = 800
-BULLET.RangeDamageMul = 0.3
+BULLET.Damage = 225
+BULLET.Radius = 300
+BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
-BULLET.PlayerDamage = 150
+BULLET.PlayerDamage = 225
 BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 3.5
+BULLET.Reloadtime = 2.3
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
