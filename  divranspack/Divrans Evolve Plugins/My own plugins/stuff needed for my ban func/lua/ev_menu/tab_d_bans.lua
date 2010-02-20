@@ -21,10 +21,7 @@ function TAB:Update()
 	self.Container:RequestFocus()
 	self.BanList:Clear()
 	for _, tbl in pairs( self.Bans ) do
-		local timeleft = math.Round((tbl[4]-os.time())/60)
-		if (timeleft > -1) then
-			self.BanList:AddLine( tbl[1], tbl[2], os.date( "%c", tbl[3]), os.date( "%c", tbl[4] ), timeleft .. " / " .. math.Round((tbl[4]-tbl[3])/60), tbl[5] )
-		end
+		self.BanList:AddLine( tbl[1], tbl[2], os.date( "%c", tbl[3]), os.date( "%c", tbl[4] ), math.Round((tbl[4]-os.time())/60) .. " / " .. math.Round((tbl[4]-tbl[3])/60), tbl[5] )
 	end
 end
 
