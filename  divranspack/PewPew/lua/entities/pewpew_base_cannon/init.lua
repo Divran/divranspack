@@ -84,7 +84,7 @@ function ENT:FireBullet()
 		local num = self.Bullet.Spread or 0
 		local randomang = Angle(0,0,0)
 		if (num) then
-			randomang = Angle( math.Rand(-num,num) * 4, math.Rand(-num,num), 0 )
+			randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
 		end	
 		ent:SetAngles( self.Entity:GetAngles() + randomang )
 		-- Spawn

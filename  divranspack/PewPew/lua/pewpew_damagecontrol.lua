@@ -13,6 +13,8 @@ pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_gr
 pewpew.PewPewDamage = true
 pewpew.PewPewFiring = true
 pewpew.PewPewNumpads = true
+pewpew.PewPewDamageMul = 1
+pewpew.PewPewCoreDamageOnly = false
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
@@ -148,6 +150,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	if (!self:CheckValid( TargetEntity )) then return end
 	if (!self:CheckAllowed( TargetEntity )) then return end
 	if (!Damage or Damage == 0) then return end
+	Damage = Damage * self.PewPewDamageMul
 	if (!TargetEntity.pewpewHealth) then
 		self:SetHealth( TargetEntity )
 	end
@@ -164,6 +167,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 		self:DamageCore( TargetEntity.Core, Damage )
 		return
 	end
+	if (self.PewPewCoreDamageOnly) then return end
 	-- Deal damage
 	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
 	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
@@ -348,4 +352,31 @@ local function ToggleNumpads( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_ToggleNumpads", ToggleNumpads)
+
+local function DamageMul( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	if ( !arg[1] ) then return end
+	pewpew.PewPewDamageMul = math.max( arg[1], 0.01 )
+	for _, v in pairs( player.GetAll() ) do
+		v:ChatPrint( ply:Nick() .. " has changed the PewPew Damage Multiplier to " .. pewpew.PewPewDamageMul)
+	end
+end
+concommand.Add("PewPew_DamageMul",DamageMul)
+
+local function ToggleCoreDamageOnly( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	pewpew.PewPewCoreDamageOnly = !pewpew.PewPewCoreDamageOnly
+	if (pewpew.PewPewCoreDamageOnly) then
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Core Damage Only and it is now ON!")
+		end
+	else
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( ply:Nick() .. " has toggled PewPew Core Damage Only and it is now OFF!")
+		end
+	end
+end
+concommand.Add("PewPew_ToggleCoreDamageOnly", ToggleCoreDamageOnly)
 		
