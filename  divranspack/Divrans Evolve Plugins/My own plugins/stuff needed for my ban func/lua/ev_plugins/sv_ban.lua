@@ -210,7 +210,9 @@ function evolve:SendBans( ply )
 end
 
 local function Resend( ply, cmd, args )
-	evolve:SendBans( ply )
+	if (ply:EV_IsAdmin()) then
+		evolve:SendBans( ply )
+	end
 end
 concommand.Add("ev_resendbanlist", Resend)
 
