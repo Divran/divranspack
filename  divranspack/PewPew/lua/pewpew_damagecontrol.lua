@@ -391,7 +391,7 @@ local function RepairToolHeal( ply, command, arg )
 		v:ChatPrint( ply:Nick() .. " has changed the speed at which the Repair Tool heals to " .. pewpew.RepairToolHeal)
 	end
 end
-concommand.Add("PewPew_RepairToolHeal",DamageMul)
+concommand.Add("PewPew_RepairToolHeal",RepairToolHeal)
 
 local function RepairToolHealCores( ply, command, arg )
 	if ( !ply or !ply:IsValid() ) then return end
@@ -402,5 +402,5 @@ local function RepairToolHealCores( ply, command, arg )
 		v:ChatPrint( ply:Nick() .. " has changed the speed at which the Repair Tool heals against cores to " .. pewpew.RepairToolHealCores)
 	end
 end
-concommand.Add("PewPew_RepairToolHealCores",DamageMul)
+concommand.Add("PewPew_RepairToolHealCores",RepairToolHealCores)
 		
