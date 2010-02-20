@@ -17,9 +17,9 @@ if (SERVER) then
 				if (!trace.Hit) then return end
 				if (trace.HitPos:Distance(ply:GetShootPos()) < 125 and trace.Entity and pewpew:CheckValid( trace.Entity )) then
 					if (trace.Entity:GetClass() == "pewpew_core" and trace.Entity.pewpewCoreHealth) then
-						pewpew:RepairCoreHealth( trace.Entity, 200 )
+						pewpew:RepairCoreHealth( trace.Entity, pewpew.RepairToolHealCores )
 					elseif (trace.Entity.pewpewHealth) then
-						pewpew:RepairHealth( trace.Entity, 75 )
+						pewpew:RepairHealth( trace.Entity, pewpew.RepairToolHeal )
 					end
 					-- Effect
 					local effectdata = EffectData()

@@ -15,6 +15,8 @@ pewpew.PewPewFiring = true
 pewpew.PewPewNumpads = true
 pewpew.PewPewDamageMul = 1
 pewpew.PewPewCoreDamageOnly = false
+pewpew.RepairToolHeal = 75
+pewpew.RepairToolHealCores = 200
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
@@ -379,4 +381,26 @@ local function ToggleCoreDamageOnly( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_ToggleCoreDamageOnly", ToggleCoreDamageOnly)
+
+local function RepairToolHeal( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	if ( !arg[1] ) then return end
+	pewpew.RepairToolHeal = math.max( arg[1], 20 )
+	for _, v in pairs( player.GetAll() ) do
+		v:ChatPrint( ply:Nick() .. " has changed the speed at which the Repair Tool heals to " .. pewpew.RepairToolHeal)
+	end
+end
+concommand.Add("PewPew_RepairToolHeal",DamageMul)
+
+local function RepairToolHealCores( ply, command, arg )
+	if ( !ply or !ply:IsValid() ) then return end
+	if ( !ply:IsAdmin() ) then return end
+	if ( !arg[1] ) then return end
+	pewpew.RepairToolHealCores = math.max( arg[1], 20 )
+	for _, v in pairs( player.GetAll() ) do
+		v:ChatPrint( ply:Nick() .. " has changed the speed at which the Repair Tool heals against cores to " .. pewpew.RepairToolHealCores)
+	end
+end
+concommand.Add("PewPew_RepairToolHealCores",DamageMul)
 		
