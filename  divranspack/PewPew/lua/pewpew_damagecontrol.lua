@@ -150,8 +150,18 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 		if (!self.PewPewDamage) then return end
 	-- Check for errors
 	if (!self:CheckValid( TargetEntity )) then return end
-	if (!self:CheckAllowed( TargetEntity )) then return end
 	if (!Damage or Damage == 0) then return end
+	-- Check if allowed
+	if (!self:CheckAllowed( TargetEntity )) then
+		local temp = constraint.GetAllConstrainedEntities( TargetEntity )
+		local OldEnt = TargetEntity
+		for _, ent in pairs( temp ) do
+			if (self:CheckAllowed( ent )) then
+				TargetEntity = ent
+				break
+			end
+		end
+	end
 	Damage = Damage * self.PewPewDamageMul
 	if (!TargetEntity.pewpewHealth) then
 		self:SetHealth( TargetEntity )

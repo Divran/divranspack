@@ -32,17 +32,6 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 		if (self.Ammo > self.Bullet.Ammo) then self.Ammo = self.Bullet.Ammo end
 	end
 	
-	-- Too little ammo?
-	if (self.Ammo and self.AmmoReloadtime) then
-		-- Make it reload
-		if (self.Ammo < self.Bullet.Ammo) then 
-			self.LastFired = CurTime()
-			self.CanFire = false
-			self.Ammo = 0
-			Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-		end
-	end
-	
 	-- Remove old numpads (if there are any)
 	if (self.FireDown) then
 		numpad.Remove( self.FireDown )
@@ -139,7 +128,6 @@ function ENT:Think()
 			-- if we don't have any ammo left...
 			if (self.Firing) then -- if you are holding down fire
 				self.CanFire = false
-				self.LastFired = CurTime()
 				Wire_TriggerOutput( self.Entity, "Can Fire", 0)
 				-- Sound
 				if (self.Bullet.EmptyMagSound) then
@@ -220,7 +208,7 @@ end
 -- Wiring
 function ENT:TriggerInput(iname, value)
 	if (self.Bullet.WireInputOverride) then
-		self.Bullet:WireInput( iname, value )
+		self.Bullet:WireInput( self, iname, value )
 	else
 		InputChange( self, iname, value )
 	end
