@@ -16,13 +16,12 @@ BULLET.Material = nil
 BULLET.Color = nil 
 BULLET.Trail = nil 
 
-
-
 -- Effects / Sounds
 BULLET.FireSound = {"arty/40mm.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = "muzzleflash"
 BULLET.ExplosionEffect = "HEATsplode"
+BULLET.EmptyMagSound = {"weapons/ar2/ar2_empty.wav"}
 
 -- Movement
 BULLET.Speed = 50

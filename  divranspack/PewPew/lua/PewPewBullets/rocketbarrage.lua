@@ -26,17 +26,17 @@ BULLET.ExplosionEffect = "v2splode"
 BULLET.Speed = 60
 BULLET.PitchChange = 0.2
 BULLET.RecoilForce = 0
-BULLET.Spread = 5
+BULLET.Spread = 3
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 150
-BULLET.Radius = 200
+BULLET.Radius = 250
 BULLET.RangeDamageMul = 0.5
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
-BULLET.PlayerDamage = 100
-BULLET.PlayerDamageRadius = 100
+BULLET.PlayerDamage = 150
+BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 0.2

@@ -32,6 +32,17 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 		if (self.Ammo > self.Bullet.Ammo) then self.Ammo = self.Bullet.Ammo end
 	end
 	
+	-- Too little ammo?
+	if (self.Ammo and self.AmmoReloadtime) then
+		-- Make it reload
+		if (self.Ammo < self.Bullet.Ammo) then 
+			self.LastFired = CurTime()
+			self.CanFire = false
+			self.Ammo = 0
+			Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+		end
+	end
+	
 	-- Remove old numpads (if there are any)
 	if (self.FireDown) then
 		numpad.Remove( self.FireDown )
@@ -126,18 +137,34 @@ function ENT:Think()
 	if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then -- if you can fire
 		if (self.Ammo <= 0 and self.Bullet.Ammo > 0) then -- check for ammo
 			-- if we don't have any ammo left...
-			self.CanFire = false
-			Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-			if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
-				self.Ammo = self.Bullet.Ammo
-				Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
-				self.CanFire = true
-				if (self.Firing) then 
-					self.LastFired = CurTime()
-					self.CanFire = false
-					self:FireBullet()
-				else
-					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+			if (self.Firing) then -- if you are holding down fire
+				self.CanFire = false
+				self.LastFired = CurTime()
+				Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+				-- Sound
+				if (self.Bullet.EmptyMagSound) then
+					local soundpath = ""
+					if (table.Count(self.Bullet.EmptyMagSound) > 1) then
+						soundpath = table.Random(self.Bullet.EmptyMagSound)
+					else
+						soundpath = self.Bullet.EmptyMagSound[1]
+					end
+					self:EmitSound( soundpath )
+				end			
+			else -- if you are not holding down fire
+				self.CanFire = false
+				Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+				if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
+					self.Ammo = self.Bullet.Ammo
+					Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+					self.CanFire = true
+					if (self.Firing) then 
+						self.LastFired = CurTime()
+						self.CanFire = false
+						self:FireBullet()
+					else
+						Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+					end
 				end
 			end
 		else
