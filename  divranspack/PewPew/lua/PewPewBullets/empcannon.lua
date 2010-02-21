@@ -7,7 +7,7 @@ BULLET.Name = "EMP Cannon"
 BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
 BULLET.Description = "Fires a bullet which releases an EMP on impact, disabling all wiring for 3 seconds."
-BULLET.AdminOnly = true
+BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance

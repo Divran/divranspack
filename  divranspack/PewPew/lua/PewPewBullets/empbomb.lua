@@ -7,7 +7,7 @@ BULLET.Name = "EMP Bomb"
 BULLET.Category = "Explosives"
 BULLET.Author = "Divran"
 BULLET.Description = "EMP Bomb. No damage, but disables wiring for 15 seconds."
-BULLET.AdminOnly = true
+BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
