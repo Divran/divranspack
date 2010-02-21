@@ -127,8 +127,6 @@ function ENT:Think()
 		if (self.Ammo <= 0 and self.Bullet.Ammo > 0) then -- check for ammo
 			-- if we don't have any ammo left...
 			if (self.Firing) then -- if you are holding down fire
-				self.CanFire = false
-				Wire_TriggerOutput( self.Entity, "Can Fire", 0)
 				-- Sound
 				if (self.Bullet.EmptyMagSound) then
 					local soundpath = ""
@@ -139,20 +137,19 @@ function ENT:Think()
 					end
 					self:EmitSound( soundpath )
 				end			
-			else -- if you are not holding down fire
-				self.CanFire = false
-				Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-				if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
-					self.Ammo = self.Bullet.Ammo
-					Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
-					self.CanFire = true
-					if (self.Firing) then 
-						self.LastFired = CurTime()
-						self.CanFire = false
-						self:FireBullet()
-					else
-						Wire_TriggerOutput( self.Entity, "Can Fire", 1)
-					end
+			end
+			self.CanFire = false
+			Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+			if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
+				self.Ammo = self.Bullet.Ammo
+				Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+				self.CanFire = true
+				if (self.Firing) then 
+					self.LastFired = CurTime()
+					self.CanFire = false
+					self:FireBullet()
+				else
+					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
 				end
 			end
 		else
