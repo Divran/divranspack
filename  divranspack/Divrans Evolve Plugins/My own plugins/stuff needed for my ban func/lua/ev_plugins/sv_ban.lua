@@ -116,10 +116,11 @@ function PLUGIN:PlayerInitialSpawn( ply )
 			if (os.time() < tbl[4] and tbl[4] != 0) then
 				evolve:RemoveBan( tbl[2] )
 				evolve:WriteBans()
+				evolve:Notify( evolve.colors.red, ply:Nick(), evolve.colors.white, " is no longer banned." )
 			else
 				game.ConsoleCommand( "banid " .. tbl[4] .. " " .. tbl[5] .. "\n" )
 				ply:Kick("You're supposed to be banned! Stop hacking to get in. Ban time extended.")
-				print("[EV] Banned " .. ply:Nick() .. " again. Reason: " .. tbl[5] .. ". Player was banned at " .. os.date( "%c", tbl[3] ) .. " for " .. tbl[4] .. " minutes. Time left is: " .. tbl[4] .. " minutes.")
+				evolve:Notify( evolve.colors.white, "Banned ", evolve.colors.red, ply:Nick(), evolve.colors.white, " again. Reason: " .. tbl[5] .. ". Player was banned at " .. os.date( "%c", tbl[3] ) .. " for " .. tbl[4] .. " minutes. Time left is: " .. tbl[4] .. " minutes.")
 			end
 		end
 	end
@@ -214,11 +215,11 @@ local function Reban()
 			if (os.time() < tbl[4] or tbl[4] != 0) then
 				if (SERVER) then game.ConsoleCommand( "banid " .. timeleft .. " " .. tbl[2] .. "\n" ) end
 				table.insert( evolve.Bans, tbl )
-				print("[EV] Banned " .. tbl[1] .. " again. Reason: '" .. tbl[5] .. "'. Player was banned at " .. os.date( "%c", tbl[3] ) .. " for " .. (tbl[4]-tbl[4]) .. " minutes. Time left is: " .. math.Round(timeleft) .. " minutes.")
+				evolve:Notify( evolve.colors.white, "Banned ", evolve.colors.red, tbl[1], evolve.colors.white, " again. Reason: '" .. tbl[5] .. "'. Player was banned at " .. os.date( "%c", tbl[3] ) .. " for " .. (tbl[4]-tbl[4]) .. " minutes. Time left is: " .. math.Round(timeleft) .. " minutes.")
 			else
 				evolve:RemoveBan( tbl[2] )
 				evolve:WriteBans()
-				print("[EV] Player " .. tbl[1] .. " is no longer banned.")
+				evolve:Notify( evolve.colors.red, tbl[1], evolve.colors.white, " is no longer banned." )
 			end
 		end
 	end
