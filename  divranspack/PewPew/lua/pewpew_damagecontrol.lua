@@ -15,6 +15,7 @@ pewpew.PewPewDamage = true
 pewpew.PewPewFiring = true
 pewpew.PewPewNumpads = true
 pewpew.PewPewDamageMul = 1
+pewpew.PewPewCoreDamageMul = 1
 pewpew.PewPewCoreDamageOnly = false
 pewpew.RepairToolHeal = 75
 pewpew.RepairToolHealCores = 200
@@ -34,11 +35,13 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 				if (ent != IgnoreEnt) then
 					distance = Position:Distance( ent:GetPos() )
 					dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
+					if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 3 end
 					self:DealDamageBase( ent, dmg )
 				end
 			else
 				distance = Position:Distance( ent:GetPos() )
 				dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
+				if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 3 end
 				self:DealDamageBase( ent, dmg )
 			end
 		end
@@ -188,7 +191,7 @@ end
 function pewpew:DamageCore( ent, Damage )
 	if (!self:CheckValid( ent )) then return end
 	if (ent:GetClass() != "pewpew_core") then return end
-	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage)
+	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage) * self.PewPewCoreDamageMul
 	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth)
 	-- Wire Output
 	Wire_TriggerOutput( ent, "Health", ent.pewpewCoreHealth or 0 )
@@ -389,6 +392,20 @@ local function DamageMul( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_DamageMul",DamageMul)
+
+local function CoreDamageMul( ply, command, arg )
+	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
+		if ( !arg[1] ) then return end
+		pewpew.PewPewCoreDamageMul = math.max( arg[1], 0.01 )
+		local name = "Console"
+		local msg = " has changed the PewPew Core Damage Multiplier to "
+		if (ply:IsValid()) then name = ply:Nick() end
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( name .. msg .. pewpew.PewPewCoreDamageMul)
+		end
+	end
+end
+concommand.Add("PewPew_CoreDamageMul",CoreDamageMul)
 
 local function ToggleCoreDamageOnly( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
