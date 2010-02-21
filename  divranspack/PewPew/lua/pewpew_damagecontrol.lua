@@ -1,11 +1,13 @@
 -- Pewpew Damage Control
 -- These functions take care of damage
-
+--Added "NeverEverList". Class types in this list will NEVER EVER take damage by PewPew weaponry.
 ------------------------------------------------------------------------------------------------------------
 -- Deal Damage
 
--- Entity types in the blacklist will not be harmed by PewPew weaponry.
-pewpew.DamageBlacklist = { "pewpew_base_bullet", "gmod_wire", "gmod_ghost" }
+-- Entities in the Never Ever hit list will NEVER EVER take damage by PewPew weaponry.
+pewpew.NeverEverList = { "pewpew_base_bullet", "gmod_ghost" }
+-- Entity types in the blacklist will deal their damage to the first non-blacklisted entity they are constrained to. If they are not constrained to one, they take the damage themselves
+pewpew.DamageBlacklist = { "gmod_wire" }
 -- Entity types in the whitelist will ALWAYS be harmed by PewPew weaponry, even if they are in the blacklist as well.
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
@@ -152,6 +154,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	if (!self:CheckValid( TargetEntity )) then return end
 	if (!Damage or Damage == 0) then return end
 	-- Check if allowed
+	if (!self:CheckNeverEverList( TargetEntity )) then return end
 	if (!self:CheckAllowed( TargetEntity )) then
 		local temp = constraint.GetAllConstrainedEntities( TargetEntity )
 		local OldEnt = TargetEntity
@@ -300,6 +303,13 @@ function pewpew:CheckAllowed( entity )
 	end
 	for _, str in pairs( self.DamageBlacklist ) do
 		if (string.find( entity:GetClass(), str )) then return false end
+	end
+	return true
+end
+
+function pewpew:CheckNeverEverList( entity )
+	for _, str in pairs( self.NeverEverList ) do
+		if (entity:GetClass() == str) then return false end
 	end
 	return true
 end
