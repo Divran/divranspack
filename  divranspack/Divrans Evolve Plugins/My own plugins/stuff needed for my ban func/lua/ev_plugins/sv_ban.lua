@@ -84,6 +84,30 @@ function PLUGIN:Call( ply, args )
 	end
 end
 
+function PLUGIN:Menu( arg, players )
+	if ( arg ) then
+		RunConsoleCommand( "ev", "ban", players[1], arg )
+	else
+		return "Ban", evolve.category.administration, {
+			{ "5 minutes", "5" },
+			{ "10 minutes", "10" },
+			{ "15 minutes", "15" },
+			{ "30 minutes", "30" },
+			{ "1 hour", "60" },
+			{ "2 hours", "120" },
+			{ "4 hours", "240" },
+			{ "12 hours", "720" },
+			{ "One day", "1440" },
+			{ "Two days", "2880" },
+			{ "One week", "10080" },
+			{ "Two weeks", "20160" },
+			{ "One month", "43200" },
+			{ "One year", "525600" },
+			{ "Permanently", "0" }
+		}
+	end
+end
+
 -- Check if the player is no longer banned
 function PLUGIN:PlayerInitialSpawn( ply )
 	if (!evolve:BanFileExists()) then return end
