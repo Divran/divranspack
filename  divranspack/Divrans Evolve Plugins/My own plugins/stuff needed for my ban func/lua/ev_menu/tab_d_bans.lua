@@ -131,7 +131,7 @@ function TAB:Initialize()
 	
 	self.ResendButton = vgui.Create( "DButton", self.Container )
 	self.ResendButton:SetSize( w*(1/6)/2, 20 )
-	self.ResendButton:SetPos( w*(5/6)+self.LockButton:GetWide()+3, h-52 )
+	self.ResendButton:SetPos( w*(5/6)+self.LockButton:GetWide()+1, h-52 )
 	self.ResendButton:SetText( "Update" )
 	function self.ResendButton:DoClick()
 		RunConsoleCommand("ev_resendbanlist")

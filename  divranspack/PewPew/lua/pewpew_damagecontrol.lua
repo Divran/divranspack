@@ -9,7 +9,7 @@ pewpew.DamageBlacklist = { "pewpew_base_bullet", "gmod_wire", "gmod_ghost" }
 -- Entity types in the whitelist will ALWAYS be harmed by PewPew weaponry, even if they are in the blacklist as well.
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
--- Serverwide Damage toggle
+-- Default Values
 pewpew.PewPewDamage = true
 pewpew.PewPewFiring = true
 pewpew.PewPewNumpads = true
@@ -306,16 +306,19 @@ end
 
 -- Toggle Damage
 local function ToggleDamage( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	pewpew.PewPewDamage = !pewpew.PewPewDamage
-	if (pewpew.PewPewDamage) then
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Damage and it is now ON!")
-		end
-	else
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Damage and it is now OFF!")
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		pewpew.PewPewDamage = !pewpew.PewPewDamage
+		local name = "Console"
+		if (ply:IsValid) then name = ply:Nick() end
+		local msg = " has toggled PewPew Damage and it is now "
+		if (pewpew.PewPewDamage) then
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "ON!")
+			end
+		else
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "OFF!")
+			end
 		end
 	end
 end
@@ -323,16 +326,19 @@ concommand.Add("PewPew_ToggleDamage", ToggleDamage)
 
 -- Toggle Firing
 local function ToggleFiring( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	pewpew.PewPewFiring = !pewpew.PewPewFiring
-	if (pewpew.PewPewFiring) then
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Firing and it is now ON!")
-		end
-	else
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Firing and it is now OFF!")
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		pewpew.PewPewFiring = !pewpew.PewPewFiring
+		local name = "Console"
+		if (ply:IsValid) then name = ply:Nick() end
+		local msg = " has toggled PewPew Firing and it is now "
+		if (pewpew.PewPewFiring) then
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "ON!")
+			end
+		else
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "OFF!")
+			end
 		end
 	end
 end
@@ -340,66 +346,81 @@ concommand.Add("PewPew_ToggleFiring", ToggleFiring)
 
 -- Toggle Numpads
 local function ToggleNumpads( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	pewpew.PewPewNumpads = !pewpew.PewPewNumpads
-	if (pewpew.PewPewNumpads) then
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Numpad Inputs and they are now ON!")
-		end
-	else
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Numpad Inputs and they are now OFF!")
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		pewpew.PewPewNumpads = !pewpew.PewPewNumpads
+		local name = "Console"
+		if (ply:IsValid) then name = ply:Nick() end
+		local msg = " has toggled PewPew Numpads and they are now "
+		if (pewpew.PewPewNumpads) then
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "ON!")
+			end
+		else
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "OFF!")
+			end
 		end
 	end
 end
 concommand.Add("PewPew_ToggleNumpads", ToggleNumpads)
 
 local function DamageMul( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	if ( !arg[1] ) then return end
-	pewpew.PewPewDamageMul = math.max( arg[1], 0.01 )
-	for _, v in pairs( player.GetAll() ) do
-		v:ChatPrint( ply:Nick() .. " has changed the PewPew Damage Multiplier to " .. pewpew.PewPewDamageMul)
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		if ( !arg[1] ) then return end
+		pewpew.PewPewDamageMul = math.max( arg[1], 0.01 )
+		local name = "Console"
+		local msg = " has changed the PewPew Damage Multiplier to "
+		if (ply:IsValid) then name = ply:Nick() end
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( name .. msg .. pewpew.PewPewDamageMul)
+		end
 	end
 end
 concommand.Add("PewPew_DamageMul",DamageMul)
 
 local function ToggleCoreDamageOnly( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	pewpew.PewPewCoreDamageOnly = !pewpew.PewPewCoreDamageOnly
-	if (pewpew.PewPewCoreDamageOnly) then
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Core Damage Only and it is now ON!")
-		end
-	else
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( ply:Nick() .. " has toggled PewPew Core Damage Only and it is now OFF!")
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		pewpew.PewPewCoreDamageOnly = !pewpew.PewPewCoreDamageOnly
+		local name = "Console"
+		if (ply:IsValid) then name = ply:Nick() end
+		local msg = " has toggled PewPew Core Damage Only and it is now "
+		if (pewpew.PewPewCoreDamageOnly) then
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "ON!")
+			end
+		else
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg .. "OFF!")
+			end
 		end
 	end
 end
 concommand.Add("PewPew_ToggleCoreDamageOnly", ToggleCoreDamageOnly)
 
 local function RepairToolHeal( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	if ( !arg[1] ) then return end
-	pewpew.RepairToolHeal = math.max( arg[1], 20 )
-	for _, v in pairs( player.GetAll() ) do
-		v:ChatPrint( ply:Nick() .. " has changed the speed at which the Repair Tool heals to " .. pewpew.RepairToolHeal)
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		if ( !arg[1] ) then return end
+		pewpew.RepairToolHeal = math.max( arg[1], 20 )
+		local name = "Console"
+		if (ply:IsValid) then name = ply:Nick() end
+		local msg = " has changed the speed at which the Repair Tool heals to "
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( name .. msg .. pewpew.RepairToolHeal)
+		end
 	end
 end
 concommand.Add("PewPew_RepairToolHeal",RepairToolHeal)
 
 local function RepairToolHealCores( ply, command, arg )
-	if ( !ply or !ply:IsValid() ) then return end
-	if ( !ply:IsAdmin() ) then return end
-	if ( !arg[1] ) then return end
-	pewpew.RepairToolHealCores = math.max( arg[1], 20 )
-	for _, v in pairs( player.GetAll() ) do
-		v:ChatPrint( ply:Nick() .. " has changed the speed at which the Repair Tool heals against cores to " .. pewpew.RepairToolHealCores)
+	if ( (ply:IsValid and ply:IsAdmin()) or !ply:IsValid() ) then
+		if ( !arg[1] ) then return end
+		pewpew.RepairToolHealCores = math.max( arg[1], 20 )
+		local name = "Console"
+		if (ply:IsValid) then name = ply:Nick() end
+		local msg = " has changed the speed at which the Repair Tool heals cores to "
+		for _, v in pairs( player.GetAll() ) do
+			v:ChatPrint( name .. msg .. pewpew.RepairToolHealCores)
+		end
 	end
 end
 concommand.Add("PewPew_RepairToolHealCores",RepairToolHealCores)
