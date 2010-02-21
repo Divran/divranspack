@@ -35,13 +35,13 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 				if (ent != IgnoreEnt) then
 					distance = Position:Distance( ent:GetPos() )
 					dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-					if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 3 end
+					if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
 					self:DealDamageBase( ent, dmg )
 				end
 			else
 				distance = Position:Distance( ent:GetPos() )
 				dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-				if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 3 end
+				if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
 				self:DealDamageBase( ent, dmg )
 			end
 		end
@@ -379,6 +379,7 @@ local function ToggleNumpads( ply, command, arg )
 end
 concommand.Add("PewPew_ToggleNumpads", ToggleNumpads)
 
+-- Damage Multiplier
 local function DamageMul( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
@@ -393,6 +394,7 @@ local function DamageMul( ply, command, arg )
 end
 concommand.Add("PewPew_DamageMul",DamageMul)
 
+-- Damage Multiplier vs cores
 local function CoreDamageMul( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
@@ -407,6 +409,7 @@ local function CoreDamageMul( ply, command, arg )
 end
 concommand.Add("PewPew_CoreDamageMul",CoreDamageMul)
 
+-- Core Damage only
 local function ToggleCoreDamageOnly( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		pewpew.PewPewCoreDamageOnly = !pewpew.PewPewCoreDamageOnly
@@ -426,6 +429,7 @@ local function ToggleCoreDamageOnly( ply, command, arg )
 end
 concommand.Add("PewPew_ToggleCoreDamageOnly", ToggleCoreDamageOnly)
 
+-- Repair tool rate
 local function RepairToolHeal( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
@@ -440,6 +444,7 @@ local function RepairToolHeal( ply, command, arg )
 end
 concommand.Add("PewPew_RepairToolHeal",RepairToolHeal)
 
+-- Repair tool rate vs cores
 local function RepairToolHealCores( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
