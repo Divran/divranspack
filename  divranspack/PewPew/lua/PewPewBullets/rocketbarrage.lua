@@ -26,7 +26,7 @@ BULLET.ExplosionEffect = "v2splode"
 BULLET.Speed = 60
 BULLET.PitchChange = 0.2
 BULLET.RecoilForce = 0
-BULLET.Spread = 3
+BULLET.Spread = 2
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
