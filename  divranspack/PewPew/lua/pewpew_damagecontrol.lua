@@ -1,6 +1,5 @@
 -- Pewpew Damage Control
 -- These functions take care of damage
---Added "NeverEverList". Class types in this list will NEVER EVER take damage by PewPew weaponry.
 ------------------------------------------------------------------------------------------------------------
 -- Deal Damage
 
@@ -96,8 +95,25 @@ end
 
 
 -- EMPDamage - (Electro Magnetic Pulse. Disables all wiring within the radius for the duration)
+pewpew.EMPAffected = {}
+
+-- Override TriggerInput
+local OriginalFunc = WireLib.TriggerInput
+function WireLib.TriggerInput(ent, name, value, ...)
+	-- My addition
+	if (pewpew.EMPAffected[ent:EntIndex()] and pewpew.EMPAffected[ent:EntIndex()][1]) then  -- if it is affected
+		if (CurTime() < pewpew.EMPAffected[ent:EntIndex()][2]) then -- if the time isn't up yet
+			return
+		else -- if the time is up
+			pewpew.EMPAffected[ent:EntIndex()] = nil 
+		end
+	end
+	
+	OriginalFunc( ent, name, value, ... )
+end
+
+-- Add to EMPAffected
 function pewpew:EMPDamage( Position, Radius, Duration )
-	print("EMP Damage")
 		-- Check damage
 		if (!self.PewPewDamage) then return end
 	-- Check for errors
@@ -105,43 +121,19 @@ function pewpew:EMPDamage( Position, Radius, Duration )
 	
 	-- Find all entities in the radius
 	local ents = ents.FindInSphere( Position, Radius )
-	--print("Found " .. table.Count(ents) .. " entities")
 	
-	local ents2 = {}
 	-- Loop through all found entities
 	for _, ent in pairs(ents) do
-		--print("A NEW ENTITY.")
 		if (ent.TriggerInput) then
-			--print("THE ENTITY DOES HAVE INPUTS")
-			local tbl = {}
-			-- Loop through all the inputs on the entity
-			for key, _ in pairs( ent.Inputs ) do
-				local value = ent.Inputs[key].Value
-				--print("INPUT ON ENTITY: KEY: " .. key .. " VALUE: " .. value)
-				table.insert( tbl, { key, value } ) 
+			if (!self.EMPAffected[ent:EntIndex()]) then self.EMPAffected[ent:EntIndex()] = {} end
+			if (self.EMPAffected[ent:EntIndex()][1]) then -- if it is already affected
+				self.EMPAffected[ent:EntIndex()][2] = CurTime() + Duration -- edit the duration
+			else
+				self.EMPAffected[ent:EntIndex()][1] = true -- affect it
+				self.EMPAffected[ent:EntIndex()][2] = CurTime() + Duration -- set duration
 			end
-			table.insert( ents2, { ent, tbl } )
 		end
 	end
-	
-	-- Start a new timer which will block inputs
-	timer.Create( "PewPew_EMPDamage_" .. CurTime(), 0, 0, function( ents )
-		for _, tbl in pairs( ents ) do
-			local ent = tbl[1]
-			if (ent and ent:IsValid()) then
-				--print("BLOCKING ENTITY INPUTS: " .. tostring(ent))
-				for _, input in pairs( tbl[2] ) do
-					ent:TriggerInput( input[1], input[2] )
-					--print("BLOCKED INPUT: KEY: " .. input[1] .. " VALUE: " .. input[2] )
-				end
-			end
-		end
-	end, ents2 )
-	
-	-- Start a new timer which will remove the previous timer after the duration
-	timer.Create( "PewPew_EMPStopDamage_" .. CurTime(), Duration, 1, function( UniqueID )
-		timer.Remove( UniqueID )
-	end, "PewPew_EMPDamage_" .. CurTime() )
 end
 
 ------------------------------------------------------------------------------------------------------------
