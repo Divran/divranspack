@@ -13,6 +13,7 @@ function ENT:Initialize()
 	self.CanFire = true
 	self.LastFired = 0
 	self.Firing = false
+	self.SoundTimer = 0
 	
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
@@ -128,7 +129,8 @@ function ENT:Think()
 			-- if we don't have any ammo left...
 			if (self.Firing) then -- if you are holding down fire
 				-- Sound
-				if (self.Bullet.EmptyMagSound) then
+				if (self.Bullet.EmptyMagSound and self.SoundTimer and CurTime() > self.SoundTimer) then
+					self.SoundTimer = CurTime() + self.Bullet.Reloadtime
 					local soundpath = ""
 					if (table.Count(self.Bullet.EmptyMagSound) > 1) then
 						soundpath = table.Random(self.Bullet.EmptyMagSound)

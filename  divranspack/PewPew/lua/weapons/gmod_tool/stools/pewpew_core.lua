@@ -32,7 +32,7 @@ end
 						
 if (SERVER) then
 	AddCSLuaFile("pewpew_core.lua")
-	CreateConVar("sbox_maxpewpew_cores", 10)
+	CreateConVar("sbox_maxpewpew_cores", 6)
 
 	function TOOL:CreateCore( ply, trace, model )
 		local ent = ents.Create( "pewpew_core" )

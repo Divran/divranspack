@@ -105,8 +105,8 @@ if (SERVER) then
 				local nocollide = constraint.NoCollide( ent, trace.Entity, 0, trace.PhysicsBone )
 			end
 				
-			ply:AddCount("pewpew",ent)
-			ply:AddCleanup ( "pewpew", ent )
+			ply:AddCount( "pewpew", ent)
+			ply:AddCleanup( "pewpew", ent )
 
 			undo.Create( "pewpew" )
 				undo.AddEntity( ent )
