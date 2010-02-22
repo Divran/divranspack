@@ -1,12 +1,12 @@
--- Basic Laser
+-- Basic Cannon
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Basic Laser"
-BULLET.Category = "Lasers"
+BULLET.Name = "Laser Sword"
+BULLET.Category = "CloseCombat"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires a laser beam which slices through and damages 4 props."
+BULLET.Description = "May the force be with you."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -17,10 +17,11 @@ BULLET.Color = nil
 BULLET.Trail = nil
 
 -- Effects / Sounds
-BULLET.FireSound = {"Lasers/Small/Laser.wav"}
+BULLET.FireSound = nil
 BULLET.ExplosionSound = nil
-BULLET.FireEffect = nil
-BULLET.ExplosionEffect = "ISSmallPulseBeam"
+BULLET.FireEffect = "pewpew_swordeffect"
+BULLET.ExplosionEffect = nil
+BULLET.EmptyMagSound = nil
 
 -- Movement
 BULLET.Speed = nil
@@ -29,17 +30,18 @@ BULLET.RecoilForce = nil
 BULLET.Spread = nil
 
 -- Damage
-BULLET.DamageType = "SliceDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 85
+BULLET.DamageType = "SliceDamage"
+BULLET.Damage = 200
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
-BULLET.NumberOfSlices = 4
-BULLET.SliceDistance = 50000
-BULLET.PlayerDamageRadius = nil
+BULLET.NumberOfSlices = 3
+BULLET.SliceDistance = 500
+BULLET.Duration = nil
 BULLET.PlayerDamage = nil
+BULLET.PlayerDamageRadius = nil
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.7
+BULLET.Reloadtime = 0.05
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -51,18 +53,15 @@ BULLET.FireOverride = true
 function BULLET:Fire( self )
 	-- Get the start position
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 10)
+	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 2)
 	
 	-- Deal damage
 	local HitPos = pewpew:SliceDamage( startpos, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance )
 	
-	-- Effects
-	self:EmitSound( self.Bullet.FireSound[1] )
-	
 	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * self.Bullet.SliceDistance)  )
 	effectdata:SetStart( startpos )
-	util.Effect( self.Bullet.ExplosionEffect, effectdata )
+	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * self.Bullet.SliceDistance) )
+	util.Effect( self.Bullet.FireEffect, effectdata )
 end
 
 pewpew:AddBullet( BULLET )

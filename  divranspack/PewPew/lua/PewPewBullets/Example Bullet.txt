@@ -21,7 +21,7 @@ BULLET.FireSound = {"sound1", "sound2","sound3","and so on"} -- use as many soun
 BULLET.ExplosionSound = {"sound1", "sound2","sound3","and so on"}  -- use as many sounds as you want
 BULLET.FireEffect = "cannon_flare" -- find an effect in the effects folder
 BULLET.ExplosionEffect = "big_splosion" -- find an effect in the effects folder
-BULLET.EmptyMagSound = ["sound1","sound2","sound3","and so on"} -- use as many sounds as you want
+BULLET.EmptyMagSound = {"sound1","sound2","sound3","and so on"} -- use as many sounds as you want
 
 -- Movement
 BULLET.Speed = 50

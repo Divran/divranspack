@@ -27,7 +27,7 @@ function ENT:Initialize()
 		-- Color
 		if (self.Bullet.Color) then
 			local C = self.Bullet.Color
-			self.Entity:SetColor( C.r, C.g, C.b, 255 )
+			self.Entity:SetColor( C.r, C.g, C.b, C.a or 255 )
 		end
 	end
 end   

@@ -69,6 +69,7 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 	if (trace.HitWorld) then return trace.HitPos end
 	-- Get ent
 	local HitEnt = trace.Entity
+	local ret = nil
 	-- Loop
 	for I=1, NumberOfSlices do
 		-- Check world
@@ -85,8 +86,8 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 			tr.start = OldPos
 			tr.endpos = OldPos + Direction * MaxRange
 			tr.filter = HitEnt
-			if (I == NumberOfSlices) then local ret = trace.HitPos end
 			trace = util.TraceLine( tr )
+			ret = OldPos
 			OldPos = trace.HitPos
 			HitEnt = trace.Entity
 			-- Check world
@@ -322,10 +323,13 @@ end
 -- Toggle Damage
 local function ToggleDamage( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
-		pewpew.PewPewDamage = !pewpew.PewPewDamage
+		if (!arg[1]) then return end
+		local bool = false
+		if (tonumber(arg[1]) != 0) then bool = true end
+		pewpew.PewPewDamage = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has toggled PewPew Damage and it is now "
+		local msg = " has changed PewPew Damage and it is now "
 		if (pewpew.PewPewDamage) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ON!")
@@ -342,10 +346,13 @@ concommand.Add("PewPew_ToggleDamage", ToggleDamage)
 -- Toggle Firing
 local function ToggleFiring( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
-		pewpew.PewPewFiring = !pewpew.PewPewFiring
+		if (!arg[1]) then return end
+		local bool = false
+		if (tonumber(arg[1]) != 0) then bool = true end
+		pewpew.PewPewFiring = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has toggled PewPew Firing and it is now "
+		local msg = " has changed PewPew Firing and it is now "
 		if (pewpew.PewPewFiring) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ON!")
@@ -362,17 +369,20 @@ concommand.Add("PewPew_ToggleFiring", ToggleFiring)
 -- Toggle Numpads
 local function ToggleNumpads( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
-		pewpew.PewPewNumpads = !pewpew.PewPewNumpads
+		if (!arg[1]) then return end
+		local bool = false
+		if (tonumber(arg[1]) != 0) then bool = true end
+		pewpew.PewPewNumpads = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has toggled PewPew Numpads and they are now "
+		local msg = " has changed PewPew Numpads and they are now "
 		if (pewpew.PewPewNumpads) then
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "ON!")
+				v:ChatPrint( name .. msg .. "ENABLED!")
 			end
 		else
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "OFF!")
+				v:ChatPrint( name .. msg .. "DISABLED!")
 			end
 		end
 	end
@@ -412,10 +422,13 @@ concommand.Add("PewPew_CoreDamageMul",CoreDamageMul)
 -- Core Damage only
 local function ToggleCoreDamageOnly( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
-		pewpew.PewPewCoreDamageOnly = !pewpew.PewPewCoreDamageOnly
+		if (!arg[1]) then return end
+		local bool = false
+		if (tonumber(arg[1]) != 0) then bool = true end
+		pewpew.PewPewCoreDamageOnly = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has toggled PewPew Core Damage Only and it is now "
+		local msg = " has changed PewPew Core Damage Only and it is now "
 		if (pewpew.PewPewCoreDamageOnly) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ON!")
