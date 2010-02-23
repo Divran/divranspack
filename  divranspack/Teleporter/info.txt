@@ -1,0 +1,11 @@
+"AddonInfo"
+{
+	"name"				"Wire Teleporter"
+	"version"			"1"
+	"up_date"			""
+	"author_name"			"Divran"
+	"author_email"			""
+	"author_url"			""
+	"info"				"An entity that allows you to teleport entire contraptions"
+	"override"			"0"
+}
