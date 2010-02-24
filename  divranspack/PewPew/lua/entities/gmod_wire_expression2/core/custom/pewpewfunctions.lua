@@ -134,10 +134,10 @@ e2function number entity:pewSpeed()
 end
 
 -- Returns the pitch change (aka how fast it drops toward the ground)
-e2function number entity:pewPitchChange()
+e2function number entity:pewGravity()
 	if (!validPhysics(this)) then return 0 end
 	if (this:GetClass() != "pewpew_base_cannon") then return 0 end
-	return this.Bullet.PitchChange or 0
+	return this.Bullet.Gravity or 0
 end
 
 -- Returns the recoil force

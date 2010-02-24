@@ -45,7 +45,7 @@ function ENT:Think()
 	else
 		-- Make it fly
 		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-		self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.PitchChange / self.Bullet.Speed)
+		self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.Gravity / self.Bullet.Speed)
 		self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 		
 		-- Check if it hit something

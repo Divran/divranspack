@@ -24,7 +24,7 @@ BULLET.ExplosionEffect = "HEATsplode"
 
 -- Movement
 BULLET.Speed = 80
-BULLET.PitchChange = 0.3
+BULLET.Gravity = 0.3
 BULLET.RecoilForce = 350
 BULLET.Spread = 0
 

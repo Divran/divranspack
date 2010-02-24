@@ -24,7 +24,7 @@ BULLET.ExplosionEffect = "gcombat_explosion"
 
 -- Movement
 BULLET.Speed = nil
-BULLET.PitchChange = nil
+BULLET.Gravity = nil
 BULLET.RecoilForce = nil
 BULLET.Spread = nil
 

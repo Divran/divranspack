@@ -3,7 +3,7 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Guass Gun"
+BULLET.Name = "Gauss Gun"
 BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
 BULLET.Description = "An electro-magnetic powered cannon."
@@ -24,7 +24,7 @@ BULLET.ExplosionEffect = "gcombat_explosion"
 
 -- Movement
 BULLET.Speed = 150
-BULLET.PitchChange = 0.007
+BULLET.Gravity = 0.007
 BULLET.RecoilForce = 0
 BULLET.Spread = 0.05
 

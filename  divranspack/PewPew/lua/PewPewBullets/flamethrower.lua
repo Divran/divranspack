@@ -25,7 +25,7 @@ BULLET.EmptyMagSound = nil
 
 -- Movement
 BULLET.Speed = 35
-BULLET.PitchChange = 1
+BULLET.Gravity = 1
 BULLET.RecoilForce = 0
 BULLET.Spread = 5
 

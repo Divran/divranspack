@@ -25,7 +25,7 @@ BULLET.EmptyMagSound = {"sound1","sound2","sound3","and so on"} -- use as many s
 
 -- Movement
 BULLET.Speed = 50
-BULLET.PitchChange = 0.2
+BULLET.Gravity = 0.2
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 

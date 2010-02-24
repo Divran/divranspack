@@ -24,7 +24,7 @@ BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
 BULLET.Speed = 145
-BULLET.PitchChange = 0.1
+BULLET.Gravity = 0.1
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 

@@ -24,7 +24,7 @@ BULLET.ExplosionEffect = nil
 
 -- Movement
 BULLET.Speed = 90
-BULLET.PitchChange = 0.01
+BULLET.Gravity = 0.01
 BULLET.RecoilForce = 10
 BULLET.Spread = 0.4
 

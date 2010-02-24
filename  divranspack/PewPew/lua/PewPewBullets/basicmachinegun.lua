@@ -26,7 +26,7 @@ BULLET.EmptyMagSound = {"weapons/pistol/pistol_empty.wav"}
 
 -- Movement
 BULLET.Speed = 70
-BULLET.PitchChange = 0.2
+BULLET.Gravity = 0.2
 BULLET.RecoilForce = 30
 BULLET.Spread = 0.2
 
