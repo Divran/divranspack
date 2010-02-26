@@ -8,7 +8,7 @@ function ENT:Initialize()
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
 	self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
-	self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo" })
+	self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" })
 	
 	self.CanFire = true
 	self.LastFired = 0
@@ -16,7 +16,7 @@ function ENT:Initialize()
 	self.SoundTimer = 0
 	
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
-	Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+	Wire_TriggerOutput( self.Entity, "Can Fire", 1 )
 end
 
 function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
@@ -120,6 +120,8 @@ function ENT:FireBullet()
 			self.Ammo = self.Ammo - 1
 			Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 		end
+		Wire_TriggerOutput( self.Entity, "Last Fired", ent )
+		Wire_TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() )
 	end
 end
 
