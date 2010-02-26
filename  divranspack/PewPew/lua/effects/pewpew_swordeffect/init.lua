@@ -1,3 +1,5 @@
+-- Made by Divran
+
 EFFECT.Mat = Material( "cable/blue_elec" )
 /*---------------------------------------------------------
    Init( data table )

@@ -1,3 +1,5 @@
+-- Made by Divran
+
 function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	local Size = math.Round(data:GetScale())
