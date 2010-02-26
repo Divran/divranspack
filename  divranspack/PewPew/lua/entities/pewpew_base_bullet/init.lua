@@ -91,13 +91,13 @@ function ENT:Think()
 				if (!damagetype) then return end
 				if (damagetype == "BlastDamage") then
 					if (trace.Entity and trace.Entity:IsValid()) then
-						pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
+						pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
 						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
 					else
 						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
 					end
 				elseif (damagetype == "PointDamage") then
-					pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
+					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
 				elseif (damagetype == "SliceDamage") then
 					pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Entity )
 				elseif (damagetype == "EMPDamage") then
