@@ -36,8 +36,8 @@ BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
-BULLET.PlayerDamage = 35
-BULLET.PlayerDamageRadius = 50
+BULLET.PlayerDamage = nil
+BULLET.PlayerDamageRadius = nil
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 0.2

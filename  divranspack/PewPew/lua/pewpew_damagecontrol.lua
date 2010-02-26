@@ -49,13 +49,16 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 end
 
 -- Point Damage - (Deals damage to 1 single entity)
-function pewpew:PointDamage( TargetEntity, Damage )
-	self:DealDamageBase( TargetEntity, Damage )
-	-- Might change this later...
+function pewpew:PointDamage( TargetEntity, Damage, DamageDealer )
+	if (TargetEntity:IsPlayer()) then
+		TargetEntity:TakeDamage( Damage, DamageDealer )
+	else
+		self:DealDamageBase( TargetEntity, Damage )
+	end
 end
 
 -- Slice damage - (Deals damage to a number of entities in a line. It is stopped by the world)
-function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange )
+function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange, DamageDealer )
 		-- Check dmg
 		if (!self.PewPewDamage) then return nil end
 	local OldPos = StartPos
@@ -78,17 +81,13 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 			-- Check distance
 			if (StartPos:Distance(OldPos) > MaxRange) then return OldPos end
 		end
-		if (HitEnt and HitEnt:IsPlayer() and HitEnt:Health() > 0) then
-			local HP = HitEnt:Health()
-			if (HP - Damage < 0) then
-				HitEnt:Kill()
-			else
-				HitEnt:SetHealth( HP - Damage )
+		if (HitEnt) then
+			if (HitEnt:IsPlayer()) then
+				HitEnt:TakeDamage( Damage, DamageDealer )
+			elseif (self:CheckValid( HitEnt )) then
+				-- Deal damage
+				self:DealDamageBase( HitEnt, Damage )
 			end
-		end
-		if (HitEnt and self:CheckValid( HitEnt )) then
-			-- Deal damage
-			self:DealDamageBase( HitEnt, Damage )
 			-- New trace
 			tr = {}
 			tr.start = OldPos
@@ -98,8 +97,6 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 			ret = OldPos
 			OldPos = trace.HitPos
 			HitEnt = trace.Entity
-			-- Check world
-			if (trace.HitWorld) then return trace.HitPos end
 		end
 	end
 	return ret

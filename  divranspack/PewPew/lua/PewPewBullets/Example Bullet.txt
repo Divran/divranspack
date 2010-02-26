@@ -37,7 +37,7 @@ BULLET.RangeDamageMul = 0.3 -- This is only used with "BlastDamage". It determin
 BULLET.NumberOfSlices = nil -- this is only used with "SliceDamage". It determines how many props in a line you want to deal damage to.
 BULLET.SliceDistance = nil -- This is only used with "SliceDamage". It determines the total maximum range the trace will travel.
 BULLET.Duration = nil -- This is only used with "EMPDamage". It determines how long the target entities will be disabled.
-BULLET.PlayerDamage = 150
+BULLET.PlayerDamage = 150 -- Damage vs players. This is only used in "BlastDamage". In other damage types, you should make this nil. If these are not nil in other damage types, the player may take twice as much damage.
 BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
