@@ -6,7 +6,7 @@ ENT.WireDebugName = "Teleporter"
 
 function ENT:Initialize()
 	
-	self.Entity:SetModel( "models//props_c17/utilityconducter001.mdl" )
+	self.Entity:SetModel( "models/props_c17/utilityconducter001.mdl" )
 	
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
@@ -130,8 +130,18 @@ function ENT:Jump()
 		if (self:CheckAllowed( ent ) and ent != self.Entity) then			
 			-- Save the entity
 			table.insert(self.Entities, ent )
-			-- Save the localized position
-			self.LocalPos[ent:EntIndex()] = self.Entity:WorldToLocal( ent:GetPos() )
+			-- Check for bones
+			if (ent:GetPhysicsObjectCount() > 1) then
+				local tbl = {}
+				for i=0, ent:GetPhysicsObjectCount()-1 do
+					tbl[i] = self.Entity:WorldToLocal( ent:GetPhysicsObjectNum( i ):GetPos() )
+				end
+				-- Save the localized position table
+				self.LocalPos[ent:EntIndex()] = tbl
+			else
+				-- Save the localized position
+				self.LocalPos[ent:EntIndex()] = self.Entity:WorldToLocal( ent:GetPos() )
+			end
 		end
 	end
 
@@ -154,9 +164,19 @@ function ENT:Jump()
 
 	-- Teleport others
 	for _, ent in pairs( self.Entities ) do
-		if (self.LocalPos[ent:EntIndex()]) then				
-			-- Set pos
-			ent:SetPos( self.Entity:LocalToWorld(self.LocalPos[ent:EntIndex()]) )
+		if (self.LocalPos[ent:EntIndex()]) then			
+			-- Check for bones
+			if (ent:GetPhysicsObjectCount() > 1) then
+				for i=0, ent:GetPhysicsObjectCount()-1 do
+					-- Teleport each bone
+					ent:GetPhysicsObjectNum( i ):SetPos( self.Entity:LocalToWorld(self.LocalPos[ent:EntIndex()][i]) )
+					ent:GetPhysicsObject():Wake()
+				end
+			else
+				-- Set pos
+				ent:SetPos( self.Entity:LocalToWorld(self.LocalPos[ent:EntIndex()]) )
+				DoPropSpawnedEffect( ent )
+			end
 			
 			-- Effect in
 			effectdata = EffectData()
@@ -171,6 +191,6 @@ function ENT:Jump()
 end
 
 function ENT:CheckAllowed( e )
-	if (e:GetParent():EntIndex() != 0 or e:GetPhysicsObjectCount() > 1) then return false end
+	if (e:GetParent():EntIndex() != 0) then return false end
 	return true
 end
