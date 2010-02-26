@@ -98,7 +98,7 @@ if (SERVER) then
 			-- else create a new one
 			
 			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload )
-			if (!ent) then return end
+			if (!ent or !ent:IsValid()) then return end
 			
 			if (!traceent:IsWorld() and !traceent:IsPlayer()) then
 				local weld = constraint.Weld( ent, trace.Entity, 0, trace.PhysicsBone, 0 )
@@ -174,9 +174,9 @@ if (SERVER) then
 	
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
-			if (trace.Entity and ValidEntity(trace.Entity)) then
+			if (trace.Entity and ValidEntity(trace.Entity) and !trace.Entity:IsPlayer()) then
 				self:GetOwner():ConCommand("pewpew_model " .. trace.Entity:GetModel())
-				self:GetOwner():ChatPrint("GCombat Cannon model set to: " .. trace.Entity:GetModel())
+				self:GetOwner():ChatPrint("PewPew Cannon model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
@@ -197,7 +197,6 @@ else
 		CPanel:AddDefaultControls()
 		CPanel:AddControl("Header", { Text = "#Tool_pewpew_name", Description = "#Tool_pewpew_desc" })
 		
-		-- Models
 		CPanel:AddControl("ComboBox", {
 			Label = "#Presets",
 			MenuButton = "1",

@@ -78,6 +78,14 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 			-- Check distance
 			if (StartPos:Distance(OldPos) > MaxRange) then return OldPos end
 		end
+		if (HitEnt and HitEnt:IsPlayer() and HitEnt:Health() > 0) then
+			local HP = HitEnt:Health()
+			if (HP - Damage < 0) then
+				HitEnt:Kill()
+			else
+				HitEnt:SetHealth( HP - Damage )
+			end
+		end
 		if (HitEnt and self:CheckValid( HitEnt )) then
 			-- Deal damage
 			self:DealDamageBase( HitEnt, Damage )
