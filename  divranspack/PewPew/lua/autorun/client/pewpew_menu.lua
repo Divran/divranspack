@@ -34,7 +34,7 @@ local function SetTable( Bullet )
 	list[8] = 	{"PlayerDamage", 		Bullet.PlayerDamage}
 	list[9] = 	{"PlayerDamageRadius", 	Bullet.PlayerDamageRadius}
 	list[10] = 	{"Speed", 				Bullet.Speed}
-	list[11] = 	{"Gravity", 		Bullet.Gravity}
+	list[11] = 	{"Gravity", 			Bullet.Gravity}
 	list[12] =	{"RecoilForce", 		Bullet.RecoilForce}
 	list[13] = 	{"Spread",				Bullet.Spread}
 	list[14] = 	{"Reloadtime", 			Bullet.Reloadtime}

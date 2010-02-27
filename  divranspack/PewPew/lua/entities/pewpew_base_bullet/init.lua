@@ -61,11 +61,6 @@ function ENT:Think()
 				-- Allows you to override the Explode function
 				self.Bullet:Explode( self, trace )
 			else
-				-- Player Damage
-				if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
-					util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
-				end
-				
 				-- Effects
 				if (self.Bullet.ExplosionEffect) then
 					local effectdata = EffectData()
@@ -95,6 +90,11 @@ function ENT:Think()
 						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
 					else
 						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+					end
+					
+					-- Player Damage
+					if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
+						util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 					end
 				elseif (damagetype == "PointDamage") then
 					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )

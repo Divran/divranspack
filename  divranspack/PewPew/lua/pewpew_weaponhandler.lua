@@ -15,7 +15,7 @@ end
 
 -- Add the bullets to the bullet list
 function pewpew:AddBullet( bullet )
-	print("Added PewPew Bullet: " .. bullet.Name)
+	if (SERVER) then print("Added PewPew Bullet: " .. bullet.Name) end
 	table.insert( self.bullets, bullet )
 	if (!self.Categories[bullet.Category]) then
 		self.Categories[bullet.Category] = {}
