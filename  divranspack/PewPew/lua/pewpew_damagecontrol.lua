@@ -97,7 +97,7 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 			ret = OldPos
 			OldPos = trace.HitPos
 			HitEnt = trace.Entity
-		end
+		elseif (trace.HitWorld) then return trace.HitPos end
 	end
 	return ret
 end
