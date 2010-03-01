@@ -50,6 +50,7 @@ function BULLET:InitializeFunc(self)
 	self.Propelled = false
 	self.Sticked = false
 	self.StickBlow = 0
+	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 2
 	
 	constraint.NoCollide(self.Entity, self.Cannon.Entity, 0, 0)
 	

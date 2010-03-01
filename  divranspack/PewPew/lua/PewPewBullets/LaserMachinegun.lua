@@ -20,7 +20,7 @@ BULLET.Trail = nil
 BULLET.FireSound = {"Lasers/SPulse/PulseLaser.wav"}
 BULLET.ExplosionSound = nil
 BULLET.FireEffect = nil
-BULLET.ExplosionEffect = nil
+BULLET.ExplosionEffect = "pewpew_laserhiteffect"
 
 -- Movement
 BULLET.Speed = 90

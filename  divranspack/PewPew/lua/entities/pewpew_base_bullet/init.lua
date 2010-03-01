@@ -12,6 +12,7 @@ function ENT:Initialize()
 		self.Entity:SetSolid( SOLID_NONE )    
 		self.FlightDirection = self.Entity:GetUp()
 		self.Exploded = false
+		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 2
 		
 		-- Trail
 		if (self.Bullet.Trail) then
@@ -48,65 +49,71 @@ function ENT:Think()
 		self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.Gravity / self.Bullet.Speed)
 		self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 		
-		-- Check if it hit something
-		local tr = {}
-		tr.start = self.Entity:GetPos()
-		tr.endpos = self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed
-		tr.filter = self.Entity
-		local trace = util.TraceLine( tr )
-		
-		if (trace.Hit and !self.Exploded) then	
-			self.Exploded = true
-			if (self.Bullet.ExplodeOverride) then
-				-- Allows you to override the Explode function
-				self.Bullet:Explode( self, trace )
-			else
-				-- Effects
-				if (self.Bullet.ExplosionEffect) then
-					local effectdata = EffectData()
-					effectdata:SetOrigin( trace.HitPos + trace.HitNormal * 5 )
-					effectdata:SetStart( trace.HitPos + trace.HitNormal * 5 )
-					effectdata:SetNormal( trace.HitNormal )
-					util.Effect( self.Bullet.ExplosionEffect, effectdata )
-				end
-				
-				-- Sounds
-				if (self.Bullet.ExplosionSound) then
-					local soundpath = ""
-					if (table.Count(self.Bullet.ExplosionSound) > 1) then
-						soundpath = table.Random(self.Bullet.ExplosionSound)
-					else
-						soundpath = self.Bullet.ExplosionSound[1]
+		if (CurTime() > self.TraceDelay) then
+			-- Check if it hit something
+			local tr = {}
+			tr.start = self.Entity:GetPos() - self.FlightDirection * self.Bullet.Speed
+			tr.endpos = self.Entity:GetPos()
+			tr.filter = self.Entity
+			local trace = util.TraceLine( tr )
+			
+			if (trace.Hit and !self.Exploded) then	
+				self.Exploded = true
+				if (self.Bullet.ExplodeOverride) then
+					-- Allows you to override the Explode function
+					self.Bullet:Explode( self, trace )
+				else
+					-- Effects
+					if (self.Bullet.ExplosionEffect) then
+						local effectdata = EffectData()
+						effectdata:SetOrigin( trace.HitPos + trace.HitNormal * 5 )
+						effectdata:SetStart( trace.HitPos + trace.HitNormal * 5 )
+						effectdata:SetNormal( trace.HitNormal )
+						util.Effect( self.Bullet.ExplosionEffect, effectdata )
 					end
-					WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
-				end
 					
-				-- GCombat Damage
-				local damagetype = self.Bullet.DamageType
-				if (!damagetype) then return end
-				if (damagetype == "BlastDamage") then
-					if (trace.Entity and trace.Entity:IsValid()) then
+					-- Sounds
+					if (self.Bullet.ExplosionSound) then
+						local soundpath = ""
+						if (table.Count(self.Bullet.ExplosionSound) > 1) then
+							soundpath = table.Random(self.Bullet.ExplosionSound)
+						else
+							soundpath = self.Bullet.ExplosionSound[1]
+						end
+						WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
+					end
+						
+					-- GCombat Damage
+					local damagetype = self.Bullet.DamageType
+					if (!damagetype) then return end
+					if (damagetype == "BlastDamage") then
+						if (trace.Entity and trace.Entity:IsValid()) then
+							pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
+							pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+						else
+							pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+						end
+						
+						-- Player Damage
+						if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
+							util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+						end
+					elseif (damagetype == "PointDamage") then
 						pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
-						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
-					else
-						pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+					elseif (damagetype == "SliceDamage") then
+						pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Entity )
+					elseif (damagetype == "EMPDamage") then
+						pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
 					end
 					
-					-- Player Damage
-					if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
-						util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
-					end
-				elseif (damagetype == "PointDamage") then
-					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
-				elseif (damagetype == "SliceDamage") then
-					pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Entity )
-				elseif (damagetype == "EMPDamage") then
-					pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
+					self.Entity:SetPos( trace.HitPos )
+					-- Remove the bullet
+					self.Entity:Remove()
 				end
-				
-				self.Entity:SetPos( trace.HitPos )
-				-- Remove the bullet
-				self.Entity:Remove()
+			else			
+				-- Run more often!
+				self.Entity:NextThink( CurTime() )
+				return true
 			end
 		else			
 			-- Run more often!
