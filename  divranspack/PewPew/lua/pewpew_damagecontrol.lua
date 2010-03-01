@@ -59,49 +59,52 @@ end
 
 -- Slice damage - (Deals damage to a number of entities in a line. It is stopped by the world)
 function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange, DamageDealer )
-		-- Check dmg
-		if (!self.PewPewDamage) then return nil end
-	local OldPos = StartPos
+	-- Check dmg
+	if (!self.PewPewDamage) then return StartPos + Direction * MaxRange end
 	-- First trace
 	local tr = {}
 	tr.start = StartPos
 	tr.endpos = StartPos + Direction * MaxRange
 	local trace = util.TraceLine( tr )
-	-- Check world
-	if (!trace.Hit) then return nil end
-	if (trace.HitWorld) then return trace.HitPos end
-	-- Get ent
+	local Hit = trace.Hit
+	local HitWorld = trace.HitWorld
+	local HitPos = trace.HitPos
 	local HitEnt = trace.Entity
-	local ret = nil
-	-- Loop
+	local ret = HitPos
 	for I=1, NumberOfSlices do
-		-- Check world
-		if (OldPos) then
-			if (!trace.Hit) then return OldPos end
-			-- Check distance
-			if (StartPos:Distance(OldPos) > MaxRange) then return OldPos end
-		end
-		if (HitEnt) then
-			if (HitEnt:IsPlayer()) then
-				HitEnt:TakeDamage( Damage, DamageDealer )
-			elseif (self:CheckValid( HitEnt )) then
-				-- Deal damage
-				self:DealDamageBase( HitEnt, Damage )
+		if (HitEnt and HitEnt:IsValid()) then -- if the trace hit an entity
+			if (StartPos:Distance(HitPos) > MaxRange) then -- check distance
+				return StartPos + Direction * MaxRange
+			else
+				if (HitEnt:IsPlayer()) then
+					HitEnt:TakeDamage( Damage, DamageDealer ) -- deal damage to players
+				elseif (self:CheckValid( HitEnt )) then
+					self:DealDamageBase( HitEnt, Damage ) -- Deal damage to entities
+				end
+				-- new trace
+				local tr = {}
+				tr.start = HitPos
+				tr.endpos = HitPos + Direction * MaxRange
+				tr.filter = HitEnt
+				ret = HitPos
+				local trace = util.TraceLine( tr )
+				Hit = trace.Hit
+				HitWorld = trace.HitWorld
+				HitPos = trace.HitPos
+				HitEnt = trace.Entity
 			end
-			-- New trace
-			tr = {}
-			tr.start = OldPos
-			tr.endpos = OldPos + Direction * MaxRange
-			tr.filter = HitEnt
-			trace = util.TraceLine( tr )
-			ret = OldPos
-			OldPos = trace.HitPos
-			HitEnt = trace.Entity
-		elseif (trace.HitWorld) then return trace.HitPos end
+		elseif (HitWorld) then-- if the trace hit the world
+			if (StartPos:Distance(HitPos) > MaxRange) then -- check distance
+				return StartPos + Direction * MaxRange
+			else
+				return HitPos
+			end
+		elseif (!Hit) then -- if the trace hit nothing
+			return StartPos + Direction * MaxRange
+		end
 	end
-	return ret
+	return ret or HitPos or StartPos + Direction * MaxRange
 end
-
 
 -- EMPDamage - (Electro Magnetic Pulse. Disables all wiring within the radius for the duration)
 pewpew.EMPAffected = {}
