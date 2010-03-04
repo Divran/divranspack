@@ -9,4 +9,8 @@ include("pewpew_damagecontrol.lua")
 AddCSLuaFile("pewpew_weaponhandler.lua")
 include("pewpew_weaponhandler.lua")
 
+-- Compability
+AddCSLuaFile("pewpew_gcombatcompability.lua")
+include("pewpew_gcombatcompability.lua")
+
 pewpew:LoadBullets()

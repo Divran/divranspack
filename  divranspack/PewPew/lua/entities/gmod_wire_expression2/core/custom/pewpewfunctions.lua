@@ -56,6 +56,13 @@ e2function number entity:pewDamage()
 	return this.Bullet.Damage or 0
 end
 
+e2function number entity:pewDPS()
+	if (!validPhysics(this)) then return 0 end
+	if (this:GetClass() != "pewpew_base_cannon") then return 0 end
+	local dmg = this.Bullet.Damage * (1/this.Bullet.Reloadtime)
+	return dmg or 0
+end
+
 -- Returns the amount of ammo
 e2function number entity:pewAmmo()
 	if (!validPhysics(this)) then return 0 end

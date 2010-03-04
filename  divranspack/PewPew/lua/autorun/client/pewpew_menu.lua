@@ -3,8 +3,8 @@
 -- Use Menu
 local function CreateMenu()
 	pewpew_frame = vgui.Create("DFrame")
-	pewpew_frame:SetPos( ScrW()/2-400,ScrH()/2+155 )
-	pewpew_frame:SetSize( 800, 315 )
+	pewpew_frame:SetPos( ScrW()/2-400,ScrH()/2+330/2 )
+	pewpew_frame:SetSize( 800, 330 )
 	pewpew_frame:SetTitle( "PewPew Cannon Information" )
 	pewpew_frame:SetVisible( false )
 	pewpew_frame:SetDraggable( true )
@@ -30,16 +30,17 @@ local function SetTable( Bullet )
 	list[4] = 	{"Category", 			Bullet.Category }
 	list[5] = 	{"Damage Type",			Bullet.DamageType}
 	list[6] = 	{"Damage",	 			Bullet.Damage}
-	list[7] = 	{"Radius", 				Bullet.Radius}
-	list[8] = 	{"PlayerDamage", 		Bullet.PlayerDamage}
-	list[9] = 	{"PlayerDamageRadius", 	Bullet.PlayerDamageRadius}
-	list[10] = 	{"Speed", 				Bullet.Speed}
-	list[11] = 	{"Gravity", 			Bullet.Gravity}
-	list[12] =	{"RecoilForce", 		Bullet.RecoilForce}
-	list[13] = 	{"Spread",				Bullet.Spread}
-	list[14] = 	{"Reloadtime", 			Bullet.Reloadtime}
-	list[15] = 	{"Ammo", 				Bullet.Ammo}
-	list[16] = 	{"AmmoReloadtime", 		Bullet.AmmoReloadtime}
+	list[7] = 	{"DPS",					Bullet.Damage * (1/Bullet.Reloadtime)}
+	list[8] = 	{"Radius", 				Bullet.Radius}
+	list[9] = 	{"PlayerDamage", 		Bullet.PlayerDamage}
+	list[10] = 	{"PlayerDamageRadius", 	Bullet.PlayerDamageRadius}
+	list[11] = 	{"Speed", 				Bullet.Speed}
+	list[12] = 	{"Gravity", 			Bullet.Gravity}
+	list[13] =	{"RecoilForce", 		Bullet.RecoilForce}
+	list[14] = 	{"Spread",				Bullet.Spread}
+	list[15] = 	{"Reloadtime", 			Bullet.Reloadtime}
+	list[16] = 	{"Ammo", 				Bullet.Ammo}
+	list[17] = 	{"AmmoReloadtime", 		Bullet.AmmoReloadtime}
 end
 
 local function OpenUseMenu( bulletname )

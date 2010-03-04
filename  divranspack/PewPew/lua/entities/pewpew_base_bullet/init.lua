@@ -83,7 +83,7 @@ function ENT:Think()
 						WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
 					end
 						
-					-- GCombat Damage
+					-- Damage
 					local damagetype = self.Bullet.DamageType
 					if (!damagetype) then return end
 					if (damagetype == "BlastDamage") then

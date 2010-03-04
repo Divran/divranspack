@@ -5,6 +5,7 @@ E2Helper.Descriptions["pewCoreHealth"] = "Returns the health of the core. If the
 E2Helper.Descriptions["pewCoreMaxHealth"] = "Returns the maximum health of the core. If the entity is not a core it attempts to find and return the maximum health of that entity's core."
 E2Helper.Descriptions["pewBulletName"] = "Returns the name."
 E2Helper.Descriptions["pewDamage"] = "Returns the damage."
+E2Helper.Descriptions["pewDPS"] = "Calculates and returns the damage per second. NOTE: Does not take ammo and ammo reload time into account. Formula used: 'Damage*(1/Reloadtime)'."
 E2Helper.Descriptions["pewDamageRadius"] = "Returns the radius of the explosion (Note: only if the damage type is BlastDamage)."
 E2Helper.Descriptions["pewNumberOfSlices"] = "Returns the number of slices (Note: only if the damage type is SliceDamage)."
 E2Helper.Descriptions["pewSliceDistance"] = "Returns the max range the slice beam will travel (Note: only if the damage type is SliceDamage)."

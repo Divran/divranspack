@@ -11,6 +11,7 @@ pewpew.DamageBlacklist = { "gmod_wire" }
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
 -- Default Values
+pewpew.Installed = true -- Yep it's installed :)
 pewpew.PewPewDamage = true
 pewpew.PewPewFiring = true
 pewpew.PewPewNumpads = true
@@ -19,6 +20,8 @@ pewpew.PewPewCoreDamageMul = 1
 pewpew.PewPewCoreDamageOnly = false
 pewpew.RepairToolHeal = 75
 pewpew.RepairToolHealCores = 200
+
+------------------------------------------------------------------------------------------------------------
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
@@ -51,7 +54,9 @@ end
 -- Point Damage - (Deals damage to 1 single entity)
 function pewpew:PointDamage( TargetEntity, Damage, DamageDealer )
 	if (TargetEntity:IsPlayer()) then
-		TargetEntity:TakeDamage( Damage, DamageDealer )
+		if (DamageDealer and DamageDealer:IsValid()) then
+			TargetEntity:TakeDamage( Damage, DamageDealer )
+		end
 	else
 		self:DealDamageBase( TargetEntity, Damage )
 	end
@@ -59,8 +64,6 @@ end
 
 -- Slice damage - (Deals damage to a number of entities in a line. It is stopped by the world)
 function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange, DamageDealer )
-	-- Check dmg
-	if (!self.PewPewDamage) then return StartPos + Direction * MaxRange end
 	-- First trace
 	local tr = {}
 	tr.start = StartPos
@@ -70,6 +73,16 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 	local HitWorld = trace.HitWorld
 	local HitPos = trace.HitPos
 	local HitEnt = trace.Entity
+	
+	-- Check dmg
+	if (!self.PewPewDamage) then
+		if (Hit) then
+			return HitPos
+		else
+			return StartPos + Direction * MaxRange
+		end
+	end
+	
 	local ret = HitPos
 	for I=1, NumberOfSlices do
 		if (HitEnt and HitEnt:IsValid()) then -- if the trace hit an entity
