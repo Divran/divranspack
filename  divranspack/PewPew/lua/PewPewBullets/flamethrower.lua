@@ -25,23 +25,23 @@ BULLET.EmptyMagSound = nil
 
 -- Movement
 BULLET.Speed = 70
-BULLET.Gravity = 0.1
+BULLET.Gravity = 0.08
 BULLET.RecoilForce = 0
-BULLET.Spread = 5
+BULLET.Spread = 1
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 100
-BULLET.Radius = 40
+BULLET.Damage = 80
+BULLET.Radius = 60
 BULLET.RangeDamageMul = 1
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.Duration = nil
-BULLET.PlayerDamage = 40
-BULLET.PlayerDamageRadius = 50
+BULLET.PlayerDamage = 50
+BULLET.PlayerDamageRadius = 80
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.05
+BULLET.Reloadtime = 0.1
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
@@ -69,7 +69,7 @@ function BULLET:ThinkFunc( self )
 	if (self.Speed < 3) then
 		self.Exp = true
 	end
-	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * math.Clamp(self.Speed,3,40)/2 )
+	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * math.Clamp(self.Speed,4,70)/2 )
 	self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.Gravity / self.Bullet.Speed)
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 	
@@ -137,23 +137,29 @@ BULLET.CLInitializeOverride = true
 function BULLET:CLInitializeFunc()
 	self.emitter = ParticleEmitter( Vector(0,0,0) )
 	self.delta = 15
+	self.delay = CurTime() + 0.01
 end
 
 BULLET.CLThinkOverride = true
 function BULLET:CLThinkFunc()
-	self.delta = math.Clamp(self.delta + 1,2,50)
-	local Pos = self.Entity:GetPos()
-	local particle = self.emitter:Add("particles/flamelet" .. math.random(1,5), Pos)
-	if (particle) then
-		particle:SetLifeTime(0)
-		particle:SetDieTime(1)
-		particle:SetStartAlpha(math.random( 200, 255 ) )
-		particle:SetEndAlpha(0)
-		particle:SetStartSize(self.delta)
-		particle:SetEndSize(0)
-		particle:SetRoll(math.random(0, 45))
-		particle:SetRollDelta(math.random(-10, 10))
-		particle:SetColor(255, 255, 255) 
+	if (CurTime() > self.delay) then
+		local add = 2
+		if (self.delta > 100) then add = 4 end
+		self.delta = math.Clamp(self.delta + add,2,180)
+		local Pos = self.Entity:GetPos()
+		local particle = self.emitter:Add("particles/flamelet" .. math.random(1,5), Pos)
+		if (particle) then
+			particle:SetLifeTime(0)
+			particle:SetDieTime(1)
+			particle:SetStartAlpha(math.random( 200, 255 ) )
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(self.delta)
+			particle:SetEndSize(self.delta-10)
+			--particle:SetRoll(math.random(-5, 5))
+			particle:SetRollDelta(math.random(-5, 5))
+			particle:SetColor(255, 255, 255) 
+		end
+		self.delay = CurTime() + math.Rand(0.01,0.08)
 	end
 end
 

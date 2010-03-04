@@ -4,7 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Gauss Gun"
-BULLET.Category = "Cannons"
+BULLET.Category = "Machineguns"
 BULLET.Author = "Divran"
 BULLET.Description = "An electro-magnetic powered cannon."
 BULLET.AdminOnly = false
@@ -24,13 +24,13 @@ BULLET.ExplosionEffect = "gcombat_explosion"
 
 -- Movement
 BULLET.Speed = 150
-BULLET.Gravity = 0.007
+BULLET.Gravity = 0.04
 BULLET.RecoilForce = 0
-BULLET.Spread = 0.05
+BULLET.Spread = 0.2
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
-BULLET.Damage = 60
+BULLET.DamageType = "BlastDamage"
+BULLET.Damage = 15
 BULLET.Radius = 75
 BULLET.RangeDamageMul = 0.9
 BULLET.NumberOfSlices = nil

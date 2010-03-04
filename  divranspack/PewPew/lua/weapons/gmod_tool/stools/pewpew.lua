@@ -64,7 +64,10 @@ if (SERVER) then
 		
 		-- Get the bullet
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
-		if (!bullet) then return end
+		if (!bullet) then 
+			ply:ChatPrint("That PewPew bullet does not exist!")
+			return 
+		end
 		
 		-- Check admin only
 		if (bullet.AdminOnly and !ply:IsAdmin()) then 
@@ -125,7 +128,10 @@ if (SERVER) then
 		
 		-- Get the bullet
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
-		if (!bullet) then return end
+		if (!bullet) then 
+			ply:ChatPrint("That PewPew bullet does not exist!")
+			return 
+		end
 		
 		-- Check admin only
 		if (bullet.AdminOnly and !ply:IsAdmin()) then 
