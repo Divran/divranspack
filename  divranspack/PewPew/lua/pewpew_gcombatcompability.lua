@@ -111,3 +111,41 @@ function gcombat.nrghit( entity, damage, pierce, src, dest)
 	end
 end
 cbt_dealnrghit = gcombat.nrghit
+
+---------------------------
+-- Useless heat functions ...
+function gcombat.applyheat(ent, temp) end
+cbt_applyheat = gcombat.applyheat
+
+function gcombat.emitheat( position, radius, temp, own) end
+cbt_emitheat = gcombat.emitheat
+
+-- The GCombat Death ray didn't like it when these didn't exist:
+local gcbt_p_ent = {}
+propent = {}
+
+function propent.new( maxents, maxtime )
+	local TD = {}
+	TD.dietime = CurTime() + maxtime
+	TD.maxents = maxents
+	TD.entl0 = 0
+	local ind = #gcbt_p_ent + 1
+	gcbt_p_ent[ind] = TD
+	return ind
+end
+
+function propent.think( id )
+	return (gcbt_p_ent[id].dietime > CurTime())
+end
+
+function propent.addme( id )
+	gcbt_p_ent[id].entl0 = gcbt_p_ent[id].entl0 + 1
+end
+
+function propent.delme( id )
+	gcbt_p_ent[id].entl0 = gcbt_p_ent[id].entl0 - 1
+end
+
+function propent.canmakemore( id )
+	return (gcbt_p_ent[id].entl0 < gcbt_p_ent[id].maxents)
+end
