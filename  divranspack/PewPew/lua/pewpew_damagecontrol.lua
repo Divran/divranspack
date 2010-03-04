@@ -1,7 +1,6 @@
 -- Pewpew Damage Control
 -- These functions take care of damage
 ------------------------------------------------------------------------------------------------------------
--- Deal Damage
 
 -- Entities in the Never Ever hit list will NEVER EVER take damage by PewPew weaponry.
 pewpew.NeverEverList = { "pewpew_base_bullet", "gmod_ghost" }

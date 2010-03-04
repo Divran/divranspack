@@ -33,6 +33,8 @@ function gcombat.devhit( entity, damage, pierce )
 	if (!entity:IsValid()) then
 		attack = 2
 	end
+	
+	return attack
 end
 cbt_dealdevhit = gcombat.devhit
 
