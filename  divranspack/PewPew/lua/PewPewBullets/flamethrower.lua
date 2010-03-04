@@ -31,7 +31,7 @@ BULLET.Spread = 5
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 150
+BULLET.Damage = 100
 BULLET.Radius = 40
 BULLET.RangeDamageMul = 1
 BULLET.NumberOfSlices = nil
@@ -67,7 +67,7 @@ function BULLET:ThinkFunc( self )
 	-- Make it fly
 	self.Speed = self.Speed - 0.5
 	if (self.Speed < 3) then
-		self.Explode = true
+		self.Exp = true
 	end
 	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * math.Clamp(self.Speed,3,40)/2 )
 	self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.Gravity / self.Bullet.Speed)
@@ -81,7 +81,7 @@ function BULLET:ThinkFunc( self )
 		tr.filter = self.Entity
 		local trace = util.TraceLine( tr )
 		
-		if ((trace.Hit and !self.Exploded) or self.Explode) then	
+		if ((trace.Hit and !self.Exploded) or self.Exp) then	
 			self.Exploded = true
 			-- Effects
 			if (self.Bullet.ExplosionEffect) then

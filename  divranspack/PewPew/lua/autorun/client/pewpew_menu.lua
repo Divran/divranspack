@@ -24,13 +24,15 @@ timer.Simple( 0.5, CreateMenu )
 
 local list = {}		
 local function SetTable( Bullet )
+	local rld = Bullet.Reloadtime
+	if (!rld or rld == 0) then rld = 1 end
 	list[1] = 	{"Name", 				Bullet.Name}
 	list[2] = 	{"Author", 				Bullet.Author}
 	list[3] = 	{"Description", 		Bullet.Description}
 	list[4] = 	{"Category", 			Bullet.Category }
 	list[5] = 	{"Damage Type",			Bullet.DamageType}
 	list[6] = 	{"Damage",	 			Bullet.Damage}
-	list[7] = 	{"DPS",					Bullet.Damage * (1/Bullet.Reloadtime)}
+	list[7] = 	{"DPS",					(Bullet.Damage or 0) * (1/rld)}
 	list[8] = 	{"Radius", 				Bullet.Radius}
 	list[9] = 	{"PlayerDamage", 		Bullet.PlayerDamage}
 	list[10] = 	{"PlayerDamageRadius", 	Bullet.PlayerDamageRadius}

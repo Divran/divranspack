@@ -37,13 +37,17 @@ BULLET.RangeDamageMul = 0.3 -- This is only used with "BlastDamage". It determin
 BULLET.NumberOfSlices = nil -- this is only used with "SliceDamage". It determines how many props in a line you want to deal damage to.
 BULLET.SliceDistance = nil -- This is only used with "SliceDamage". It determines the total maximum range the trace will travel.
 BULLET.Duration = nil -- This is only used with "EMPDamage". It determines how long the target entities will be disabled.
-BULLET.PlayerDamage = 150 -- Damage vs players. This is only used in "BlastDamage". In other damage types, you should make this nil. If these are not nil in other damage types, the player may take twice as much damage.
+BULLET.PlayerDamage = 150 -- Damage vs players. This is only used in "BlastDamage".
 BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 3.5
 BULLET.Ammo = 0 -- If you set this to 0, it will have infinite ammo
 BULLET.AmmoReloadtime = 0
+
+-- Other
+BULLET.Lifetime = {0,0} -- These two numbers determine the random interval of the bullets lifetime. (Meaning, it runs: "self.Lifetime = math.Rand(self.Bullet.Lifetime[1],self.Bullet.Lifetime[2])")
+BULLET.ExplodeAfterDeath = false -- This determines wether or not the bullet should explode after the lifetime runs out. False: disappears. True: explodes.
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
