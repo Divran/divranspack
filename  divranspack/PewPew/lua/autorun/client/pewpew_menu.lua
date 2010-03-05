@@ -3,8 +3,8 @@
 -- Use Menu
 local function CreateMenu()
 	pewpew_frame = vgui.Create("DFrame")
-	pewpew_frame:SetPos( ScrW()/2-400,ScrH()/2+330/2 )
-	pewpew_frame:SetSize( 800, 330 )
+	pewpew_frame:SetPos( ScrW()/2-400,ScrH()/2+345/2 )
+	pewpew_frame:SetSize( 800, 350 )
 	pewpew_frame:SetTitle( "PewPew Cannon Information" )
 	pewpew_frame:SetVisible( false )
 	pewpew_frame:SetDraggable( true )
@@ -43,6 +43,7 @@ local function SetTable( Bullet )
 	list[15] = 	{"Reloadtime", 			Bullet.Reloadtime}
 	list[16] = 	{"Ammo", 				Bullet.Ammo}
 	list[17] = 	{"AmmoReloadtime", 		Bullet.AmmoReloadtime}
+	list[18] = 	{"EnergyPerShot",		Bullet.EnergyPerShot}
 end
 
 local function OpenUseMenu( bulletname )

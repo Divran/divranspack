@@ -34,17 +34,19 @@ BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "SliceDamage"
-BULLET.Damage = 550
+BULLET.Damage = 650
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = 5
-BULLET.SliceDistance = 500
+BULLET.SliceDistance = 750
 BULLET.PlayerDamageRadius = nil
 BULLET.PlayerDamage = nil
 
 -- Reload/Ammo
-BULLET.Reloadtime = 3
+BULLET.Reloadtime = 5.2
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
+
+BULLET.EnergyPerShot = 5500
 
 pewpew:AddBullet( BULLET )

@@ -30,7 +30,7 @@ BULLET.Spread = 0.2
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 15
+BULLET.Damage = 40
 BULLET.Radius = 75
 BULLET.RangeDamageMul = 0.9
 BULLET.NumberOfSlices = nil
@@ -42,5 +42,7 @@ BULLET.PlayerDamage = 70
 BULLET.Reloadtime = 0.2
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
+
+BULLET.EnergyPerShot = 500
 
 pewpew:AddBullet( BULLET )

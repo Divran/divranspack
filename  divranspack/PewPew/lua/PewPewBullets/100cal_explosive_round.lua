@@ -44,4 +44,6 @@ BULLET.Reloadtime = 0.4
 BULLET.Ammo = 20
 BULLET.AmmoReloadtime = 4
 
+BULLET.EnergyPerShot = 600
+
 pewpew:AddBullet( BULLET )

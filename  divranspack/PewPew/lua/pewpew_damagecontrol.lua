@@ -11,20 +11,25 @@ pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_gr
 
 -- Default Values
 pewpew.Installed = true -- Yep it's installed :)
-pewpew.PewPewDamage = true
-pewpew.PewPewFiring = true
-pewpew.PewPewNumpads = true
-pewpew.PewPewDamageMul = 1
-pewpew.PewPewCoreDamageMul = 1
-pewpew.PewPewCoreDamageOnly = false
+pewpew.Damage = true
+pewpew.Firing = true
+pewpew.Numpads = true
+pewpew.DamageMul = 1
+pewpew.CoreDamageMul = 1
+pewpew.CoreDamageOnly = false
 pewpew.RepairToolHeal = 75
 pewpew.RepairToolHealCores = 200
+pewpew.EnergyUsage = false
+
+if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+	pewpew.EnergyUsage = true
+end
 
 ------------------------------------------------------------------------------------------------------------
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
-		if (!self.PewPewDamage) then return end
+		if (!self.Damage) then return end
 	if (!Radius or Radius <= 0) then return end
 	if (!Damage or Damage <= 0) then return end
 	local ents = ents.FindInSphere( Position, Radius )
@@ -74,7 +79,7 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 	local HitEnt = trace.Entity
 	
 	-- Check dmg
-	if (!self.PewPewDamage) then
+	if (!self.Damage) then
 		if (Hit) then
 			return HitPos
 		else
@@ -139,7 +144,7 @@ end
 -- Add to EMPAffected
 function pewpew:EMPDamage( Position, Radius, Duration )
 		-- Check damage
-		if (!self.PewPewDamage) then return end
+		if (!self.Damage) then return end
 	-- Check for errors
 	if (!Position or !Radius or !Duration) then return end
 	
@@ -165,7 +170,7 @@ end
 
 -- Base code for dealing damage
 function pewpew:DealDamageBase( TargetEntity, Damage )
-		if (!self.PewPewDamage) then return end
+		if (!self.Damage) then return end
 	-- Check for errors
 	if (!self:CheckValid( TargetEntity )) then return end
 	if (!Damage or Damage == 0) then return end
@@ -181,7 +186,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 			end
 		end
 	end
-	Damage = Damage * self.PewPewDamageMul
+	Damage = Damage * self.DamageMul
 	if (!TargetEntity.pewpewHealth) then
 		self:SetHealth( TargetEntity )
 	end
@@ -198,7 +203,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 		self:DamageCore( TargetEntity.Core, Damage )
 		return
 	end
-	if (self.PewPewCoreDamageOnly) then return end
+	if (self.CoreDamageOnly) then return end
 	-- Deal damage
 	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
 	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
@@ -212,7 +217,7 @@ end
 function pewpew:DamageCore( ent, Damage )
 	if (!self:CheckValid( ent )) then return end
 	if (ent:GetClass() != "pewpew_core") then return end
-	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage) * self.PewPewCoreDamageMul
+	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage) * self.CoreDamageMul
 	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth)
 	-- Wire Output
 	Wire_TriggerOutput( ent, "Health", ent.pewpewCoreHealth or 0 )
@@ -346,11 +351,11 @@ local function ToggleDamage( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
-		pewpew.PewPewDamage = bool
+		pewpew.Damage = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed PewPew Damage and it is now "
-		if (pewpew.PewPewDamage) then
+		if (pewpew.Damage) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ON!")
 			end
@@ -369,11 +374,11 @@ local function ToggleFiring( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
-		pewpew.PewPewFiring = bool
+		pewpew.Firing = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed PewPew Firing and it is now "
-		if (pewpew.PewPewFiring) then
+		if (pewpew.Firing) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ON!")
 			end
@@ -392,11 +397,11 @@ local function ToggleNumpads( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
-		pewpew.PewPewNumpads = bool
+		pewpew.Numpads = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed PewPew Numpads and they are now "
-		if (pewpew.PewPewNumpads) then
+		if (pewpew.Numpads) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ENABLED!")
 			end
@@ -413,12 +418,12 @@ concommand.Add("PewPew_ToggleNumpads", ToggleNumpads)
 local function DamageMul( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
-		pewpew.PewPewDamageMul = math.max( arg[1], 0.01 )
+		pewpew.DamageMul = math.max( arg[1], 0.01 )
 		local name = "Console"
 		local msg = " has changed the PewPew Damage Multiplier to "
 		if (ply:IsValid()) then name = ply:Nick() end
 		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( name .. msg .. pewpew.PewPewDamageMul)
+			v:ChatPrint( name .. msg .. pewpew.DamageMul)
 		end
 	end
 end
@@ -428,12 +433,12 @@ concommand.Add("PewPew_DamageMul",DamageMul)
 local function CoreDamageMul( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
-		pewpew.PewPewCoreDamageMul = math.max( arg[1], 0.01 )
+		pewpew.CoreDamageMul = math.max( arg[1], 0.01 )
 		local name = "Console"
 		local msg = " has changed the PewPew Core Damage Multiplier to "
 		if (ply:IsValid()) then name = ply:Nick() end
 		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( name .. msg .. pewpew.PewPewCoreDamageMul)
+			v:ChatPrint( name .. msg .. pewpew.CoreDamageMul)
 		end
 	end
 end
@@ -445,11 +450,11 @@ local function ToggleCoreDamageOnly( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
-		pewpew.PewPewCoreDamageOnly = bool
+		pewpew.CoreDamageOnly = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed PewPew Core Damage Only and it is now "
-		if (pewpew.PewPewCoreDamageOnly) then
+		if (pewpew.CoreDamageOnly) then
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( name .. msg .. "ON!")
 			end
@@ -491,4 +496,36 @@ local function RepairToolHealCores( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_RepairToolHealCores",RepairToolHealCores)
+
+-- Toggle Life Support
+local function ToggleEnergyUsage( ply, command, arg )
+	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
+		if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+			if (!arg[1]) then return end
+			local bool = false
+			if (tonumber(arg[1]) != 0) then bool = true end
+			pewpew.EnergyUsage = bool
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed PewPew Energy Usage and it is now "
+			if (pewpew.EnergyUsage) then
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( name .. msg .. "ENABLED!")
+				end
+			else
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( name .. msg .. "DISABLED!")
+				end
+			end
+		else
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " tried to enable PewPew Energy Usage, but the server does not have the required addons (Spacebuild 3 & co.)!"
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( name .. msg )
+			end
+		end
+	end
+end
+concommand.Add("PewPew_ToggleEnergyUsage", ToggleEnergyUsage)
 		

@@ -30,7 +30,7 @@ BULLET.Spread = nil
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- custom
-BULLET.Damage = 9001
+BULLET.Damage = 100000
 BULLET.Radius = 7000
 BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil
@@ -42,6 +42,8 @@ BULLET.PlayerDamageRadius = 5000
 BULLET.Reloadtime = 11
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
+
+BULLET.EnergyPerShot = 11000000
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -85,7 +87,7 @@ function BULLET:Fire( self )
 		WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
 	end
 	
-	if (pewpew.PewPewDamage) then
+	if (pewpew.Damage) then
 		if (trace.Entity and trace.Entity:IsValid()) then
 			pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
 			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )

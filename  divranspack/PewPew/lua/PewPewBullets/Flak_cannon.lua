@@ -46,5 +46,6 @@ BULLET.AmmoReloadtime = 0
 -- Other
 BULLET.Lifetime = {1,2.5}
 BULLET.ExplodeAfterDeath = true
+BULLET.EnergyPerShot = 2000
 
 pewpew:AddBullet( BULLET )

@@ -43,5 +43,6 @@ BULLET.PlayerDamageRadius = nil
 BULLET.Reloadtime = 1
 BULLET.Ammo = 3
 BULLET.AmmoReloadtime = 6
+BULLET.EnergyPerShot = 3000
 
 pewpew:AddBullet( BULLET )

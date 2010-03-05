@@ -46,6 +46,7 @@ BULLET.AmmoReloadtime = 8
 -- Other
 BULLET.Lifetime = {2,3}
 BULLET.ExplodeAfterDeath = true
+BULLET.EnergyPerShot = 650
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)

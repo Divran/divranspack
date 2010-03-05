@@ -29,7 +29,7 @@ BULLET.RecoilForce = 700
 BULLET.Spread = 0
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 1850
 BULLET.Radius = 500
 BULLET.RangeDamageMul = 0.7
@@ -42,5 +42,7 @@ BULLET.PlayerDamageRadius = 600
 BULLET.Reloadtime = 17.5
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
+
+BULLET.EnergyPerShot = 20000
 
 pewpew:AddBullet( BULLET )

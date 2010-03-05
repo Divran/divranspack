@@ -43,6 +43,8 @@ BULLET.Reloadtime = 1
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = nil
 
+BULLET.EnergyPerShot = 100000000
+
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
@@ -62,7 +64,7 @@ function BULLET:Fire( self )
 		util.Effect( self.Bullet.FireEffect, effectdata )
 		
 		-- Damage
-		if (pewpew.PewPewDamage) then
+		if (pewpew.Damage) then
 			util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 		end
 		pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity )

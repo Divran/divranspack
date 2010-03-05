@@ -37,6 +37,8 @@ BULLET.Reloadtime = 3.5
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
+BULLET.EnergyPerShot = 3500
+
 -- Overrides
 
 BULLET.FireOverride = false
@@ -76,7 +78,7 @@ function BULLET:ThinkFunc( self )
 	end
 	
 	if (self.Sticked and CurTime() >= self.StickBlow) then
-		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
+		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
 			util.BlastDamage(self.Entity, self.Entity, self:GetPos(), self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
 		end
 		

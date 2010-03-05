@@ -3,6 +3,10 @@ AddCSLuaFile( "shared.lua" )
 include('shared.lua')
 
 function ENT:Initialize()   
+	if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+		self.BaseClass.Initialize(self)
+		CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(self.Entity)
+	end
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )  	
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
@@ -62,7 +66,15 @@ end
 
 function ENT:FireBullet()
 	-- Is shooting disabled?
-	if (!pewpew.PewPewFiring) then return end
+	if (!pewpew.Firing) then return end
+	
+	-- Is energy usage enabled?
+	if (pewpew.EnergyUsage) then
+		local amount = self:GetResourceAmount("energy")
+		local req = self.Bullet.EnergyPerShot or 0
+		if (amount < req) then return end
+		self:ConsumeResource("energy",req)
+	end
 	
 	if (self.Bullet.FireOverride) then
 		-- Allows you to override the fire function
@@ -217,22 +229,22 @@ end
 
 -- Numpad
 local function NumpadOn( ply, self )
-	if (!pewpew.PewPewNumpads) then return end
+	if (!pewpew.Numpads) then return end
 	InputChange( self, "Fire", 1 )
 end
 
 local function NumpadOff( ply, self )
-	if (!pewpew.PewPewNumpads) then return end
+	if (!pewpew.Numpads) then return end
 	InputChange( self, "Fire", 0 )
 end
 
 local function NumpadReloadOn( ply, self )
-	if (!pewpew.PewPewNumpads) then return end
+	if (!pewpew.Numpads) then return end
 	InputChange( self, "Reload", 1 )
 end
 
 local function NumpadReloadOff( ply, self )
-	if (!pewpew.PewPewNumpads) then return end
+	if (!pewpew.Numpads) then return end
 	InputChange( self, "Reload", 0 )
 end
 

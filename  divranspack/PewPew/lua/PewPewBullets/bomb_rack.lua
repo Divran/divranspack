@@ -43,6 +43,8 @@ BULLET.Reloadtime = 0.8
 BULLET.Ammo = 5
 BULLET.AmmoReloadtime = 8
 
+BULLET.EnergyPerShot = 2000
+
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
@@ -76,7 +78,7 @@ function BULLET:ThinkFunc( self )
 	self:SetAngles( vel:GetNormal():Angle() )
 	self.Entity:GetPhysicsObject():SetVelocity( vel )
 	if (self.Collided == true or CurTime() > self.Timer) then
-		if (pewpew.PewPewDamage) then
+		if (pewpew.Damage) then
 			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
 		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)

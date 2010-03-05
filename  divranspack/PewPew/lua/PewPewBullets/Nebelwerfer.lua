@@ -24,12 +24,12 @@ BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
 BULLET.Speed = 50
-BULLET.Gravity = nil -- Invalid in this context
+BULLET.Gravity = nil
 BULLET.RecoilForce = 500
 BULLET.Spread = 2
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 100
 BULLET.Radius = 800
 BULLET.RangeDamageMul = 0.3
@@ -42,6 +42,8 @@ BULLET.PlayerDamageRadius = 500
 BULLET.Reloadtime = 0.3
 BULLET.Ammo = 6
 BULLET.AmmoReloadtime = 6
+
+BULLET.EnergyPerShot = 400
 
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
@@ -74,7 +76,7 @@ function BULLET:ThinkFunc( self )
 	end
 	
 	if (not self.Burning and self.Entity:GetVelocity():Length() < 1) then
-		if (pewpew.PewPewDamage) then
+		if (pewpew.Damage) then
 			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
 		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)

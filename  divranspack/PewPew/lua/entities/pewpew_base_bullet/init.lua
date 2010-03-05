@@ -88,7 +88,7 @@ function ENT:Explode(trace)
 			end
 			
 			-- Player Damage
-			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.PewPewDamage) then
+			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
 				util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 			end
 		elseif (damagetype == "PointDamage") then
