@@ -52,6 +52,31 @@ else
 		end
 	end
 	
+	function TOOL.BuildCPanel( CPanel )
+		local label = vgui.Create("DLabel", pewpew_weaponframe)
+		label:SetText([[Usage:
+		Aim at an entity and hold 
+		down the fire button to heal the entity.
+		
+		You may notice entities having 
+		"?/?" health. This means you CAN 
+		change their health by changing its weight.
+
+		If an entity does not have "?/?", 
+		but instead has numbers, you CAN NOT 
+		change its health by changing its weight.
+		
+		If you repair the entity to full health, 
+		it will become "?/?" and you can 
+		change its health using the weight tool again.
+		
+		You can also toggle the
+		health icons using Reload.]])
+		label:SizeToContents()
+		
+		CPanel:AddItem(label)
+	end
+	
 	function TOOL:DrawHUD()
 		local ply = self:GetOwner()
 		if (!self.HealthVision) then return end

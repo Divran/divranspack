@@ -132,8 +132,16 @@ end
 timer.Simple(0.5, CreateMenu2)
 
 concommand.Add("PewPew_WeaponMenu", function( ply, cmd, arg )
-	-- Open weapons menu and close Q menu and Context menu
+	-- Open weapons menu
 	pewpew_weaponframe:SetVisible( true )	
-	RunConsoleCommand("-menu")
-	RunConsoleCommand("-menu_context")
+end)
+
+concommand.Add("+PewPew_WeaponMenu", function( ply, cmd, arg )
+	-- Open weapons menu
+	pewpew_weaponframe:SetVisible( true )
+end)
+
+concommand.Add("-PewPew_WeaponMenu", function( ply, cmd, arg )
+	-- Open weapons menu
+	pewpew_weaponframe:SetVisible( false )
 end)

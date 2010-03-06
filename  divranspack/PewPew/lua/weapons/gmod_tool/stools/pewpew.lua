@@ -229,21 +229,66 @@ else
 			Models = PewPewModels
 		})
 
-		-- Bullets
-		local Ctype = {Label = "#Tool_turret_type", MenuButton = 0, Options={}}
-		for _, blt in pairs( pewpew.bullets ) do
-			if (blt.Name) then
-				Ctype["Options"]["#" .. blt.Name]	= { pewpew_bulletname = blt.Name }
+		-- Bullets	
+			local label = vgui.Create("DLabel")
+			label:SetText("Left click to select, right click for info.")
+			label:SizeToContents()
+			
+			-- Panel List 1
+			local list1 = vgui.Create("DPanelList")
+			list1:SetHeight( 300 )
+			list1:SetAutoSize( false )
+			list1:SetSpacing( 1 )
+			list1:EnableHorizontal( false ) 
+			list1:EnableVerticalScrollbar( true )
+
+			-- Loop through all categories
+			for key, value in pairs( pewpew.Categories ) do
+				-- Create a Collapsible Category for each
+				local cat = vgui.Create( "DCollapsibleCategory" )
+				cat:SetSize( 146, 50 )
+				cat:SetExpanded( 0 )
+				cat:SetLabel( key )
+				
+				-- Create a list inside each collapsible category
+				local list = vgui.Create("DPanelList")
+				list:SetAutoSize( true )
+				list:SetSpacing( 2 )
+				list:EnableHorizontal( false ) 
+				list:EnableVerticalScrollbar( true )
+				
+				-- Loop through all weapons in each category
+				for key2, value2 in pairs( pewpew.Categories[key] ) do
+					-- Create a button for each list
+					local btn = vgui.Create("DButton")
+					btn:SetSize( 48, 20 )
+					btn:SetText( value2 )
+					-- Set bullet, change weapon, and close menu
+					btn.DoClick = function()
+						RunConsoleCommand("pewpew_bulletname", value2)
+					end
+					btn.DoRightClick = function()
+						RunConsoleCommand("PewPew_UseMenu", value2)
+					end
+					list:AddItem( btn )
+				end
+				
+				cat:SetContents( list )
+				list1:AddItem( cat )
 			end
-		end
+			
+		CPanel:AddItem(label)
+		CPanel:AddItem(list1)
 		
-		CPanel:AddControl("ComboBox", Ctype )
+		local label = vgui.Create("DLabel")
+		label:SetText([[To open this weapons menu in a seperate 
+		window, use the console command: 
+		'PewPew_WeaponMenu'
+		or
+		'+PewPew_WeaponMenu']])
+		label:SizeToContents()
 		
-		CPanel:AddControl( "Button", {
-			Label = "#PewPew Weapon Menu", 
-			Description = "#Open the weapons menu to select weapons.",
-			Text = "#PewPew Weapon Menu",
-			Command = "PewPew_WeaponMenu"} )
+		CPanel:AddItem(label)
 			
 		CPanel:AddControl( "Numpad", { Label = "#Fire", Command = "pewpew_fire_key", ButtonSize = 22 } )
 		CPanel:AddControl( "Numpad", { Label = "#Reload", Command = "pewpew_reload_key", ButtonSize = 22 } )
