@@ -1,4 +1,5 @@
 -- Smokepuff, made by Divran
+
 function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	local NumParticles = 32
@@ -15,7 +16,7 @@ function EFFECT:Init( data )
 			particle:SetEndAlpha( math.Rand(10,80) )
 			particle:SetStartSize( math.Rand(50,150) )
 			particle:SetEndSize( math.Rand(200,400) )
-			particle:SetColor( 50,50,50 )
+			particle:SetColor( 70,70,70 )
 			particle:SetRoll( math.Rand(-1,1) )
 			particle:SetAirResistance( 500 )
 			particle:SetGravity( Vector( 0,0,-500) )
@@ -25,10 +26,6 @@ function EFFECT:Init( data )
 	emitter:Finish()
 end
 
-
-/*---------------------------------------------------------
-   THINK
----------------------------------------------------------*/
 function EFFECT:Think( )
 	return false
 end

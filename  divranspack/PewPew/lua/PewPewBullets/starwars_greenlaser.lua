@@ -23,7 +23,7 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = nil
 
 -- Movement
-BULLET.Speed = 95
+BULLET.Speed = 115
 BULLET.Gravity = 0.01
 BULLET.RecoilForce = 0
 BULLET.Spread = 0.3

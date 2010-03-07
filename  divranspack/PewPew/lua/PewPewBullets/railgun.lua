@@ -6,7 +6,7 @@ local BULLET = {}
 BULLET.Name = "Railgun"
 BULLET.Category = "Cannons"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires fast moving rounds with deadly accuracy. Slices through armor like a hot knife through butter."
+BULLET.Description = "Fires extremely fast moving rounds with deadly accuracy. Slices through armor like a hot knife through butter."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -16,7 +16,7 @@ BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = { StartSize = 10,
 				 EndSize = 2,
-				 Length = 0.4,
+				 Length = 0.3,
 				 Texture = "trails/smoke.vmt",
 				 Color = Color( 255, 255, 255, 255 ) }
 
@@ -27,14 +27,14 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "HEATsplode"
 
 -- Movement
-BULLET.Speed = 200
+BULLET.Speed = 300
 BULLET.Gravity = 0.02
 BULLET.RecoilForce = 0
 BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "SliceDamage"
-BULLET.Damage = 650
+BULLET.Damage = 800
 BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = 5
@@ -43,7 +43,7 @@ BULLET.PlayerDamageRadius = nil
 BULLET.PlayerDamage = nil
 
 -- Reload/Ammo
-BULLET.Reloadtime = 5.2
+BULLET.Reloadtime = 6.2
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 

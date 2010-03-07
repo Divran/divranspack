@@ -23,7 +23,7 @@ BULLET.FireEffect = "cannon_flare"
 BULLET.ExplosionEffect = "pewpew_smokepuff"
 
 -- Movement
-BULLET.Speed = 80
+BULLET.Speed = 135
 BULLET.Gravity = 0.06
 BULLET.RecoilForce = 400
 BULLET.Spread = 2
@@ -44,7 +44,7 @@ BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
 -- Other
-BULLET.Lifetime = {1,2.5}
+BULLET.Lifetime = {0.7,1.2}
 BULLET.ExplodeAfterDeath = true
 BULLET.EnergyPerShot = 2000
 

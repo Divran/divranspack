@@ -48,12 +48,15 @@ BULLET.AmmoReloadtime = 0
 -- Other
 BULLET.Lifetime = {0,0} -- These two numbers determine the random interval of the bullets lifetime. (Meaning, it runs: "self.Lifetime = math.Rand(self.Bullet.Lifetime[1],self.Bullet.Lifetime[2])")
 BULLET.ExplodeAfterDeath = false -- This determines wether or not the bullet should explode after the lifetime runs out. False: disappears. True: explodes.
-BULLEt.EnergyPerShot = 4000 -- This is the amount of energy the bullet will use per shot. It only uses this if the server has Spacebuild 3 (& co.) installed and if pewpew.EnergyUsage is enabled.
+BULLET.EnergyPerShot = 4000 -- This is the amount of energy the bullet will use per shot. It only uses this if the server has Spacebuild 3 (& co.) installed and if pewpew.EnergyUsage is enabled.
 
--- Custom Functions 
+BULLET.CustomInputs = nil -- Use a table here to replace the default wire inputs (Only for adv users).
+BULLET.CustomOutputs = nil -- Use a table here to replace the default wire outputs (Only for adv users).
+
+-- Custom Functions (Only for adv users)
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
--- Wire Input
+-- Wire Input (This is called whenever a wire input is changed)
 BULLET.WireInputOverride = false
 function BULLET:WireInput( self, inputname, value )
 	-- Nothing

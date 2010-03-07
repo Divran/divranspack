@@ -24,7 +24,7 @@ BULLET.ExplosionEffect = "HEATsplode"
 BULLET.EmptyMagSound = {"weapons/ar2/ar2_empty.wav"}
 
 -- Movement
-BULLET.Speed = 50
+BULLET.Speed = 85
 BULLET.Gravity = 0.2
 BULLET.RecoilForce = 80
 BULLET.Spread = 0.3

@@ -194,9 +194,10 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	local phys = TargetEntity:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
-	local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
-	if (TargetEntity.pewpewHealth > mass / 5 + boxsize:Length()) then
-		TargetEntity.pewpewHealth = (mass / 5 + boxsize:Length()) * (mass/TargetEntity.MaxMass)
+	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
+	local volume = phys:GetVolume() / 1000
+	if (TargetEntity.pewpewHealth > mass / 5 + volume) then
+		TargetEntity.pewpewHealth = (mass / 5 + volume) * (mass/TargetEntity.MaxMass)
 	end
 	-- Check if the entity has a core
 	if (TargetEntity.Core and self:CheckValid(TargetEntity.Core)) then
@@ -253,8 +254,9 @@ function pewpew:SetHealth( ent )
 	local phys = ent:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
-	local boxsize = ent:OBBMaxs() - ent:OBBMins()
-	local health = mass / 5 + boxsize:Length()
+	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
+	local volume = phys:GetVolume() / 1000
+	local health = mass / 5 + volume
 	ent.pewpewHealth = health
 	ent.MaxMass = mass
 	ent:SetNWInt("pewpewHealth",health)
@@ -272,8 +274,9 @@ function pewpew:RepairHealth( ent, amount )
 	local phys = ent:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
-	local boxsize = ent:OBBMaxs() - ent:OBBMins()
-	local maxhealth = (mass / 5 + boxsize:Length())
+	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
+	local volume = phys:GetVolume() / 1000
+	local maxhealth = (mass / 5 + volume)
 	-- Add health
 	ent.pewpewHealth = math.Clamp(ent.pewpewHealth+math.abs(amount),0,maxhealth)
 	-- Make the health changeable again with weight tool
@@ -292,15 +295,16 @@ function pewpew:GetHealth( ent )
 	local phys = ent:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
-	local boxsize = ent:OBBMaxs() - ent:OBBMins()
+	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
+	local volume = phys:GetVolume() / 1000
 	if (ent.pewpewHealth) then
 		-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
-		if (ent.pewpewHealth > mass / 5 + boxsize:Length()) then
-			return (mass / 5 + boxsize:Length()) * (mass/ent.MaxMass)
+		if (ent.pewpewHealth > mass / 5 + volume) then
+			return (mass / 5 + volume) * (mass/ent.MaxMass)
 		end
 		return ent.pewpewHealth
 	else
-		return (mass / 5 + boxsize:Length())
+		return (mass / 5 + volume)
 	end
 end
 

@@ -23,7 +23,7 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "pewpew_laserhiteffect"
 
 -- Movement
-BULLET.Speed = 90
+BULLET.Speed = 120
 BULLET.Gravity = 0.01
 BULLET.RecoilForce = 10
 BULLET.Spread = 0.4

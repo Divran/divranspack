@@ -23,14 +23,14 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "v2splode"
 
 -- Movement
-BULLET.Speed = 30
-BULLET.Gravity = 0
-BULLET.RecoilForce = 0
+BULLET.Speed = 45
+BULLET.Gravity = nil
+BULLET.RecoilForce = 20
 BULLET.Spread = 1.5
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 180
+BULLET.Damage = 450
 BULLET.Radius = 300
 BULLET.RangeDamageMul = 0.5
 BULLET.NumberOfSlices = nil

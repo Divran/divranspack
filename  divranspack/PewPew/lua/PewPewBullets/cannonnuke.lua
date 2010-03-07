@@ -29,7 +29,7 @@ BULLET.RecoilForce = 1000
 BULLET.Spread = 0
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 100000
 BULLET.Radius = 7000
 BULLET.RangeDamageMul = 0.6

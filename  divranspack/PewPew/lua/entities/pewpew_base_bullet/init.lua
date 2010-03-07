@@ -12,7 +12,7 @@ function ENT:Initialize()
 		self.Entity:SetSolid( SOLID_NONE )    
 		self.FlightDirection = self.Entity:GetUp()
 		self.Exploded = false
-		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 2
+		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 4
 		
 		-- Lifetime
 		self.Lifetime = false
@@ -78,27 +78,27 @@ function ENT:Explode(trace)
 			
 		-- Damage
 		local damagetype = self.Bullet.DamageType
-		if (!damagetype) then return end
-		if (damagetype == "BlastDamage") then
-			if (trace.Entity and trace.Entity:IsValid()) then
+		if (damagetype and type(damagetype) == "string") then
+			if (damagetype == "BlastDamage") then
+				if (trace.Entity and trace.Entity:IsValid()) then
+					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
+					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+				else
+					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+				end
+				
+				-- Player Damage
+				if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
+					util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+				end
+			elseif (damagetype == "PointDamage") then
 				pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
-				pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
-			else
-				pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+			elseif (damagetype == "SliceDamage") then
+				pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Entity )
+			elseif (damagetype == "EMPDamage") then
+				pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
 			end
-			
-			-- Player Damage
-			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
-				util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
-			end
-		elseif (damagetype == "PointDamage") then
-			pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
-		elseif (damagetype == "SliceDamage") then
-			pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Entity )
-		elseif (damagetype == "EMPDamage") then
-			pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
 		end
-
 		
 		-- Remove the bullet
 		self.Entity:Remove()
@@ -112,7 +112,7 @@ function ENT:Think()
 	else
 		-- Make it fly
 		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-		self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.Gravity / self.Bullet.Speed)
+		self.FlightDirection = self.FlightDirection - Vector(0,0,(self.Bullet.Gravity or 0) / (self.Bullet.Speed or 1))
 		self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 		
 		-- Lifetime

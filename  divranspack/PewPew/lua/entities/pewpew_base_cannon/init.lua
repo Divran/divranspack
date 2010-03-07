@@ -11,8 +11,19 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
-	self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
-	self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" })
+	-- Custom wire inputs
+	if (self.Bullet.CustomInputs) then
+		self.Inputs = Wire_CreateInputs( self.Entity, self.Bullet.CustomInputs )
+	else
+		self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
+	end
+	
+	-- Custom wire outputs
+	if (self.Bullet.CustomOutputs) then
+		self.Outputs = Wire_CreateOutputs( self.Entity, self.Bullet.CustomOutputs )
+	else
+		self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+	end
 	
 	self.CanFire = true
 	self.LastFired = 0
@@ -132,8 +143,8 @@ function ENT:FireBullet()
 			self.Ammo = self.Ammo - 1
 			Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 		end
-		Wire_TriggerOutput( self.Entity, "Last Fired", ent )
-		Wire_TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() )
+		Wire_TriggerOutput( self.Entity, "Last Fired", ent or nil )
+		Wire_TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
 	end
 end
 
@@ -200,7 +211,6 @@ local function InputChange( self, name, value )
 			Wire_TriggerOutput(self.Entity, "Can Fire", 0)
 			self:FireBullet()
 		end
-		return true
 	elseif (name == "Reload") then
 		if (self.Ammo and self.Ammo > 0 and self.Ammo < self.Bullet.Ammo) then
 			if (self.Bullet.Ammo and self.Bullet.Ammo > 0 and self.Bullet.AmmoReloadtime and self.Bullet.AmmoReloadtime > 0) then
