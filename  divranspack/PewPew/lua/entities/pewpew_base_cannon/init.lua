@@ -73,6 +73,25 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 		self.ReloadDown = numpad.OnDown( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_On", 	self )
 		self.ReloadUp =	numpad.OnUp( 	 ply, 	reloadkey, 	"PewPew_Cannon_Reload_Off", 	self )
 	end
+	
+	-- Adjust wire inputs
+	if (self.Bullet.CustomInputs) then
+		self.Inputs = Wire_AdjustInputs( self.Entity, self.Bullet.CustomInputs )
+	else
+		if (self.Inputs and self.Inputs != {"Fire", "Reload"}) then
+			self.Inputs = Wire_AdjustInputs( self.Entity, { "Fire", "Reload" } )
+		end
+	end
+	
+	-- Adjust wire outputs
+	if (self.Bullet.CustomOutputs) then
+		self.Outputs = Wire_AdjustOutputs( self.Entity, self.Bullet.CustomOutputs )
+	else
+		if (self.Outputs and self.Outputs != { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" }) then
+			self.Outputs = Wire_AdjustOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+		end
+	end
+		
 end
 
 function ENT:FireBullet()
@@ -198,7 +217,7 @@ function ENT:Think()
 	end
 end
 
-local function InputChange( self, name, value )
+function ENT:InputChange( name, value )
 	if (name == "Fire") then
 		if (value != 0) then
 			self.Firing = true
@@ -233,29 +252,33 @@ function ENT:TriggerInput(iname, value)
 	if (self.Bullet.WireInputOverride) then
 		self.Bullet:WireInput( self, iname, value )
 	else
-		InputChange( self, iname, value )
+		self:InputChange( iname, value )
 	end
 end
 
 -- Numpad
 local function NumpadOn( ply, self )
 	if (!pewpew.Numpads) then return end
-	InputChange( self, "Fire", 1 )
+	if (!self or !self:IsValid()) then return end
+	self:InputChange( "Fire", 1 )
 end
 
 local function NumpadOff( ply, self )
 	if (!pewpew.Numpads) then return end
-	InputChange( self, "Fire", 0 )
+	if (!self or !self:IsValid()) then return end
+	self:InputChange( "Fire", 0 )
 end
 
 local function NumpadReloadOn( ply, self )
 	if (!pewpew.Numpads) then return end
-	InputChange( self, "Reload", 1 )
+	if (!self or !self:IsValid()) then return end
+	self:InputChange( "Reload", 1 )
 end
 
 local function NumpadReloadOff( ply, self )
 	if (!pewpew.Numpads) then return end
-	InputChange( self, "Reload", 0 )
+	if (!self or !self:IsValid()) then return end
+	self:InputChange( "Reload", 0 )
 end
 
 numpad.Register( "PewPew_Cannon_Fire_On", NumpadOn )

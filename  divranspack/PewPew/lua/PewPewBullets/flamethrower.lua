@@ -162,7 +162,7 @@ function BULLET:CLThinkFunc()
 			particle:SetRollDelta(math.random(-5, 5))
 			particle:SetColor(255, 255, 255) 
 		end
-		self.delay = CurTime() + math.Rand(0.01,0.08)
+		self.delay = CurTime() + math.Rand(0.01,0.04)
 	end
 end
 

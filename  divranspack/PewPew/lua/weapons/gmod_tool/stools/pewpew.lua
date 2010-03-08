@@ -166,8 +166,8 @@ if (SERVER) then
 			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload )
 			if (!ent) then return end	
 			
-			ply:AddCount("pewpew",ent)
-			ply:AddCleanup ( "pewpew", ent )
+			ply:AddCount( "pewpew",ent )
+			ply:AddCleanup( "pewpew", ent )
 
 			undo.Create( "pewpew" )
 				undo.AddEntity( ent )

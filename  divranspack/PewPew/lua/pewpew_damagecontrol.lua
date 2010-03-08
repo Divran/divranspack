@@ -165,6 +165,29 @@ function pewpew:EMPDamage( Position, Radius, Duration )
 	end
 end
 
+-- Fire Damage (Damages an entity over time)
+function pewpew:FireDamage( TargetEntity, DPS, Duration )
+		-- Check damage
+		if (!self.Damage) then return end
+	-- Check for errors
+	if (!TargetEntity or !self:CheckValid(TargetEntity) or !DPS or !Duration) then return end
+	
+	-- Effect
+	TargetEntity:Ignite( Duration )
+	
+	-- Initial damage
+	self:DealDamageBase( TargetEntity, DPS/10 )
+	
+	-- Start a timer
+	local timername = "pewpew_firedamage_"..TargetEntity:EntIndex()..CurTime()
+	timer.Create( timername, 0.1, Duration*10, function( TargetEntity, DPS, timername ) 
+		-- Damage
+		pewpew:DealDamageBase( TargetEntity, DPS/10 )
+		-- Auto remove timer if dead
+		if (!TargetEntity or !TargetEntity:IsValid()) then timer.Remove( timername ) end
+	end, TargetEntity, DPS, timername )
+end
+
 ------------------------------------------------------------------------------------------------------------
 -- Base Code
 

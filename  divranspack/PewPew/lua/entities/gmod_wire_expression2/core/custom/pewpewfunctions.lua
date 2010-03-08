@@ -1,3 +1,5 @@
+E2Lib.RegisterExtension("pewpew", true)
+
 -- Returns 1 if the entity is a PewPew Cannon
 e2function number entity:pewIsCannon()
 	if (!validPhysics(this)) then return 0 end
@@ -186,4 +188,10 @@ e2function number entity:pewCanFire()
 		ret = 1
 	end
 	return ret
+end
+
+e2function void entity:pewFire( number fire )
+	if (!validPhysics(this)) then return end
+	if (this:GetClass() != "pewpew_base_cannon") then return end
+	this:InputChange( "Fire", fire )	
 end
