@@ -96,7 +96,7 @@ if (SERVER) then
 		if (trace.Hit) then
 			if (trace.Entity and ValidEntity(trace.Entity)) then
 				self:GetOwner():ConCommand("pewpew_core_model " .. trace.Entity:GetModel())
-				self:GetOwner():ChatPrint("GCombat Cannon model set to: " .. trace.Entity:GetModel())
+				self:GetOwner():ChatPrint("PewPew Core model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
@@ -105,9 +105,9 @@ else
 	language.Add( "Tool_pewpew_core_desc", "Used to spawn PewPew cores." )
 	language.Add( "Tool_pewpew_core_0", "Primary: Spawn a PewPew core and weld it, Secondary: Spawn a PewPew core and don't weld it, Reload: Change the model of the core." )
 	language.Add( "undone_pewpew_core", "Undone PewPew core" )
-	language.Add( "Cleanup_pewpew_cores", "PewPew Weapons" )
-	language.Add( "Cleaned_pewpew_cores", "Cleaned up all PewPew Weapons" )
-	language.Add( "SBoxLimit_pewpew_cores", "You've reached the PewPew Weapon limit!" )
+	language.Add( "Cleanup_pewpew_cores", "PewPew Cores" )
+	language.Add( "Cleaned_pewpew_cores", "Cleaned up all PewPew Cores" )
+	language.Add( "SBoxLimit_pewpew_cores", "You've reached the PewPew Core limit!" )
 	
 	
 	function TOOL.BuildCPanel( CPanel )
@@ -125,14 +125,12 @@ else
 
 			Options = {
 				Default = {
-					pewpew_model = "models/combatmodels/tank_gun.mdl",
-					pewpew_bulletname = "",
+					pewpew_model = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 				}
 			},
 
 			CVars = {
-				[0] = "pewpew_model",
-				[1] = "pewpew_bulletname",
+				[0] = "pewpew_model"
 			}
 		})
 		

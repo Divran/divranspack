@@ -23,3 +23,4 @@ E2Helper.Descriptions["pewDamageType"] = "Returns the damage type (BlastDamage/P
 E2Helper.Descriptions["pewAuthor"] = "Returns the author of the bullet."
 E2Helper.Descriptions["pewDescription"] = "Returns the bullet's description."
 E2Helper.Descriptions["pewCanFire"] = "Returns 1 if the cannon can fire."
+E2Helper.Descriptions["pewFire"] = "0 makes the cannon stop firing. Anything other than 0 makes it start firing."

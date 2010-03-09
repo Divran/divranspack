@@ -2,7 +2,7 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include('shared.lua')
 
-function ENT:Initialize()   
+function ENT:Initialize()
 	if (self.Bullet.InitializeOverride) then
 		-- Allows you to override the Initialize function
 		self.Bullet:InitializeFunc( self )
@@ -13,6 +13,10 @@ function ENT:Initialize()
 		self.FlightDirection = self.Entity:GetUp()
 		self.Exploded = false
 		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 4
+		
+		-- Stargate shield compatability
+		self.Passes = 1
+		self.Passed = {}
 		
 		-- Lifetime
 		self.Lifetime = false
@@ -52,6 +56,13 @@ function ENT:SetOptions( BULLET, Cannon )
 end
 
 function ENT:Explode(trace)
+	if (!trace) then
+		local tr = {}
+		tr.start = self.Entity:GetPos() - self.FlightDirection * self.Bullet.Speed
+		tr.endpos = self.Entity:GetPos()
+		tr.filter = self.Entity
+		trace = util.TraceLine( tr )
+	end
 	if (self.Bullet.ExplodeOverride) then
 		-- Allows you to override the Explode function
 		self.Bullet:Explode( self, trace )

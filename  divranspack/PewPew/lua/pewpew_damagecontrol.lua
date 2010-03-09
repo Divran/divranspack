@@ -277,8 +277,9 @@ function pewpew:SetHealth( ent )
 	local phys = ent:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
-	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
-	local volume = phys:GetVolume() / 1000
+	local volume = 0
+	if (!phys:GetVolume()) then volume = 100 end
+	volume = phys:GetVolume() / 1000
 	local health = mass / 5 + volume
 	ent.pewpewHealth = health
 	ent.MaxMass = mass
