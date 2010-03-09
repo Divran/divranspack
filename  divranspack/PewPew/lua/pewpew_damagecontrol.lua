@@ -165,7 +165,7 @@ function pewpew:EMPDamage( Position, Radius, Duration )
 	end
 end
 
--- Fire Damage (Damages an entity over time)
+-- Fire Damage (Damages an entity over time) (DO NOT USE THIS YET.)
 function pewpew:FireDamage( TargetEntity, DPS, Duration )
 		-- Check damage
 		if (!self.Damage) then return end
@@ -196,6 +196,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 		if (!self.Damage) then return end
 	-- Check for errors
 	if (!self:CheckValid( TargetEntity )) then return end
+	if (!TargetEntity.pewpew) then TargetEntity.pewpew = {} end
 	if (!Damage or Damage == 0) then return end
 	-- Check if allowed
 	if (!self:CheckNeverEverList( TargetEntity )) then return end
@@ -210,7 +211,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 		end
 	end
 	Damage = Damage * self.DamageMul
-	if (!TargetEntity.pewpewHealth) then
+	if (!TargetEntity.pewpew.Health) then
 		self:SetHealth( TargetEntity )
 	end
 	-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
@@ -219,18 +220,18 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	local mass = phys:GetMass() or 0
 	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
 	local volume = phys:GetVolume() / 1000
-	if (TargetEntity.pewpewHealth > mass / 5 + volume) then
-		TargetEntity.pewpewHealth = (mass / 5 + volume) * (mass/TargetEntity.MaxMass)
+	if (TargetEntity.pewpew.Health > mass / 5 + volume) then
+		TargetEntity.pewpew.Health = (mass / 5 + volume) * (mass/TargetEntity.pewpew.MaxMass)
 	end
 	-- Check if the entity has a core
-	if (TargetEntity.Core and self:CheckValid(TargetEntity.Core)) then
-		self:DamageCore( TargetEntity.Core, Damage )
+	if (TargetEntity.pewpew.Core and self:CheckValid(TargetEntity.pewpew.Core)) then
+		self:DamageCore( TargetEntity.pewpew.Core, Damage )
 		return
 	end
 	if (self.CoreDamageOnly) then return end
 	-- Deal damage
-	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
-	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
+	TargetEntity.pewpew.Health = TargetEntity.pewpew.Health - math.abs(Damage)
+	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpew.Health)
 	self:CheckIfDead( TargetEntity )
 end
 
@@ -240,11 +241,12 @@ end
 -- Dealing damage to cores
 function pewpew:DamageCore( ent, Damage )
 	if (!self:CheckValid( ent )) then return end
+	if (!ent.pewpew) then ent.pewpew = {} end
 	if (ent:GetClass() != "pewpew_core") then return end
-	ent.pewpewCoreHealth = ent.pewpewCoreHealth - math.abs(Damage) * self.CoreDamageMul
-	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth)
+	ent.pewpew.CoreHealth = ent.pewpew.CoreHealth - math.abs(Damage) * self.CoreDamageMul
+	ent:SetNWInt("pewpewHealth",ent.pewpew.CoreHealth)
 	-- Wire Output
-	Wire_TriggerOutput( ent, "Health", ent.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )
 	self:CheckIfDeadCore( ent )
 end
 
@@ -252,18 +254,20 @@ end
 function pewpew:RepairCoreHealth( ent, amount )
 	-- Check for errors
 	if (!self:CheckValid( ent )) then return end
+	if (!ent.pewpew) then ent.pewpew = {} end
 	if (ent:GetClass() != "pewpew_core") then return end
-	if (!ent.pewpewCoreHealth or !ent.pewpewCoreMaxHealth) then return end
+	if (!ent.pewpew.CoreHealth or !ent.pewpew.CoreMaxHealth) then return end
 	if (!amount or amount == 0) then return end
 	-- Add health
-	ent.pewpewCoreHealth = math.Clamp(ent.pewpewCoreHealth+math.abs(amount),0,ent.pewpewCoreMaxHealth)
-	ent:SetNWInt("pewpewHealth",ent.pewpewCoreHealth or 0)
+	ent.pewpew.CoreHealth = math.Clamp(ent.pewpew.CoreHealth+math.abs(amount),0,ent.pewpew.CoreMaxHealth)
+	ent:SetNWInt("pewpewHealth",ent.pewpew.CoreHealth or 0)
 		-- Wire Output
-	Wire_TriggerOutput( ent, "Health", ent.pewpewCoreHealth or 0 )
+	Wire_TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )
 end
 
 function pewpew:CheckIfDeadCore( ent )
-	if (ent.pewpewCoreHealth <= 0) then
+	if (!ent.pewpew) then ent.pewpew = {} return end
+	if (ent.pewpew.CoreHealth <= 0) then
 		ent:RemoveAllProps()
 	end	
 end
@@ -274,6 +278,7 @@ end
 -- Set the health of a spawned entity
 function pewpew:SetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
+	if (!ent.pewpew) then ent.pewpew = {} end
 	local phys = ent:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
@@ -281,8 +286,8 @@ function pewpew:SetHealth( ent )
 	if (!phys:GetVolume()) then volume = 100 end
 	volume = phys:GetVolume() / 1000
 	local health = mass / 5 + volume
-	ent.pewpewHealth = health
-	ent.MaxMass = mass
+	ent.pewpew.Health = health
+	ent.pewpew.MaxMass = mass
 	ent:SetNWInt("pewpewHealth",health)
 	ent:SetNWInt("pewpewMaxHealth",health)
 end
@@ -292,7 +297,8 @@ function pewpew:RepairHealth( ent, amount )
 	-- Check for errors
 	if (!self:CheckValid( ent )) then return end
 	if (!self:CheckAllowed( ent )) then return end
-	if (!ent.pewpewHealth or !ent.MaxMass) then return end
+	if (!ent.pewpew) then ent.pewpew = {} end
+	if (!ent.pewpew.Health or !ent.MaxMass) then return end
 	if (!amount or amount == 0) then return end
 	-- Get the max allowed health
 	local phys = ent:GetPhysicsObject()
@@ -302,13 +308,13 @@ function pewpew:RepairHealth( ent, amount )
 	local volume = phys:GetVolume() / 1000
 	local maxhealth = (mass / 5 + volume)
 	-- Add health
-	ent.pewpewHealth = math.Clamp(ent.pewpewHealth+math.abs(amount),0,maxhealth)
+	ent.pewpew.Health = math.Clamp(ent.pewpew.Health+math.abs(amount),0,maxhealth)
 	-- Make the health changeable again with weight tool
-	if (ent.pewpewHealth == maxhealth) then
-		ent.pewpewHealth = nil
-		ent.MaxMass = nil
+	if (ent.pewpew.Health == maxhealth) then
+		ent.pewpew.Health = nil
+		ent.pewpew.MaxMass = nil
 	end
-	ent:SetNWInt("pewpewHealth",ent.pewpewHealth or 0)
+	ent:SetNWInt("pewpewHealth",ent.pewpew.Health or 0)
 	ent:SetNWInt("pewpewMaxHealth",maxhealth or 0)
 end
 
@@ -316,17 +322,18 @@ end
 function pewpew:GetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
 	if (!self:CheckAllowed( ent )) then return end
+	if (!ent.pewpew) then ent.pewpew = {} end
 	local phys = ent:GetPhysicsObject()
 	if (!phys:IsValid()) then return end
 	local mass = phys:GetMass() or 0
 	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
 	local volume = phys:GetVolume() / 1000
-	if (ent.pewpewHealth) then
+	if (ent.pewpew.Health) then
 		-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
-		if (ent.pewpewHealth > mass / 5 + volume) then
-			return (mass / 5 + volume) * (mass/ent.MaxMass)
+		if (ent.pewpew.Health > mass / 5 + volume) then
+			return (mass / 5 + volume) * (mass/ent.pewpew.MaxMass)
 		end
-		return ent.pewpewHealth
+		return ent.pewpew.Health
 	else
 		return (mass / 5 + volume)
 	end
@@ -337,7 +344,8 @@ end
 
 -- Check if the entity should be removed
 function pewpew:CheckIfDead( ent )
-	if (ent.pewpewHealth <= 0) then
+	if (!ent.pewpew) then ent.pewpew = {} end
+	if (ent.pewpew.Health <= 0) then
 		local effectdata = EffectData()
 		effectdata:SetOrigin( ent:GetPos() )
 		effectdata:SetScale( (ent:OBBMaxs() - ent:OBBMins()):Length() )

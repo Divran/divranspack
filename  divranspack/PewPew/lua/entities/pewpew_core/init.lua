@@ -9,10 +9,11 @@ function ENT:Initialize()
 
 	self.Outputs = Wire_CreateOutputs( self.Entity, { "Health", "Total Health" })
 	
+	self.pewpew = {}
 	self.Props = {}
 	self.PropHealth = {}
-	self.pewpewCoreHealth = 1
-	self.pewpewCoreMaxHealth = 1
+	self.pewpew.CoreHealth = 1
+	self.pewpew.CoreMaxHealth = 1
 	self.Entity.Core = self
 	
 	Wire_TriggerOutput( self.Entity, "Health", self.pewpewCoreHealth or 0 )

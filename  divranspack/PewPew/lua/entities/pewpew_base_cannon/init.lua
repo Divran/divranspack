@@ -11,6 +11,7 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
+	if (!self.Bullet) then return end
 	-- Custom wire inputs
 	if (self.Bullet.CustomInputs) then
 		self.Inputs = Wire_CreateInputs( self.Entity, self.Bullet.CustomInputs )
@@ -76,7 +77,9 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 	
 	-- Adjust wire inputs
 	if (self.Bullet.CustomInputs) then
-		self.Inputs = Wire_AdjustInputs( self.Entity, self.Bullet.CustomInputs )
+		if (self.Inputs and self.Inputs != self.Bullet.CustomInputs) then
+			self.Inputs = Wire_AdjustInputs( self.Entity, self.Bullet.CustomInputs )
+		end
 	else
 		if (self.Inputs and self.Inputs != {"Fire", "Reload"}) then
 			self.Inputs = Wire_AdjustInputs( self.Entity, { "Fire", "Reload" } )
@@ -85,12 +88,15 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 	
 	-- Adjust wire outputs
 	if (self.Bullet.CustomOutputs) then
-		self.Outputs = Wire_AdjustOutputs( self.Entity, self.Bullet.CustomOutputs )
+		if (self.Outputs and self.Outputs != self.Bullet.CustomOutputs) then
+			self.Outputs = Wire_AdjustOutputs( self.Entity, self.Bullet.CustomOutputs )
+		end
 	else
 		if (self.Outputs and self.Outputs != { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" }) then
 			self.Outputs = Wire_AdjustOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
 		end
 	end
+	
 		
 end
 
@@ -168,6 +174,7 @@ function ENT:FireBullet()
 end
 
 function ENT:Think()
+	if (!self.Bullet) then return end
 	if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then -- if you can fire
 		if (self.Ammo <= 0 and self.Bullet.Ammo > 0) then -- check for ammo
 			-- if we don't have any ammo left...
@@ -321,8 +328,8 @@ function ENT:BuildDupeInfo()
 	return info
 end
 
-function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
-	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
+function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
+	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
 	if ( !ply:CheckLimit( "pewpew" ) ) then 
 		ent:Remove()
 		return false
@@ -341,6 +348,7 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 				return false
 			end
 			self:SetOptions( bullet, ply, info.FireKey or "1", info.ReloadKey or "2")
+			self:Initialize()
 		else
 			local blt = {
 				Name = "Dummy bullet",
@@ -351,6 +359,7 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 			}
 			function blt:Fire(self) self.Owner:ChatPrint("You must update this cannon with a valid bullet before you can fire.") end
 			self:SetOptions( blt, ply, info.FireKey, info.ReloadKey )
+			self:Initialize()
 			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
 		end
 	end

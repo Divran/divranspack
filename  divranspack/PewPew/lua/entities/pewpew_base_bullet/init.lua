@@ -12,11 +12,7 @@ function ENT:Initialize()
 		self.Entity:SetSolid( SOLID_NONE )    
 		self.FlightDirection = self.Entity:GetUp()
 		self.Exploded = false
-		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 4
-		
-		-- Stargate shield compatability
-		self.Passes = 1
-		self.Passed = {}
+		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000
 		
 		-- Lifetime
 		self.Lifetime = false

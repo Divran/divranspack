@@ -56,7 +56,7 @@ function BULLET:InitializeFunc( self )
 	self.Entity:SetSolid( SOLID_NONE )     
 	self.FlightDirection = self.Entity:GetUp()
 	self.Exploded = false
-	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 2
+	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000
 	
 	-- Trail
 	if (self.Bullet.Trail) then
