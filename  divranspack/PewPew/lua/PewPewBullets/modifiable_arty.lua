@@ -60,23 +60,58 @@ BULLET.CustomOutputs = nil
 BULLET.WireInputOverride = true
 function BULLET:WireInput( self, inputname, value )
 	if (inputname == "Speed") then
-		self.Bullet.Speed = math.Clamp(value,10,200)
+		self.CustomSpeed = math.Clamp(value,10,200)
 	else
 		self:InputChange( inputname, value )
 	end
 end
--- Think
-BULLET.ThinkOverride = false
-function BULLET:ThinkFunc( self )
-	-- Nothing
-end
 
 -- Initialize (Is called when the bullet initializes)
 BULLET.InitializeOverride = true
-function BULLET:InitializeFunc( self )   
-	self.Bullet.Speed = 100
-	self.Bullet.InitializeOverride = false
-	self:Initialize()
+function BULLET:InitializeFunc( self ) 
+	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
+	self.Entity:SetMoveType( MOVETYPE_NONE )
+	self.Entity:SetSolid( SOLID_NONE )    
+	self.FlightDirection = self.Entity:GetUp()
+	self.Exploded = false
+		
+	self.CustomSpeed = 100
+	if (self.Cannon.CustomSpeed) then
+		self.CustomSpeed = self.Cannon.CustomSpeed
+	end
+	
+	self.TraceDelay = CurTime() + self.CustomSpeed / 1000 / 4
+end
+
+-- Think
+BULLET.ThinkOverride = true
+function BULLET:ThinkFunc( self )
+	-- Make it fly
+	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.CustomSpeed )
+	self.FlightDirection = self.FlightDirection - Vector(0,0,(self.Bullet.Gravity or 0) / (self.CustomSpeed or 1))
+	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+	
+	if (CurTime() > self.TraceDelay) then
+		-- Check if it hit something
+		local tr = {}
+		tr.start = self.Entity:GetPos() - self.FlightDirection * self.CustomSpeed
+		tr.endpos = self.Entity:GetPos()
+		tr.filter = self.Entity
+		local trace = util.TraceLine( tr )
+		
+		if (trace.Hit and !self.Exploded) then	
+			self:Explode( trace )
+			self.Exploded = true
+		else			
+			-- Run more often!
+			self.Entity:NextThink( CurTime() )
+			return true
+		end
+	else			
+		-- Run more often!
+		self.Entity:NextThink( CurTime() )
+		return true
+	end
 end
 
 pewpew:AddBullet( BULLET )

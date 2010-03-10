@@ -148,11 +148,7 @@ function ENT:Think()
 			local trace = util.TraceLine( tr )
 			
 			if (trace.Hit and !self.Exploded) then	
-				if (trace.Entity and trace.Entity.Shield) then
-					trace.Entity:Hit( self )
-				else
-					self:Explode( trace )
-				end
+				self:Explode( trace )
 				self.Exploded = true
 			else			
 				-- Run more often!
