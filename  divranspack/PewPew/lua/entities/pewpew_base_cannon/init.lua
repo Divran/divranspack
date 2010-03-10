@@ -127,6 +127,7 @@ function ENT:FireBullet()
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
+		--local velL = math.max(self:WorldToLocal(self:GetVelocity() + self:GetPos()).z/100,5)
 		local Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z/2 + bulletboxsize.z/2)
 		ent:SetPos( Pos )
 		-- Add random angle offset

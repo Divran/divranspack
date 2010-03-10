@@ -6,7 +6,7 @@ local PLUGIN = { }
 PLUGIN.Title = "Message Print"
 PLUGIN.Description = "Prints a message to console whenever someone spawns something."
 PLUGIN.Author = "Divran"
-PLUGIN.ChatCommand = "!conmsg"
+PLUGIN.ChatCommand = "conmsg"
 PLUGIN.Usage = "1/0"
 
 if (SERVER) then

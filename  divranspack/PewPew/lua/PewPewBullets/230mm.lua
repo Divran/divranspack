@@ -11,7 +11,7 @@ BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/combatmodels/tankshell.mdl"
+BULLET.Model = "models/combatmodels/tankshell_230mm.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil

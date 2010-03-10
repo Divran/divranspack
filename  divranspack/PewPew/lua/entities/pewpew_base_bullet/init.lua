@@ -12,7 +12,7 @@ function ENT:Initialize()
 		self.Entity:SetSolid( SOLID_NONE )    
 		self.FlightDirection = self.Entity:GetUp()
 		self.Exploded = false
-		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000
+		self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 4
 		
 		-- Lifetime
 		self.Lifetime = false
@@ -43,6 +43,7 @@ function ENT:Initialize()
 			self.Entity:SetColor( C.r, C.g, C.b, C.a or 255 )
 		end
 	end
+	self.Entity:NextThink( CurTime() )
 end   
 
 function ENT:SetOptions( BULLET, Cannon )
@@ -147,8 +148,12 @@ function ENT:Think()
 			local trace = util.TraceLine( tr )
 			
 			if (trace.Hit and !self.Exploded) then	
+				if (trace.Entity and trace.Entity.Shield) then
+					trace.Entity:Hit( self )
+				else
+					self:Explode( trace )
+				end
 				self.Exploded = true
-				self:Explode( trace )
 			else			
 				-- Run more often!
 				self.Entity:NextThink( CurTime() )
