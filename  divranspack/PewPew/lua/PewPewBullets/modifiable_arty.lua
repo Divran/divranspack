@@ -6,7 +6,7 @@ local BULLET = {}
 BULLET.Name = "Modifiable Artillery"
 BULLET.Category = "Artilleries"
 BULLET.Author = "Divran"
-BULLET.Description = "Fast fire rate, low damage, modifiable speed."
+BULLET.Description = "An artillery with a modifiable speed."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -31,7 +31,7 @@ BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 195
+BULLET.Damage = 350
 BULLET.Radius = 300
 BULLET.RangeDamageMul = 0.8
 BULLET.NumberOfSlices = nil
@@ -41,9 +41,9 @@ BULLET.PlayerDamage = 150
 BULLET.PlayerDamageRadius = 300
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 0.4
-BULLET.Ammo = 7
-BULLET.AmmoReloadtime = 7
+BULLET.Reloadtime = 2
+BULLET.Ammo = 0
+BULLET.AmmoReloadtime = 0
 
 -- Other
 BULLET.Lifetime = nil
