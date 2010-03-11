@@ -96,24 +96,4 @@ function BULLET:Fire( self )
 	end
 end
 
--- Think
-BULLET.CannonThinkOverride = true
-function BULLET:CannonThink( self )
-	if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then -- if you can fire
-		self.CanFire = true
-		if (self.Firing) then
-			self.LastFired = CurTime()
-			self.CanFire = false
-			self:FireBullet()
-		else
-			Wire_TriggerOutput( self.Entity, "Can Fire", 1)
-		end
-	end
-	if (self.Bullet.Reloadtime < 0.5) then
-		-- Run more often!
-		self.Entity:NextThink( CurTime() )
-		return true
-	end
-end
-
 pewpew:AddBullet( BULLET )
