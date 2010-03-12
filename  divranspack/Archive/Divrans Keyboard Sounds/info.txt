@@ -1,0 +1,8 @@
+"AddonInfo"
+{
+	"name"			"Divrans Keyboard Sounds"
+	"version"		"1.0"
+	"author_name"	"Divran"
+	"author_url"	"none"
+	"info"			"Divrans Keyboard Sounds"
+}

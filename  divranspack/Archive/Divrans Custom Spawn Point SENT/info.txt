@@ -1,0 +1,8 @@
+"AddonInfo"
+{
+	"name"			"Divrans Custom Spawn Point SENT"
+	"version"		"1.0"
+	"author_name"	"Divran"
+	"author_url"	"none"
+	"info"			"Divrans Custom Spawn Point SENT"
+}
