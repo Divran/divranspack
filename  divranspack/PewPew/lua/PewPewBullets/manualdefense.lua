@@ -6,7 +6,7 @@ local BULLET = {}
 BULLET.Name = "Manual Defense"
 BULLET.Category = "Defense"
 BULLET.Author = "Divran"
-BULLET.Description = "This defense will kill the target PewPew bullet if it is in range, and it will shoot through anything in the way."
+BULLET.Description = "This defense will kill the target PewPew bullet if it is in range. Has 3000 range."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -56,21 +56,42 @@ end
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	local Distance = 3000
+	local Distance = 3500
 	if (self.Target) then
 		Distance = self.Target:GetPos():Distance(self.Entity:GetPos())
 	end
-	if (Distance <= 2000) then
-		pewpew:DefenseDamage( self.Target, self.Bullet.Damage )
-		
-		-- Sound
-		self:EmitSound( self.Bullet.FireSound[1] )
-		
-		-- Effect
-		local effectdata = EffectData()
-		effectdata:SetOrigin( self.Target:GetPos() )
-		effectdata:SetStart( self.Entity:GetPos() )
-		util.Effect( self.Bullet.FireEffect, effectdata )
+	if (Distance < 3000) then
+		local tr = {}
+		tr.start = self.Entity:GetPos()
+		tr.endpos = self.Target:GetPos()
+		tr.filter = self.Entity
+		local trace = util.TraceLine( tr )
+		if (trace.Hit) then
+			if (trace.Entity and pewpew:CheckValid(trace.Entity)) then
+				-- Damage
+				pewpew:PointDamage( trace.Entity, self.Bullet.Damage / 3, self.Entity )
+				-- Sound
+				self:EmitSound( self.Bullet.FireSound[1] )
+				
+				-- Effect
+				local effectdata = EffectData()
+				effectdata:SetOrigin( trace.HitPos )
+				effectdata:SetStart( self.Entity:GetPos() )
+				util.Effect( self.Bullet.FireEffect, effectdata )
+			end
+		else
+			-- Damage
+			pewpew:DefenseDamage( self.Target, self.Bullet.Damage )
+					
+			-- Sound
+			self:EmitSound( self.Bullet.FireSound[1] )
+			
+			-- Effect
+			local effectdata = EffectData()
+			effectdata:SetOrigin( self.Target:GetPos() )
+			effectdata:SetStart( self.Entity:GetPos() )
+			util.Effect( self.Bullet.FireEffect, effectdata )
+		end
 	end
 end
 

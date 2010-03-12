@@ -46,9 +46,10 @@ function ENT:Initialize()
 	self.Entity:NextThink( CurTime() )
 end   
 
-function ENT:SetOptions( BULLET, Cannon )
+function ENT:SetOptions( BULLET, Cannon, ply )
 	self.Bullet = BULLET
 	self.Cannon = Cannon
+	self.Owner = ply
 	self.Entity:SetNetworkedString("BulletName", self.Bullet.Name)
 end
 

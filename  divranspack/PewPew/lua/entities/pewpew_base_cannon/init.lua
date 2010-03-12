@@ -123,7 +123,7 @@ function ENT:FireBullet()
 		-- Set Model
 		ent:SetModel( self.Bullet.Model )
 		-- Set used bullet
-		ent:SetOptions( self.Bullet, self )
+		ent:SetOptions( self.Bullet, self, self.Owner )
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()

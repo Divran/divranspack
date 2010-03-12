@@ -6,7 +6,7 @@ local BULLET = {}
 BULLET.Name = "Automatic Defense"
 BULLET.Category = "Defense"
 BULLET.Author = "Divran"
-BULLET.Description = "This defense will automatically aquire targets in front of it and it can not shoot through things in the way."
+BULLET.Description = "This defense will automatically aquire targets in front of it. Has 2500 range."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -53,7 +53,7 @@ function BULLET:Fire( self )
 	for _, v in pairs( entities ) do
 		if (v:GetClass() == "pewpew_base_bullet") then
 			local Dist2 = v:GetPos():Distance(self:GetPos())
-			if (Dist > Dist2) then
+			if (Dist > Dist2 and v.Owner != self.Owner) then
 				Dist = Dist2
 				TargetEnt = v
 			end
