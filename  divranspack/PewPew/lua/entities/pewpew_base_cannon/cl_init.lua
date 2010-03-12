@@ -1,27 +1,27 @@
 include('shared.lua')
 
 function ENT:Initialize()
-	self.Bullet = nil
-end
-
-function ENT:Draw()      
-	self.Entity:DrawModel()
-	Wire_Render(self.Entity)
-end
-
-function ENT:Think()
-	local Name = self.Entity:GetNetworkedString("BulletName")
-	if ((self.Bullet and Name ~= self.Bullet.Name and Name ~= "") or (not self.Bullet and Name ~= "")) then
-		self.Bullet = pewpew:GetBullet(Name)
-		
-		if (self.Bullet.CLInitializeOverride) then
-			self.Bullet.CLInitializeFunc(self)
+	self.Bullet = self.Entity:GetNWString("BulletName")
+	if (self.Bullet) then
+		if (self.Bullet.CLCannonInitializeOverride) then
+			self.Bullet.CLCannonInitializeFunc(self)
 		end
 	end
-	
+end
+
+function ENT:Draw()
+	if (self.Bullet and self.Bullet.CLCannonDrawOverride) then
+		self.Bullet.CLCannonDrawFunc(self)
+	else
+		self.Entity:DrawModel()
+		Wire_Render(self.Entity)
+	end
+end
+ 
+function ENT:Think()
 	if (self.Bullet) then
-		if (self.Bullet.CLThinkOverride) then
-			self.Bullet.CLThinkFunc(self)
+		if (self.Bullet.CLCannonThinkOverride) then
+			return self.Bullet.CLCannonThinkFunc(self)
 		end
 		
 		if (self.Bullet.Reloadtime < 0.5) then

@@ -55,6 +55,7 @@ BULLET.CustomOutputs = nil -- Use a table here to replace the default wire outpu
 
 -- Custom Functions (Only for adv users)
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
+-- I suggest you erase any functions you are not using to minimize file size.
 
 -- Wire Input (This is called whenever a wire input is changed) (Is run on: Cannon)
 BULLET.WireInputOverride = false
@@ -106,15 +107,34 @@ function BULLET:CLInitializeFunc()
 	-- Nothing
 end
 
+-- Cannon Initialize (Is run on: Cannon)
+BULLET.CLCannonInitializeOverride = false
+function BULLET:CLCannonInitializeFunc()
+	-- Nothing
+end
+
 -- Think (Is run on: Bullet)
 BULLET.CLThinkOverride = false
 function BULLET:CLThinkFunc()
 	-- Nothing
 end
 
+-- Cannon Think (Is run on: Cannon)
+BULLET.CLCannonThinkOverride = false
+function BULLET:CLCannonThinkFunc()
+	-- Nothing
+end
+
+
 -- Draw (Is run on: Bullet)
 BULLET.CLDrawOverride = false
 function BULLET:CLDrawFunc()
+	-- Nothing
+end
+
+-- Cannon Draw (Is run on: Cannon)
+BULLET.CLCannonDrawOverride = false
+function BULLET:CLCannonDrawFunc()
 	-- Nothing
 end
 
