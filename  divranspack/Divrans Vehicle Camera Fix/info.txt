@@ -1,8 +1,0 @@
-"AddonInfo"
-{
-	"name"			"Divrans Vehicle Camera Fix"
-	"version"		"1.0"
-	"author_name"	"Divran"
-	"author_url"	"none"
-	"info"			"Divrans Vehicle Camera Fix"
-}

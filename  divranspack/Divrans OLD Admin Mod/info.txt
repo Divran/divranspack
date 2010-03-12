@@ -1,8 +1,0 @@
-"AddonInfo"
-{
-	"name"			"Divrans Admin Mod"
-	"version"		"1.0"
-	"author_name"	"Divran"
-	"author_url"	"none"
-	"info"			"Divrans Admin Mod"
-}
