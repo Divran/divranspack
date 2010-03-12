@@ -1,38 +1,23 @@
----- Divrans Admin Mod:
-This is my very own Admin Mod
-
----- Divrans Chat Sound
-This adds the CSS Chat sound back to your game (The one that was removed in an update)
-NOTE!!!! Doesn't need CSS to work!!
-
----- Divrans Chat Temporary Fix
-This fixes the bug where you can't see the chat, and you must look in the console all the time.
-Use this as a temporary fix until you can fix the actual problem.
-NOTE!!!! If you see TWO messages at once, that means your REAL chat is WORKING and you DO NOT NEED THIS FIX.
-NOTE!!!! I have not had the chance to TEST IT yet, as I do not have this bug.
-
----- Divrans Vehicle Camera Fix
-This addon fixes the view in the jalopy.
-This is only temporary and should not be used forever.
-Since I am so noob at lua coding, it disables the use of 3rd person in the jalopy.
+---- Archive:
+In the archive I put old or useless mods.
 
 ---- Divrans Various E2 Plugins
 Put these in
 addons\wire\lua\entities\gmod_wire_expression2\core\custom
 or it will not work!
 
----- Divrans SoundPlay
-This will play a sound whenever anyone in the server writes a command
-Put in addons folder.
+---- Divrans Evolve Plugins
+These are some plugins for Overv's admin mod Evolve.
 
----- Divrans Custom Spawn Point SENT
-This adds a mobile custom spawn point SENT to your game.
-It is almost exactly the same as the Mobile spawn point found on Gmod.org.
+---- MW2 name colors
+These add colors like in MW2 to your name. Read more here: http://www.facepunch.com/showthread.php?p=20023290#post20023290
 
----- Divrans Keyboard Sounds
-This addon adds some keyboard typing sounds whenever someone types in the chat.
-(Awesome :D)
-I got the idea from visiting aVoN's server. He has something simiar to this.
+---- Teleporter
+This is a remake of the wire hoverdrive.
+
+---- PewPew
+This is by far the best addon I have ever made. Read more here: http://www.wiremod.com/forum/wiremod-lua-coding/18035-pewpew-new-gcombat.html
+
 
 ----HOW TO INSTALL.
 
