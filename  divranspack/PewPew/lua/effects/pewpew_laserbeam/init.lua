@@ -1,6 +1,6 @@
 -- Made by Divran
 
-EFFECT.Mat = Material( "cable/blue_elec" )
+EFFECT.Mat = Material( "cable/redlaser" )
 /*---------------------------------------------------------
    Init( data table )
 ---------------------------------------------------------*/
@@ -17,9 +17,8 @@ function EFFECT:Init( data )
 	
 	self.Entity:SetRenderBoundsWS( self.StartPos, self.EndPos )
 	
-	self.Size = 50
 	// Die when it reaches its target
-	self.DieTime = CurTime() + 0.3
+	self.DieTime = CurTime() + 0.1
 end
 
 /*---------------------------------------------------------
@@ -46,12 +45,11 @@ function EFFECT:Render( )
 		EPos = self.Ent:LocalToWorld(self.LocalEndPos)
 	end
 	
-	self.Size = math.max( self.Size - 0.5, 5 )
 	render.SetMaterial( self.Mat )
 	render.DrawBeam( Pos, 		
 					 EPos,
-					 self.Size,					
+					 20,					
 					 0,					
 					 0,				
-					 Color( 255, 255, 0, 255 ) )	 
+					 Color( 255, 255, 255, 255 ) )	 
 end

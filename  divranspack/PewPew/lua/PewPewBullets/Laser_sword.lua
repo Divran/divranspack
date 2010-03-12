@@ -63,6 +63,7 @@ function BULLET:Fire( self )
 	local effectdata = EffectData()
 	effectdata:SetStart( startpos )
 	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * self.Bullet.SliceDistance) )
+	effectdata:SetEntity( self.Entity )
 	util.Effect( self.Bullet.FireEffect, effectdata )
 end
 

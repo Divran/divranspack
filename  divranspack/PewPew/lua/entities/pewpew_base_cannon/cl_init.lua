@@ -1,7 +1,7 @@
 include('shared.lua')
 
 function ENT:Initialize()
-	self.Bullet = self.Entity:GetNWString("BulletName")
+	self.Bullet = pewpew:GetBullet(self.Entity:GetNWString("BulletName"))
 	if (self.Bullet) then
 		if (self.Bullet.CLCannonInitializeOverride) then
 			self.Bullet.CLCannonInitializeFunc(self)
