@@ -322,25 +322,28 @@ function ENT:Use( User, caller )
 		end
 	end
 end
--- Dupe support! Thanks to Free Fall
-function ENT:BuildDupeInfo()
-	local info = self.BaseClass.BuildDupeInfo(self) or {}
-	if (self.Bullet) then
-		info.BulletName = self.Bullet.Name
+
+-------------------------
+-- Dupe support! Thanks to Free Fall for helping
+function ENT:DupeInfoTable()
+	local ret = {}
+	ret.BulletName = self.Bullet.Name
+	ret.FireKey = self.FireKey
+	ret.ReloadKey = self.ReloadKey
+	local phys = self.Entity:GetPhysicsObject()
+	if (phys) then
+		ret.Mass = phys:GetMass()
 	end
-	info.FireKey = self.FireKey
-	info.ReloadKey = self.ReloadKey
-	return info
+	return ret
 end
 
-function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
-	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
+function ENT:DupeSpawn( ply, ent, info )
 	if ( !ply:CheckLimit( "pewpew" ) ) then 
 		ent:Remove()
 		return false
 	end
-	if (info.BulletName) then
-		local bullet = pewpew:GetBullet( info.BulletName )
+	if (info.pewpewInfo) then
+		local bullet = pewpew:GetBullet( info.pewpewInfo.BulletName )
 		if (bullet) then
 			if (bullet.AdminOnly and !ply:IsAdmin()) then 
 				ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
@@ -352,8 +355,6 @@ function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
 				ent:Remove()
 				return false
 			end
-			self:SetOptions( bullet, ply, info.FireKey or "1", info.ReloadKey or "2")
-			self:Initialize()
 		else
 			local blt = {
 				Name = "Dummy bullet",
@@ -363,10 +364,56 @@ function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
 				FireOverride = true
 			}
 			function blt:Fire(self) self.Owner:ChatPrint("You must update this cannon with a valid bullet before you can fire.") end
-			self:SetOptions( blt, ply, info.FireKey, info.ReloadKey )
-			self:Initialize()
 			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
+		end
+		self:SetOptions( bullet, ply, info.pewpewInfo.FireKey or "1", info.pewpewInfo.ReloadKey or "2")
+		self:Initialize()
+	end
+	local phys = ent:GetPhysicsObject()
+	if (phys) then
+		if (info.pewpewInfo.Mass) then
+			phys:SetMass(info.pewpewInfo.Mass)
 		end
 	end
 	ply:AddCount("pewpew",ent)
+end
+
+-------------------------
+-- Regular dupe functions
+function ENT:BuildDupeInfo()
+	local info = self.BaseClass.BuildDupeInfo(self) or {}
+	info.pewpewInfo = self:DupeInfoTable()
+	return info
+end
+
+function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
+	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
+	self:DupeSpawn( ply, ent, info )
+end
+
+-------------------------
+-- SB3 dupe functions
+
+function ENT:PreEntityCopy()
+	self.BaseClass.PreEntityCopy(self) --use this if you have to use PreEntityCopy
+	local RD = CAF.GetAddon("Resource Distribution")
+	RD.BuildDupeInfo(self.Entity)
+	if WireLib then
+		local DupeInfo = WireLib.BuildDupeInfo(self.Entity)
+		DupeInfo.pewpewInfo = self:DupeInfoTable()
+		if DupeInfo then
+			duplicator.StoreEntityModifier( self, "WireDupeInfo", DupeInfo )
+		end
+	end
+end
+
+function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
+	self.BaseClass.PostEntityPaste(self, Player, Ent, CreatedEntities ) --use this if you have to use PostEntityPaste
+	local RD = CAF.GetAddon("Resource Distribution")
+	RD.ApplyDupeInfo(Ent, CreatedEntities)
+	if WireLib and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+		local info = Ent.EntityMods.WireDupeInfo
+		WireLib.ApplyDupeInfo(Player, Ent, info, function(id) return CreatedEntities[id] end)
+		self:DupeSpawn( Player, Ent, info )
+	end
 end
