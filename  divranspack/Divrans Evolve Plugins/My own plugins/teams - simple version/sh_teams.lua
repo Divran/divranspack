@@ -40,20 +40,31 @@ PLUGIN.Teams = {}
 	end
 	
 	if (SERVER) then
-		function PLUGIN:EV_PlayerRankChanged(ply)
-			self:SetTeam( ply, ply:EV_GetRank() )
+		function PLUGIN:EV_PlayerRankChanged( ply )
+			self:Team( ply )
 		end
 
-		function PLUGIN:PlayerInitialSpawn(ply)
-			self:SetTeam( ply, ply:EV_GetRank() )
+		function PLUGIN:PlayerInitialSpawn( ply )
+			self:Team( ply )
 		end
 		
-		function PLUGIN:SetTeam( ply, TeamName )
-			if 		(TeamName == "owner") then 		ply:SetTeam(1)
-			elseif 	(TeamName == "superadmin") then ply:SetTeam(2)
-			elseif 	(TeamName == "admin") then 		ply:SetTeam(3)
-			elseif 	(TeamName == "respected") then 	ply:SetTeam(4)
-			else									ply:SetTeam(5) end
+		-- this is temporary until overv fixes PlayerRankChanged
+		function PLUGIN:PlayerSpawn( ply )
+			self:Team( ply )
+		end
+		
+		function PLUGIN:Team( ply )
+			local Rank = 5
+			if (ply:EV_IsOwner()) then
+				Rank = 1
+			elseif (ply:EV_IsSuperAdmin()) then
+				Rank = 2
+			elseif (ply:EV_IsAdmin()) then
+				Rank = 3
+			elseif (ply:EV_IsRespected()) then
+				Rank = 4
+			end
+			timer.Create("ev_teamchange"..CurTime(),0.5,1,function(ply, Rank) ply:SetTeam(Rank) end, ply, Rank)
 		end
 	end
 
