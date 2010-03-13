@@ -51,11 +51,11 @@ else
 					local title = pl:GetNWString("EV_Title")
 					if (title and title != "") then
 						local w2 = surface.GetTextSize( title ) + 6
-						drawPos.y = drawPos.y - h - 20
+						drawPos.y = drawPos.y - h - 48
 						w = math.max(w, w2)
 						h = 38
 					else
-						drawPos.y = drawPos.y - h - 12
+						drawPos.y = drawPos.y - h - 24
 					end
 						drawPos.x = drawPos.x - w / 2
 					
