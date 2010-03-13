@@ -54,17 +54,19 @@ PLUGIN.Teams = {}
 		end
 		
 		function PLUGIN:Team( ply )
-			local Rank = 5
-			if (ply:EV_IsOwner()) then
-				Rank = 1
-			elseif (ply:EV_IsSuperAdmin()) then
-				Rank = 2
-			elseif (ply:EV_IsAdmin()) then
-				Rank = 3
-			elseif (ply:EV_IsRespected()) then
-				Rank = 4
-			end
-			timer.Create("ev_teamchange"..CurTime(),0.5,1,function(ply, Rank) ply:SetTeam(Rank) end, ply, Rank)
+			timer.Create("ev_teamchange"..CurTime(),0.5,1,function(ply)
+				local Rank = 5
+				if (ply:EV_IsOwner()) then
+					Rank = 1
+				elseif (ply:EV_IsSuperAdmin()) then
+					Rank = 2
+				elseif (ply:EV_IsAdmin()) then
+					Rank = 3
+				elseif (ply:EV_IsRespected()) then
+					Rank = 4
+				end
+				ply:SetTeam(Rank) 
+			end, ply)
 		end
 	end
 
