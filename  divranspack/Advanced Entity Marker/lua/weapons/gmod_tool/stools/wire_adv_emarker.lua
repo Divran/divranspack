@@ -11,13 +11,12 @@ if ( CLIENT ) then
 	language.Add( "Tool_wire_adv_emarker_1", "Now select the entity to link to.")
 	language.Add( "Tool_wire_adv_emarker_2", "Now select the entity to unlink." )
 	language.Add( "sboxlimit_wire_adv_emarker", "You've hit adv entity marker limit!" )
-	language.Add( "undone_wireadvemarker", "Undone Adv Wire Entity Marker" )
+	language.Add( "undone_wire_adv_emarker", "Undone Adv Wire Entity Marker" )
 elseif ( SERVER ) then
-    CreateConVar('sbox_maxwire_advemarkers',30)
+    CreateConVar('sbox_maxwire_adv_emarkers',3)
 end
 
 TOOL.ClientConVar[ "model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
-
 cleanup.Register( "wire_adv_emarkers" )
 
 
@@ -26,7 +25,6 @@ function TOOL:GetModel()
 	if (!util.IsValidModel(mdl) or !util.IsValidProp(mdl)) then return "models/jaanus/wiretool/wiretool_siren.mdl" end
 	return mdl
 end
-
 
 local AdvEntityMarkers = {}
 
@@ -60,6 +58,8 @@ if (SERVER) then
 		ent:Spawn()
 		ent:Activate()
 		
+		ply:AddCount( "wire_adv_emarkers", ent )
+		
 		return ent
 	end
 	
@@ -70,7 +70,7 @@ if (SERVER) then
 		local ent = self:CreateMarker( ply, trace, self:GetModel() )
 		
 		local const = WireLib.Weld( ent, trace.Entity, trace.PhysicsBone, true )
-		undo.Create("wireadvemarker")
+		undo.Create("wire_adv_emarker")
 			undo.AddEntity( ent )
 			undo.AddEntity( const )
 			undo.SetPlayer( ply )
