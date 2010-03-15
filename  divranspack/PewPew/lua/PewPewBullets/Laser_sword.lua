@@ -4,7 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Laser Sword"
-BULLET.Category = "CloseCombat"
+BULLET.Category = "Close Combat"
 BULLET.Author = "Divran"
 BULLET.Description = "May the force be with you."
 BULLET.AdminOnly = false

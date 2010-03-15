@@ -23,8 +23,8 @@ BULLET.FireEffect = "artyfire"
 BULLET.ExplosionEffect = "big_splosion"
 
 -- Movement
-BULLET.Speed = 65
-BULLET.Gravity = 0.2
+BULLET.Speed = 80
+BULLET.Gravity = 0.25
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 

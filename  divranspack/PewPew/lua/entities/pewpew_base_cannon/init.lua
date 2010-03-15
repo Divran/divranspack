@@ -394,26 +394,28 @@ end
 -------------------------
 -- SB3 dupe functions
 
-function ENT:PreEntityCopy()
-	self.BaseClass.PreEntityCopy(self) --use this if you have to use PreEntityCopy
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.BuildDupeInfo(self.Entity)
-	if WireLib then
-		local DupeInfo = WireLib.BuildDupeInfo(self.Entity)
-		DupeInfo.pewpewInfo = self:DupeInfoTable()
-		if DupeInfo then
-			duplicator.StoreEntityModifier( self, "WireDupeInfo", DupeInfo )
+if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+	function ENT:PreEntityCopy()
+		self.BaseClass.PreEntityCopy(self) --use this if you have to use PreEntityCopy
+		local RD = CAF.GetAddon("Resource Distribution")
+		RD.BuildDupeInfo(self.Entity)
+		if WireLib then
+			local DupeInfo = WireLib.BuildDupeInfo(self.Entity)
+			DupeInfo.pewpewInfo = self:DupeInfoTable()
+			if DupeInfo then
+				duplicator.StoreEntityModifier( self, "WireDupeInfo", DupeInfo )
+			end
 		end
 	end
-end
 
-function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
-	self.BaseClass.PostEntityPaste(self, Player, Ent, CreatedEntities ) --use this if you have to use PostEntityPaste
-	local RD = CAF.GetAddon("Resource Distribution")
-	RD.ApplyDupeInfo(Ent, CreatedEntities)
-	if WireLib and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
-		local info = Ent.EntityMods.WireDupeInfo
-		WireLib.ApplyDupeInfo(Player, Ent, info, function(id) return CreatedEntities[id] end)
-		self:DupeSpawn( Player, Ent, info )
+	function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
+		self.BaseClass.PostEntityPaste(self, Player, Ent, CreatedEntities ) --use this if you have to use PostEntityPaste
+		local RD = CAF.GetAddon("Resource Distribution")
+		RD.ApplyDupeInfo(Ent, CreatedEntities)
+		if WireLib and (Ent.EntityMods) and (Ent.EntityMods.WireDupeInfo) then
+			local info = Ent.EntityMods.WireDupeInfo
+			WireLib.ApplyDupeInfo(Player, Ent, info, function(id) return CreatedEntities[id] end)
+			self:DupeSpawn( Player, Ent, info )
+		end
 	end
 end
