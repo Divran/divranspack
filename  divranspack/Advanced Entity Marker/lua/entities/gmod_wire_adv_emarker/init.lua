@@ -12,11 +12,44 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )
 	
+	self.Target = nil
+	
 	AddAdvEMarker( self.Entity )
 	
 	self.Marks = {}
+	self.Inputs = WireLib.CreateInputs( self.Entity, { "Entity [ENTITY]", "Add Entity", "Remove Entity", "Clear Entities" } )
 	self.Outputs = WireLib.CreateOutputs( self.Entity, { "First Entity [ENTITY]", "Entities [ARRAY]", "Nr" } )
 	self:SetOverlayText( "Number of entities linked: 0" )
+end
+
+function ENT:TriggerInput( name, value )
+	if (name == "Entity") then
+		if (value:IsValid()) then
+			self.Target = value
+		end
+	elseif (name == "Add Entity") then
+		if (self.Target and self.Target:IsValid()) then
+			if (value != 0) then
+				local bool, index = self:CheckEnt( self.Target )
+				if (!bool) then
+					self:AddEnt( self.Target )
+				end
+			end
+		end
+	elseif (name == "Remove Entity") then
+		if (self.Target and self.Target:IsValid()) then
+			if (value != 0) then
+				local bool, index = self:CheckEnt( self.Target )
+				if (bool) then
+					self:RemoveEnt( self.Target )
+				end
+			end
+		end
+	elseif (name == "Clear Entities") then
+		for _, ent in pairs( self.Marks ) do
+			self:RemoveEnt( ent )
+		end
+	end
 end
 
 function ENT:UpdateOutputs()
