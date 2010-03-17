@@ -18,7 +18,7 @@ function ENT:Initialize()
 	
 	self.Marks = {}
 	self.Inputs = WireLib.CreateInputs( self.Entity, { "Entity [ENTITY]", "Add Entity", "Remove Entity", "Clear Entities" } )
-	self.Outputs = WireLib.CreateOutputs( self.Entity, { "First Entity [ENTITY]", "Entities [ARRAY]", "Nr" } )
+	self.Outputs = WireLib.CreateOutputs( self.Entity, { "Entities [ARRAY]", "Nr" } )
 	self:SetOverlayText( "Number of entities linked: 0" )
 end
 
@@ -53,10 +53,36 @@ function ENT:TriggerInput( name, value )
 end
 
 function ENT:UpdateOutputs()
-	if (self.Marks and self.Marks[1] and self.Marks[1]:IsValid()) then Wire_TriggerOutput( self.Entity, "First Entity", self.Marks[1] ) end
-	Wire_TriggerOutput( self.Entity, "Entities", self.Marks )
-	Wire_TriggerOutput( self.Entity, "Nr", #self.Marks )
+	-- Adjust outputs
+	if (#self.Outputs != #self.Marks + 2) then
+		local tbl = {}
+		local types = {}
+		tbl[1] = "Entities"
+		types[1] = "ARRAY"
+		tbl[2] = "Nr"
+		types[2] = "NORMAL"
+		for I=1, math.min(#self.Marks,10) do
+			tbl[I+2] = "Entity " .. I
+			types[I+2] = "ENTITY"
+		end
+		self.Outputs = WireLib.AdjustSpecialOutputs( self.Entity, tbl, types )
+		--print("TABLE:")
+		--PrintTable(tbl)
+		--print("OUTPUTS:")
+		--PrintTable(self.Outputs)
+		for I=1,math.min(#self.Marks,10) do
+			WireLib.TriggerOutput( self.Entity, tbl[I+2], self.Marks[I] )
+		end
+	end
+	
+	-- Trigger regular outputs
+	WireLib.TriggerOutput( self.Entity, "Entities", self.Marks )
+	WireLib.TriggerOutput( self.Entity, "Nr", #self.Marks )
+	
+	-- Overlay text
 	self:SetOverlayText( "Number of entities linked: " .. #self.Marks )
+	
+	-- Yellow lines information
 	self.Entity:SetNWString( "Adv_EMarker_Marks", glon.encode( self.Marks ) )
 end
 
@@ -102,8 +128,6 @@ function ENT:BuildDupeInfo()
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
-	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
-
 	if (info.marks) then
 		local tbl = info.marks
 		
@@ -114,4 +138,6 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 		end
 		self:UpdateOutputs()
 	end
+	
+	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
 end

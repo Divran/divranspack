@@ -95,7 +95,7 @@ if (SERVER) then
 				local ret = self.marker:AddEnt(ent)
 				if (ret) then
 					self:SetStage(0)
-					ply:ChatPrint("Adv Entity Marker linked.")
+					ply:ChatPrint("Added entity: " .. tostring(ent) .. " to the Adv Entity Marker.")
 				else
 					ply:ChatPrint("The Entity Marker is already linked to that entity.")
 				end
@@ -119,7 +119,7 @@ if (SERVER) then
 				if (ret) then
 					self:SetStage(0)
 					self.marker:RemoveEnt( ent )
-					ply:ChatPrint("Adv Entity Marker unlinked.")
+					ply:ChatPrint("Removed entity: " .. tostring(ent) .. " from the Adv Entity Marker.")
 				else
 					ply:ChatPrint("The Entity Marker is not linked to that entity.")
 				end
@@ -182,11 +182,13 @@ function TOOL:DrawHUD()
 		if (marks and #marks > 0) then
 			local markerpos = self.viewing:GetPos():ToScreen()
 			for _, ent in pairs( marks ) do
-				local markpos = ent:GetPos():ToScreen()
-				if ( markpos.x > 0 and markpos.x < ScrW() and
-					 markpos.y > 0 and markpos.y < ScrW() ) then
-					surface.SetDrawColor( 255,255,100,255 )
-					surface.DrawLine( markerpos.x, markerpos.y, markpos.x, markpos.y )
+				if (ent:IsValid()) then
+					local markpos = ent:GetPos():ToScreen()
+					if ( markpos.x > 0 and markpos.x < ScrW() and
+						 markpos.y > 0 and markpos.y < ScrW() ) then
+						surface.SetDrawColor( 255,255,100,255 )
+						surface.DrawLine( markerpos.x, markerpos.y, markpos.x, markpos.y )
+					end
 				end
 			end
 		end
