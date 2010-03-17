@@ -3,10 +3,10 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Homing Missile - Normal"
+BULLET.Name = "Homing Missile - Air to surface"
 BULLET.Category = "Rockets"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires homing missiles."
+BULLET.Description = "Slow moving, deadly missile. Its limitation is that it can't fly up."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -23,29 +23,29 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "v2splode"
 
 -- Movement
-BULLET.Speed = 60
+BULLET.Speed = 35
 BULLET.Gravity = nil
 BULLET.RecoilForce = 60
 BULLET.Spread = nil
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 800
-BULLET.Radius = 325
-BULLET.RangeDamageMul = 0.5
+BULLET.Damage = 1800
+BULLET.Radius = 550
+BULLET.RangeDamageMul = 0.7
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
-BULLET.PlayerDamage = 350
+BULLET.PlayerDamage = 500
 BULLET.PlayerDamageRadius = 400
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 4
+BULLET.Reloadtime = 10
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
-BULLET.Lifetime = {6,6}
+BULLET.Lifetime = {4,4}
 BULLET.ExplodeAfterDeath = true
-BULLET.EnergyPerShot = 4800
+BULLET.EnergyPerShot = 10000
 
 BULLET.CustomInputs = { "Fire", "X", "Y", "Z", "XYZ [VECTOR]" }
 
@@ -87,6 +87,7 @@ function BULLET:InitializeFunc( self )
 	self.Entity:SetSolid( SOLID_NONE )     
 	self.FlightDirection = self.Entity:GetUp()
 	self.TargetDir = self.Entity:GetUp()
+	self.MaxZ = self.TargetDir.z
 	if (self.Cannon:IsValid()) then
 		if (self.Cannon.TargetPos and self.Cannon.TargetPos != Vector(0,0,0)) then
 			self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
@@ -142,6 +143,8 @@ function BULLET:ThinkFunc( self )
 	if (self.Cannon:IsValid()) then
 		if (self.Cannon.TargetPos and self.Cannon.TargetPos != Vector(0,0,0)) then
 			self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
+			if (self.TargetDir.z < self.MaxZ) then self.MaxZ = self.TargetDir.z end
+			self.TargetDir.z = math.min( self.TargetDir.z, self.MaxZ )
 		end
 	end
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )

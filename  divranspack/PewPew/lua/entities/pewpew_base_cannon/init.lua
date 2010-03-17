@@ -12,18 +12,27 @@ function ENT:Initialize()
 	self.Entity:SetSolid( SOLID_VPHYSICS )      
 
 	if (!self.Bullet) then return end
-	-- Custom wire inputs
+	
+	-- Adjust wire inputs
 	if (self.Bullet.CustomInputs) then
 		self.Inputs = Wire_CreateInputs( self.Entity, self.Bullet.CustomInputs )
+		self.InputsChanged = self.Bullet.Name
 	else
-		self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
+		if (!self.InputsChanged) then
+			self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
+			self.InputsChanged = "default"
+		end
 	end
 	
-	-- Custom wire outputs
+	-- Adjust wire outputs
 	if (self.Bullet.CustomOutputs) then
 		self.Outputs = Wire_CreateOutputs( self.Entity, self.Bullet.CustomOutputs )
+		self.OutputsChanged = self.Bullet.Name
 	else
-		self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+		if (!self.OutputsChanged) then
+			self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+			self.OutputsChanged = "default"
+		end
 	end
 	
 	self.CanFire = true
@@ -77,23 +86,27 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 	
 	-- Adjust wire inputs
 	if (self.Bullet.CustomInputs) then
-		if (self.Inputs and self.Inputs != self.Bullet.CustomInputs) then
+		if (self.InputsChanged and self.InputsChanged != self.Bullet.Name) then
 			self.Inputs = Wire_AdjustInputs( self.Entity, self.Bullet.CustomInputs )
+			self.InputsChanged = self.Bullet.Name
 		end
 	else
-		if (self.Inputs and self.Inputs != {"Fire", "Reload"}) then
+		if (self.InputsChanged and self.InputsChanged != "default") then
 			self.Inputs = Wire_AdjustInputs( self.Entity, { "Fire", "Reload" } )
+			self.InputsChanged = "default"
 		end
 	end
 	
 	-- Adjust wire outputs
 	if (self.Bullet.CustomOutputs) then
-		if (self.Outputs and self.Outputs != self.Bullet.CustomOutputs) then
+		if (self.OutputsChanged and self.OutputsChanged != self.Bullet.Name) then
 			self.Outputs = Wire_AdjustOutputs( self.Entity, self.Bullet.CustomOutputs )
+			self.OutputsChanged = self.Bullet.Name
 		end
 	else
-		if (self.Outputs and self.Outputs != { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" }) then
+		if (self.OutputsChanged and self.OutputsChanged != "default") then
 			self.Outputs = Wire_AdjustOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+			self.OutputsChanged = "default"
 		end
 	end
 	
@@ -387,8 +400,8 @@ function ENT:BuildDupeInfo()
 end
 
 function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
-	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
 	self:DupeSpawn( ply, ent, info )
+	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
 end
 
 -------------------------

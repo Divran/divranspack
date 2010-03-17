@@ -1,6 +1,6 @@
 -- Made by Divran
 
-EFFECT.Mat = Material( "cable/blue_elec" )
+EFFECT.Mat = Material( "cable/cable2" )
 /*---------------------------------------------------------
    Init( data table )
 ---------------------------------------------------------*/
@@ -9,8 +9,8 @@ function EFFECT:Init( data )
 	self.EndPos 	= data:GetOrigin()
 	self.Dir 		= self.EndPos - self.StartPos
 	self.Entity:SetRenderBoundsWS( self.StartPos, self.EndPos )
-	self.TracerTime = 0.3
-	self.Size = 20
+	self.TracerTime = 0.2
+	self.Size = 3
 	// Die when it reaches its target
 	self.DieTime = CurTime() + self.TracerTime
 end
@@ -32,13 +32,13 @@ end
    Draw the effect
 ---------------------------------------------------------*/
 function EFFECT:Render( )	
-	self.Size = math.max( self.Size - 0.5, 5 )
+	self.Size = math.max( self.Size - 0.1, 2 )
 	render.SetMaterial( self.Mat )
 	render.DrawBeam( self.EndPos, 		
 					 self.StartPos,
 					 self.Size,					
 					 0,					
 					 0,				
-					 Color( 255,255,255, 255 ) )
+					 Color( 0, 255, 0, 255 ) )
 					 
 end

@@ -316,7 +316,7 @@ function pewpew:RepairHealth( ent, amount )
 	if (!self:CheckValid( ent )) then return end
 	if (!self:CheckAllowed( ent )) then return end
 	if (!ent.pewpew) then ent.pewpew = {} end
-	if (!ent.pewpewHealth or !ent.MaxMass) then return end
+	if (!ent.pewpewHealth or !ent.pewpewMaxMass) then return end
 	if (!amount or amount == 0) then return end
 	-- Get the max allowed health
 	local phys = ent:GetPhysicsObject()
@@ -354,6 +354,21 @@ function pewpew:GetHealth( ent )
 		return ent.pewpewHealth
 	else
 		return (mass / 5 + volume)
+	end
+end
+
+-- Returns the maximum health of the entity without setting it
+function pewpew:GetMaxHealth( ent )
+	if (!self:CheckValid( ent )) then return end
+	if (!self:CheckAllowed( ent )) then return end
+	local phys = ent:GetPhysicsObject()
+	if (!phys:IsValid()) then return end
+	local volume = phys:GetVolume() / 1000
+	if (ent.pewpewMaxMass) then
+		return ent.pewpewMaxMass / 5 + volume
+	else
+		local mass = phys:GetMass() or 0
+		return mass / 5 + volume
 	end
 end
 

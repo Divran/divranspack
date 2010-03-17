@@ -4,7 +4,7 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Firework"
-BULLET.Category = "Rockets"
+BULLET.Category = "Fun"
 BULLET.Author = "Kouta"
 BULLET.Description = "Dazzle enemies with random colours!"
 BULLET.AdminOnly = false

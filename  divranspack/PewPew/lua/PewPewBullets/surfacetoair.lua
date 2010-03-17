@@ -3,10 +3,10 @@
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "Homing Missile - Normal"
+BULLET.Name = "Homing Missile - Surface to air"
 BULLET.Category = "Rockets"
 BULLET.Author = "Divran"
-BULLET.Description = "Fires homing missiles."
+BULLET.Description = "Extremely fast and accurate missile. Its limitation is that it only homes for a short period of time (0.4 seconds)."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
@@ -23,7 +23,7 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "v2splode"
 
 -- Movement
-BULLET.Speed = 60
+BULLET.Speed = 175
 BULLET.Gravity = nil
 BULLET.RecoilForce = 60
 BULLET.Spread = nil
@@ -31,21 +31,21 @@ BULLET.Spread = nil
 -- Damage
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 800
-BULLET.Radius = 325
-BULLET.RangeDamageMul = 0.5
+BULLET.Radius = 500
+BULLET.RangeDamageMul = 0.9
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 350
 BULLET.PlayerDamageRadius = 400
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 4
+BULLET.Reloadtime = 6
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
-BULLET.Lifetime = {6,6}
+BULLET.Lifetime = {0.4,6}
 BULLET.ExplodeAfterDeath = true
-BULLET.EnergyPerShot = 4800
+BULLET.EnergyPerShot = 7000
 
 BULLET.CustomInputs = { "Fire", "X", "Y", "Z", "XYZ [VECTOR]" }
 
@@ -96,16 +96,8 @@ function BULLET:InitializeFunc( self )
 	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 4
 	
 	-- Lifetime
-	self.Lifetime = false
-	if (self.Bullet.Lifetime) then
-		if (self.Bullet.Lifetime[1] > 0 and self.Bullet.Lifetime[2] > 0) then
-			if (self.Bullet.Lifetime[1] == self.Bullet.Lifetime[2]) then
-				self.Lifetime = CurTime() + self.Bullet.Lifetime[1]
-			else
-				self.Lifetime = CurTime() + math.Rand(self.Bullet.Lifetime[1],self.Bullet.Lifetime[2])
-			end
-		end
-	end
+	self.Lifetime = CurTime() + self.Bullet.Lifetime[2]
+	self.Thrust = CurTime() + self.Bullet.Lifetime[1]
 	
 	-- Trail
 	if (self.Bullet.Trail) then
@@ -135,8 +127,8 @@ BULLET.ThinkOverride = true
 function BULLET:ThinkFunc( self )
 	-- Make it fly
 	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-	if (self.TargetPos != Vector(0,0,0)) then
-		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
+	if (self.TargetPos != Vector(0,0,0) and CurTime() < self.Thrust) then
+		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 5
 		self.FlightDirection = self.FlightDirection:GetNormalized()
 	end
 	if (self.Cannon:IsValid()) then
