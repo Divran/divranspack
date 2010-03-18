@@ -89,7 +89,7 @@ function TAB:Initialize()
 		surface.SetDrawColor( 46, 46, 46, 255 )
 		surface.DrawRect( 0, 0, self.Block:GetWide(), self.Block:GetTall() )
 		
-		draw.SimpleText( "You need the Mapst List Plugin ('sh_mapslist.lua') for this tab to work.", "ScoreboardText", self.Block:GetWide() / 2, self.Block:GetTall() / 2 - 20, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
+		draw.SimpleText( "You need the Maps List Plugin ('sh_mapslist.lua') for this tab to work.", "ScoreboardText", self.Block:GetWide() / 2, self.Block:GetTall() / 2 - 20, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
 	end
 	
 	if ( table.Count(evolve.Maps) ) then self.Block:SetPos( self.Block:GetWide(), 0 ) end
