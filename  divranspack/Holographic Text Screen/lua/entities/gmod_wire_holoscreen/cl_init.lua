@@ -13,9 +13,13 @@ function ENT:Draw()
 		local posx = self:GetNWInt("holoscreen_pos_x") or 0
 		local posy = self:GetNWInt("holoscreen_pos_y") or 0
 		local posz = self:GetNWInt("holoscreen_pos_z") or 0
+		local angp = self:GetNWInt("holoscreen_ang_p") or 0
+		local angy = self:GetNWInt("holoscreen_ang_y") or 0
+		local angr = self:GetNWInt("holoscreen_ang_r") or 0
+		local ang = Angle(angr,angy,-angp)
 		local font = self:GetNWString("holoscreen_font") or "Default"
 		local size = self:GetNWInt("holoscreen_size") or 1
-		cam.Start3D2D( self:LocalToWorld( Vector(0,-posy,20) ), self:LocalToWorldAngles( Angle(0,0,90) ), size )
+		cam.Start3D2D( self:LocalToWorld( Vector(0,-posy,20) ), self:LocalToWorldAngles( Angle(0,0,90) + ang ), size )
 			surface.SetTextColor( r, g, b, a )
 			surface.SetFont( font )
 			local w, h = surface.GetTextSize( text )
