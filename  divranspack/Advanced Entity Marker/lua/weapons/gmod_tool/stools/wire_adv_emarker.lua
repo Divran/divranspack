@@ -135,7 +135,7 @@ else
 	
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_adv_emarker_name", Description = "#Tool_wire_adv_emarker_desc" })
-		WireDermaExts.ModelSelect(panel, "wire_adv_emarker_model", list.Get( "Wire_Misc_Tools_Models" ), 1)
+		WireDermaExts.ModelSelect(panel, "wire_adv_emarker_model", list.Get( "Wire_Misc_Tools_Models" ), 8)
 	end
 end
 	

@@ -61,16 +61,12 @@ function ENT:UpdateOutputs()
 		types[1] = "ARRAY"
 		tbl[2] = "Nr"
 		types[2] = "NORMAL"
-		for I=1, math.min(#self.Marks,10) do
+		for I=1, math.min(#self.Marks,20) do
 			tbl[I+2] = "Entity " .. I
 			types[I+2] = "ENTITY"
 		end
 		self.Outputs = WireLib.AdjustSpecialOutputs( self.Entity, tbl, types )
-		--print("TABLE:")
-		--PrintTable(tbl)
-		--print("OUTPUTS:")
-		--PrintTable(self.Outputs)
-		for I=1,math.min(#self.Marks,10) do
+		for I=1,math.min(#self.Marks,20) do
 			WireLib.TriggerOutput( self.Entity, tbl[I+2], self.Marks[I] )
 		end
 	end
@@ -128,6 +124,12 @@ function ENT:BuildDupeInfo()
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
+	if (!ply:CheckLimit("wire_adv_emarkers")) then 
+		ent:Remove()
+		return
+	end
+	ply:AddCount( "wire_adv_emarkers", ent )
+	
 	if (info.marks) then
 		local tbl = info.marks
 		
