@@ -4,10 +4,7 @@ include('shared.lua')
 
 ENT.WireDebugName = "Teleporter"
 
-function ENT:Initialize()
-	
-	self.Entity:SetModel( "models/props_c17/utilityconducter001.mdl" )
-	
+function ENT:Initialize()	
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )
@@ -26,6 +23,7 @@ function ENT:Initialize()
 	self.Inputs = Wire_CreateInputs( self.Entity, { "Jump", "TargetPos [VECTOR]", "X", "Y", "Z" } )
 end
 
+--[[
 CreateConVar("sbox_maxwire_teleporters", 2)
 local function MakeWireTeleporter( ply, Data )
 	if (!ply:CheckLimit("wire_teleporters")) then return end
@@ -54,6 +52,7 @@ function ENT:SpawnFunction( pl, tr )
 	
 	return ent
 end
+]]
 
 function ENT:TriggerInput(iname, value)
 	if (iname == "Jump") then
@@ -81,7 +80,7 @@ function ENT:ShowOutput()
 end
 
 function ENT:Jump()		
-	-- Check for errors
+	---- Check for errors
 	
 	-- Is already teleporting
 	if (self.Jumping) then 
