@@ -11,7 +11,7 @@ if ( CLIENT ) then
 	language.Add( "sboxlimit_wire_holoscreen", "You've hit holoscreen limit!" )
 	language.Add( "undone_wire_holoscreen", "Undone Holographic Screen" )
 elseif ( SERVER ) then
-    CreateConVar('sbox_maxwire_holoscreens',3)
+    CreateConVar('sbox_maxwire_holoscreens',10)
 end
 
 TOOL.ClientConVar[ "model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
