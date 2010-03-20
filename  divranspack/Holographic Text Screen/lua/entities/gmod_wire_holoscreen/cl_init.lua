@@ -19,11 +19,11 @@ function ENT:Draw()
 		local ang = Angle(angr,angy,-angp)
 		local font = self:GetNWString("holoscreen_font") or "Default"
 		local size = self:GetNWInt("holoscreen_size") or 1
-		cam.Start3D2D( self:LocalToWorld( Vector(0,-posy,20) ), self:LocalToWorldAngles( Angle(0,0,90) + ang ), size )
+		cam.Start3D2D( self:LocalToWorld( Vector(posx,-posy,20+posz) ), self:LocalToWorldAngles( Angle(0,0,90) + ang ), size )
 			surface.SetTextColor( r, g, b, a )
 			surface.SetFont( font )
 			local w, h = surface.GetTextSize( text )
-			surface.SetTextPos( posx-w/2, -posz-h )
+			surface.SetTextPos( -w/2, -h )
 			surface.DrawText( text )
 			--draw.SimpleText( text, "ScoreboardText", 0, 0, Clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		cam.End3D2D()
