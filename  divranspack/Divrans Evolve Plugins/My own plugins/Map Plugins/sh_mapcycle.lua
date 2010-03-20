@@ -343,7 +343,7 @@ else
 			if (nextmap and self.MapChangeAt) then
 				if (nextmap != "" and self.MapChangeAt != -1) then
 					local w, h = 250, 40
-					local x, y = ScrW() / 2 - w / 2, ScrH() - 50 - h / 2
+					local x, y = ScrW() / 2 - w / 2, ScrH() - 44 - h / 2
 					
 					local t = math.max(self.MapChangeAt-RealTime(),0)
 					local hour = math.floor(t/3600)
