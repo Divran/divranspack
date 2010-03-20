@@ -325,7 +325,7 @@ if (SERVER) then
 	end)
 	
 	-- Update the time for all players every 10 minutes
-	timer.Create( "Evolve_UpdateMapCycle", 600, 0, function() PLUGIN:SendMapInfo( nil, false ) end )
+	timer.Create( "Evolve_UpdateMapTime", 600, 0, function() PLUGIN:SendMapInfo( nil, false ) end )
 else
 	function PLUGIN:RecieveCycle( crap, stuff, decoded )
 		local sendall = decoded[1]
