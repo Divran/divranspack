@@ -16,7 +16,7 @@ if (SERVER) then
 				local trace = ply:GetEyeTrace()
 				if (!trace.Hit) then return end
 				if (trace.HitPos:Distance(ply:GetShootPos()) < 125 and trace.Entity and pewpew:CheckValid( trace.Entity )) then
-					if (trace.Entity:GetClass() == "pewpew_core" and trace.Entity.pewpewCoreHealth) then
+					if (trace.Entity:GetClass() == "pewpew_core" and trace.Entity.pewpew.CoreHealth) then
 						pewpew:RepairCoreHealth( trace.Entity, pewpew.RepairToolHealCores )
 					elseif (trace.Entity.pewpewHealth) then
 						pewpew:RepairHealth( trace.Entity, pewpew.RepairToolHeal )
