@@ -110,7 +110,7 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 		end
 	end
 	
-		
+	self:SetNWString( "BulletName", self.Bullet.Name )
 end
 
 function ENT:FireBullet()

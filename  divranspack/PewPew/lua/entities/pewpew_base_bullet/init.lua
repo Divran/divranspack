@@ -50,7 +50,7 @@ function ENT:SetOptions( BULLET, Cannon, ply )
 	self.Bullet = BULLET
 	self.Cannon = Cannon
 	self.Owner = ply
-	self.Entity:SetNetworkedString("BulletName", self.Bullet.Name)
+	self.Entity:SetNWString("BulletName", self.Bullet.Name)
 end
 
 function ENT:Explode(trace)
