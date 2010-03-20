@@ -8,22 +8,50 @@ TAB.Description = "Automatic map cycle."
 TAB.Author = "Divran"
 
 function TAB:Update()
-	if (evolve.Maps) then
-		self.MapList:Clear()
-		for _, filename in pairs(evolve.Maps) do
-			self.MapList:AddLine( filename )
-		end
-		self.MapList:SelectFirstItem()
-	end
-	
 	if (evolve.MapCycle) then
+		-- Get selected line and value
+		local line = self.CycleList:GetSelectedLine()
+		local lineval
+		if (line) then
+			lineval = self.CycleList:GetLine(line):GetValue(1)
+		end
+		
+		-- Re-fill list
 		self.CycleList:Clear()
 		for _, filename in pairs(evolve.MapCycle) do
 			self.CycleList:AddLine( filename )
 		end
-		self.CycleList:SelectFirstItem()
+		
+		-- Select the correct line
+		if (line and lineval) then
+			local line1 = self.CycleList:GetLine(line)
+			local line2 = self.CycleList:GetLine(line-1)
+			local line3 = self.CycleList:GetLine(line+1)
+			if (line1 and line1:GetValue(1) and line1:GetValue(1) == lineval) then
+				self.CycleList:SelectItem( line1 )
+			elseif (line2 and line2:GetValue(1) and line2:GetValue(1) == lineval) then
+				self.CycleList:SelectItem( line2 )
+			elseif (line3 and line3:GetValue(1) and line3:GetValue(1) == lineval) then
+				self.CycleList:SelectItem( line3 )
+			else
+				if (line2 and line2:GetValue(1)) then
+					self.CycleList:SelectItem( line2 )
+				else
+					self.CycleList:SelectFirstItem()
+				end
+			end		
+		else
+			self.CycleList:SelectFirstItem()
+		end
 	end
 end
+
+local function CallUpdate( handler )
+	if (handler == "evolve_cyclemaplist") then
+		timer.Simple( 0.1, function() TAB:Update() end )
+	end
+end
+hook.Add("CompletedIncomingStream", "CallUpdate", CallUpdate)
 
 function TAB:Initialize()
 	self.Container = vgui.Create( "DPanel", evolve.menuContainer )
@@ -37,6 +65,19 @@ function TAB:Initialize()
 	self.MapList:SetSize( self.Container:GetWide() / 2 - 2, self.Container:GetTall() - 58 )
 	self.MapList:SetMultiSelect( false )
 	self.MapList:AddColumn("Maps")
+	if (evolve.Maps) then
+		for _, filename in pairs(evolve.Maps) do
+			self.MapList:AddLine( filename )
+		end
+		self.MapList:SelectFirstItem()
+	else
+		timer.Simple( 5, function( self ) 
+				for _, filename in pairs(evolve.Maps) do
+					self.MapList:AddLine( filename )
+				end
+				self.MapList:SelectFirstItem()
+		end, TAB )
+	end
 	
 	self.CycleList = vgui.Create("DListView")
 	self.CycleList:SetParent( self.Container )
@@ -53,7 +94,7 @@ function TAB:Initialize()
 	self.AddButton:SetText( "Add Map" )
 	function self.AddButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "add", TAB.MapList:GetLine(TAB.MapList:GetSelectedLine()):GetValue(1) )
-		timer.Simple( 0.1, function() TAB:Update() end)
+		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.RemoveButton = vgui.Create("DButton", self.Container )
@@ -62,7 +103,7 @@ function TAB:Initialize()
 	self.RemoveButton:SetText( "Remove Map" )
 	function self.RemoveButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "remove", TAB.CycleList:GetSelectedLine() )
-		timer.Simple( 0.1, function() TAB:Update() end)
+		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.MoveUpButton = vgui.Create("DButton", self.Container )
@@ -72,7 +113,7 @@ function TAB:Initialize()
 	self.MoveUpButton:SetText( "Move Up" )
 	function self.MoveUpButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "moveup", TAB.CycleList:GetSelectedLine() )
-		timer.Simple( 0.1, function() TAB:Update() end)
+		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.MoveDownButton = vgui.Create("DButton", self.Container )
@@ -81,7 +122,7 @@ function TAB:Initialize()
 	self.MoveDownButton:SetText( "Move Down" )
 	function self.MoveDownButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "movedown", TAB.CycleList:GetSelectedLine() )
-		timer.Simple( 0.1, function() TAB:Update() end)
+		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.TimeList = vgui.Create( "DMultiChoice", self.Container )
@@ -94,6 +135,7 @@ function TAB:Initialize()
 								{ "1 hour", "60" },
 								{ "2 hours", "120" },
 								{ "4 hours", "240" },
+								{ "6 hours", "360" },
 								{ "8 hours", "480" },
 								{ "12 hours", "720" },
 								{ "One day", "1440" },

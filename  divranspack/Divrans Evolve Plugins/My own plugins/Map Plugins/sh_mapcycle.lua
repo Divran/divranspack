@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------------------------------------------------*/
 
 local PLUGIN = {}
-PLUGIN.Title = "Automatic Map Cycle Plugin"
+PLUGIN.Title = "Map Cycle"
 PLUGIN.Description = "Automatically cycle maps."
 PLUGIN.Author = "Divran"
 PLUGIN.ChatCommand = "mapcycle"
@@ -31,6 +31,7 @@ if (SERVER) then
 						evolve:Notify( ply, evolve.colors.red, "That map does not exist." )
 					else
 						self:AddMap( args[2] )
+						self:SendMapInfo( nil, true )
 						evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " added the map ", evolve.colors.red, args[2], evolve.colors.white, " to the map cycle list." )
 					end
 				elseif (what == "remove") then
@@ -42,6 +43,7 @@ if (SERVER) then
 							local bool, index = self:HasMap( args[2] )
 							if (bool) then
 								self:RemoveMap( index )
+								self:SendMapInfo( nil, true )
 								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " removed the map ", evolve.colors.red, args[2], evolve.colors.white, " from the map cycle list." )
 							else
 								evolve:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
@@ -52,6 +54,7 @@ if (SERVER) then
 							local mapname = self.Cycle[nr]
 							if (self:HasMap( mapname )) then
 								self:RemoveMap( nr )
+								self:SendMapInfo( nil, true )
 								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " removed the map ", evolve.colors.red, mapname, evolve.colors.white, " from the map cycle list." )
 							else
 								evolve:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
@@ -62,12 +65,12 @@ if (SERVER) then
 					self.Enabled = !self.Enabled
 					self.MapChangeAt = RealTime() + self.MapChangeInterval * 60
 					self:SaveCycle()
+					self:SendMapInfo( nil, false )
 					if (self.Enabled) then
 						evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has enabled the map cycle." )
 					else
 						evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has disabled the map cycle." )
 					end
-					self:SendMapInfo( nil, false )
 				elseif (what == "moveup") then
 					local nr = tonumber(args[2])
 					if (!nr or nr == 0) then
@@ -77,6 +80,7 @@ if (SERVER) then
 							local bool, index = self:HasMap( args[2] )
 							if (bool) then
 								local bool2 = self:MoveUp( index )
+								self:SendMapInfo( nil, true )
 								if (bool2) then
 									evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, args[2], evolve.colors.white, " one step up in the list." )
 								else
@@ -90,6 +94,7 @@ if (SERVER) then
 						if (nr > 0 and nr <= #self.Cycle) then
 							local mapname = self.Cycle[nr]
 							local bool = self:MoveUp( nr )
+							self:SendMapInfo( nil, true )
 							if (bool) then
 								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, mapname, evolve.colors.white, " one step up in the list." )
 							else
@@ -106,6 +111,7 @@ if (SERVER) then
 							local bool, index = self:HasMap( args[2] )
 							if (bool) then
 								local bool2 = self:MoveDown( index )
+								self:SendMapInfo( nil, true )
 								if (bool2) then
 									evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, args[2], evolve.colors.white, " one step down in the list." )
 								else
@@ -119,6 +125,7 @@ if (SERVER) then
 						if (nr > 0 and nr <= #self.Cycle) then
 							local mapname = self.Cycle[nr]
 							local bool = self:MoveDown( nr )
+							self:SendMapInfo( nil, true )
 							if (bool) then
 								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, mapname, evolve.colors.white, " one step down in the list." )
 							else
@@ -154,7 +161,6 @@ if (SERVER) then
 		end
 		self.Cycle[#self.Cycle+1] = mapname
 		self:SaveCycle()
-		self:SendMapInfo( nil, true )
 	end
 	
 	function PLUGIN:RemoveMap( mapnameorindex )
@@ -163,12 +169,10 @@ if (SERVER) then
 			if (bool) then
 				table.remove( self.Cycle, index )
 				self:SaveCycle()
-				self:SendMapInfo( nil, true )
 			end
 		elseif (type(mapnameorindex) == "number") then
 			table.remove( self.Cycle, mapnameorindex )
 			self:SaveCycle()
-			self:SendMapInfo( nil, true )
 		end	
 	end
 	
@@ -181,7 +185,6 @@ if (SERVER) then
 		if (to and to != "") then
 			self.Cycle[index] = to
 			self.Cycle[index-1] = from
-			self:SendMapInfo( nil, true )
 			self:SaveCycle()
 			return true
 		end
@@ -194,7 +197,6 @@ if (SERVER) then
 		if (to and to != "") then
 			self.Cycle[index] = to
 			self.Cycle[index+1] = from
-			self:SendMapInfo( nil, true )
 			self:SaveCycle()
 			return true
 		end
@@ -259,13 +261,7 @@ if (SERVER) then
 	-- Change map at the right time
 	function PLUGIN:Think()
 		local nextmap = self.Cycle[1] or ""
-		
-		-- if the nextmap has changed, re-send info to all players
-		if (self.NextMap != nextmap) then
-			self.NextMap = nextmap
-			self:SendMapInfo( nil, true )
-		end
-		
+	
 		-- Check if the next map exists
 		if (nextmap and nextmap != "" and self.Enabled) then
 			-- Check if the time has run out
@@ -275,10 +271,16 @@ if (SERVER) then
 					self:AddMap( nextmap )
 					self:SaveCycle()
 					RunConsoleCommand( "changelevel", nextmap )
+					return
 				else
 					evolve:Notify( evolve.colors.red, "Map Cycle Plugin error: Map '" .. nextmap .. "' does not exist!" )
 				end
 			end
+		end
+		
+		if (self.NextMap != nextmap) then		-- if the nextmap has changed, re-send info to all players
+			self.NextMap = nextmap
+			self:SendMapInfo( nil, true )
 		end
 	end
 	
@@ -331,12 +333,12 @@ else
 		local sendall = decoded[1]
 		if (sendall) then
 			PLUGIN.MapChangeAt = decoded[2]
-			PLUGIN.TimeDiff = RealTime() - decoded[3]
+			PLUGIN.TimeDiff = decoded[3] - RealTime()
 			PLUGIN.Enabled = decoded[4]
 			evolve.MapCycle = decoded[5]
 		else
 			PLUGIN.MapChangeAt = decoded[2]
-			PLUGIN.TimeDiff = RealTime() - decoded[3]
+			PLUGIN.TimeDiff = decoded[3] - RealTime()
 			PLUGIN.Enabled = decoded[4]
 		end
 	end
