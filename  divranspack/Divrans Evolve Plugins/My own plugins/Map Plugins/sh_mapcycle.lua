@@ -285,9 +285,9 @@ if (SERVER) then
 	-- Send map info
 	function PLUGIN:SendMapInfo( ply, sendall )
 		if (sendall) then
-			datastream.StreamToClients( ply or player.GetAll(), "evolve_cyclemaplist", { sendall, self.MapChangeAt, self.Enabled, self.Cycle } )
+			datastream.StreamToClients( ply or player.GetAll(), "evolve_cyclemaplist", { sendall, self.MapChangeAt, RealTime(), self.Enabled, self.Cycle } )
 		else
-			datastream.StreamToClients( ply or player.GetAll(), "evolve_cyclemaplist", { sendall, self.MapChangeAt, self.Enabled } )
+			datastream.StreamToClients( ply or player.GetAll(), "evolve_cyclemaplist", { sendall, self.MapChangeAt, RealTime(), self.Enabled } )
 		end
 	end
 	
@@ -323,16 +323,21 @@ if (SERVER) then
 			PLUGIN.MapChangeAt = RealTime() + PLUGIN.MapChangeInterval * 60
 		end
 	end)
+	
+	-- Update the time for all players every 10 minutes
+	timer.Create( "Evolve_UpdateMapCycle", 600, 0, function() PLUGIN:SendMapInfo( nil, false ) end )
 else
 	function PLUGIN:RecieveCycle( crap, stuff, decoded )
 		local sendall = decoded[1]
 		if (sendall) then
 			PLUGIN.MapChangeAt = decoded[2]
-			PLUGIN.Enabled = decoded[3]
-			evolve.MapCycle = decoded[4]
+			PLUGIN.TimeDiff = RealTime() - decoded[3]
+			PLUGIN.Enabled = decoded[4]
+			evolve.MapCycle = decoded[5]
 		else
 			PLUGIN.MapChangeAt = decoded[2]
-			PLUGIN.Enabled = decoded[3]
+			PLUGIN.TimeDiff = RealTime() - decoded[3]
+			PLUGIN.Enabled = decoded[4]
 		end
 	end
 	datastream.Hook( "evolve_cyclemaplist", PLUGIN.RecieveCycle )
@@ -345,7 +350,7 @@ else
 					local w, h = 250, 40
 					local x, y = ScrW() / 2 - w / 2, ScrH() - 44 - h / 2
 					
-					local t = math.max(self.MapChangeAt-RealTime(),0)
+					local t = math.max(self.MapChangeAt-RealTime()-(self.TimeDiff or 0),0)
 					local hour = math.floor(t/3600)
 					local minute = math.floor(t/60)-(60*hour)
 					local second = math.floor(t - hour * 3600 - minute*60)
