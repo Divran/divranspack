@@ -1,0 +1,12 @@
+"AddonInfo"
+{
+	"name"		"Exit Point"
+	"version"	"1"
+	"up_date"	""
+	"author_name"	"Divran"
+	"author_email"	""
+	"author_url"	""
+	
+	"info"		"Exit Point"
+	"override"	"0"
+}
