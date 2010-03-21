@@ -15,19 +15,27 @@ local function CheckRemovedEnt( ent )
 end
 hook.Add( "EntityRemoved", "ExitPointEntRemoved", CheckRemovedEnt )
 
-local function CheckAllowed( ply, exitpoint )
+local function CheckAllowed( ply, exitpoint, vehicle )
 	-- if SPP exists
 	if (CPPI) then
 		-- get the owner
 		local exitpointowner = exitpoint:CPPIGetOwner()
+		local vehicleowner = vehicle:CPPIGetOwner()
 		
-		-- if ply IS the owner
-		if ( exitpointowner == ply ) then
+		-- if the owner of the vehicle is the owner of the exit point
+		if ( exitpointowner == vehicleowner ) then
 			return true
 		end
 		
-		-- if ply has the owner in SPP Friends
+		-- if the exiting player has the owner of the exit point in SPP Friends
 		for _, friend in pairs( ply:CPPIGetFriends() ) do
+			if ( exitpointowner == friend ) then
+				return true
+			end
+		end
+		
+		-- if the owner of the vehicle has the owner of the exit point in SPP Friends
+		for _, friend in pairs( vehicleowner:CPPIGetFriends() ) do
 			if ( exitpointowner == friend ) then
 				return true
 			end
@@ -36,8 +44,11 @@ local function CheckAllowed( ply, exitpoint )
 		-- else return false
 		return false
 	else
-		-- if SPP doesn't exist, return true
-		return true
+		-- if SPP doesn't exist, check the distance between the exit point and the vehicle
+		if ( vehicle:GetPos():Distance( exitpoint:GetPos() ) < 1000 ) then
+			return true
+		end
+		return false
 	end
 	-- else return false
 	return false
@@ -49,15 +60,14 @@ local function LeaveVehicle( ply, vehicle )
 	-- Loop through all Exit Points
 	for _, ent in pairs( ExitPoints ) do
 		if (ent:IsValid()) then
-			
-			-- Check if the owner of the exit point is allowed to teleport ply
-			if (CheckAllowed( ply, ent )) then
-				
-				-- Loop through all entities of that exit point
-				if (ent.Entities and #ent.Entities > 0) then
-					for _, e in pairs( ent.Entities ) do
-						if (e:IsValid()) then
-							
+
+			-- Loop through all entities of that exit point
+			if (ent.Entities and #ent.Entities > 0) then
+				for _, e in pairs( ent.Entities ) do
+					if (e:IsValid()) then
+						
+						-- Check if the owner of the exit point controller is allowed to teleport ply
+						if (CheckAllowed( ply, ent, vehicle )) then
 							-- If that exit point is linked to the vehicle
 							if (e == vehicle) then
 								found = true
