@@ -126,6 +126,14 @@ local function CreateMenu2()
 		end
 		
 		cat:SetContents( list )
+		--[[
+		function cat:OnMousePressed()
+			foreach cat in pewpew.Categories do
+				  if ( cat:GetExpanded() ) then cat:Toggle() end
+				  if ( cat == selectedCat ) then cat:SetExpanded( false ) cat:Toggle() end
+			end
+		end
+		]]
 		list1:AddItem( cat )
 	end
 end
