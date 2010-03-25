@@ -56,7 +56,10 @@ function BULLET:Fire( self )
 	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 10)
 	
 	-- Deal damage
-	local HitPos = pewpew:SliceDamage( startpos, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self.Entity )
+	local HitPos
+	if (!pewpew:FindSafeZone( self.Entity:GetPos() )) then
+		HitPos = pewpew:SliceDamage( startpos, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self.Entity )
+	end
 	
 	-- Effects
 	self:EmitSound( self.Bullet.FireSound[1] )

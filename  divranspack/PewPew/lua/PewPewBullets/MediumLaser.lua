@@ -61,7 +61,7 @@ function BULLET:Fire( self )
 	tr.endpos = startpos + self.Entity:GetUp() * 100000 -- Whatever
 	local trace = util.TraceLine( tr )
 	local HitPos = trace.HitPos or StartPos +self.Entity:GetUp() * 100000
-	if(trace.HitNonWorld) then
+	if(trace.HitNonWorld and !pewpew:FindSafeZone(self.Entity:GetPos())) then
 		pewpew:PointDamage(trace.Entity, self.Bullet.Damage, self)
 	end
 

@@ -64,23 +64,27 @@ function BULLET:Fire( self )
 	traceData.filter = self.Entity 
 	local trace = util.TraceLine( traceData ) 
 	
-	local ent = ents.Create("pewpew_base_bullet")
-	ent:SetPos(trace.HitPos)
-	ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0))
-	ent:SetOptions(self.Bullet)
-	ent:GetTable().MoreLeft = 20
-	ent:Spawn()
-	ent:Activate()
+	if (!pewpew:FindSafeZone( self.Entity:GetPos() )) then
+		local ent = ents.Create("pewpew_base_bullet")
+		ent:SetPos(trace.HitPos)
+		ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0))
+		ent:SetOptions(self.Bullet)
+		ent:GetTable().MoreLeft = 20
+		ent:Spawn()
+		ent:Activate()
 	
-	if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
-		util.BlastDamage(self.Entity, self.Entity, trace.HitPos, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
+		if (trace.Entity and trace.Entity:IsValid()) then
+			pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+		else
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+		end
+		
+		-- Player Damage
+		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
+			util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+		end
 	end
-	
-	if (trace.Entity and trace.Entity:IsValid()) then
-		pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
-		pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
-	end
-	pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
 	
 	local effectdata = EffectData()
 	effectdata:SetOrigin(trace.HitPos)

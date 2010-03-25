@@ -3,6 +3,12 @@ AddCSLuaFile( "shared.lua" )
 include('shared.lua')
 
 function ENT:Initialize()
+
+	-- Check for damage blocked areas
+	if (pewpew:FindSafeZone(self.Entity:GetPos())) then
+		self.Bullet.Damage = 0
+	end
+	
 	if (self.Bullet.InitializeOverride) then
 		-- Allows you to override the Initialize function
 		self.Bullet:InitializeFunc( self )
@@ -47,7 +53,7 @@ function ENT:Initialize()
 end   
 
 function ENT:SetOptions( BULLET, Cannon, ply )
-	self.Bullet = BULLET
+	self.Bullet = table.Copy(BULLET)
 	self.Cannon = Cannon
 	self.Owner = ply
 	self.Entity:SetNWString("BulletName", self.Bullet.Name)
@@ -60,6 +66,11 @@ function ENT:Explode(trace)
 		tr.endpos = self.Entity:GetPos()
 		tr.filter = self.Entity
 		trace = util.TraceLine( tr )
+	end
+	if (self.Cannon:IsValid()) then
+		if (pewpew:FindSafeZone( self.Cannon:GetPos() )) then
+			self.Bullet.Damage = 0
+		end
 	end
 	if (self.Bullet.ExplodeOverride) then
 		-- Allows you to override the Explode function

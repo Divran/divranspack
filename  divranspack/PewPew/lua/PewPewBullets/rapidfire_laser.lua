@@ -67,7 +67,7 @@ function BULLET:Fire( self )
 	tr.endpos = startpos + direction * 100000 -- Whatever
 	local trace = util.TraceLine( tr )
 	local HitPos = trace.HitPos or StartPos + direction * 100000
-	if(trace.HitNonWorld) then
+	if(trace.HitNonWorld and !pewpew:FindSafeZone(self.Entity:GetPos())) then
 		pewpew:PointDamage(trace.Entity, self.Bullet.Damage, self)
 	end
 	
@@ -75,7 +75,7 @@ function BULLET:Fire( self )
 	self:EmitSound( self.Bullet.FireSound[1] )
 	
 	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + direction * self.Bullet.SliceDistance)  )
+	effectdata:SetOrigin( HitPos  )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 end

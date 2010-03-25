@@ -43,13 +43,15 @@ BULLET.ExplodeOverride = true
 function BULLET:Explode( self, trace )
 	if (!trace or !trace.Hit) then return end
 	if (trace.Entity and trace.Entity:IsValid()) then
-		local dir = (self:GetPos() - trace.HitPos):GetNormalized()
-		if (trace.Entity:IsPlayer()) then
-			trace.Entity:SetVelocity( dir * 1000 )
-		else
-			local phys = trace.Entity:GetPhysicsObject()
-			if (phys) then
-				phys:ApplyForceCenter( dir * 10000000 )
+		if (!pewpew:FindSafeZone(trace.Entity:GetPos())) then
+			local dir = (self:GetPos() - trace.HitPos):GetNormalized()
+			if (trace.Entity:IsPlayer()) then
+				trace.Entity:SetVelocity( dir * 1000 )
+			else
+				local phys = trace.Entity:GetPhysicsObject()
+				if (phys) then
+					phys:ApplyForceCenter( dir * 10000000 )
+				end
 			end
 		end
 		WorldSound( self.Bullet.ExplosionSound[1], trace.HitPos+trace.HitNormal*5,100,100)

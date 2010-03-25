@@ -45,7 +45,7 @@ function ENT:Initialize()
 end
 
 function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
- 	self.Bullet = BULLET
+ 	self.Bullet = table.Copy(BULLET)
 	self.Owner = ply
 	
 	-- No ammo at all?

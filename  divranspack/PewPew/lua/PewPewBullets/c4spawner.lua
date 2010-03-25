@@ -30,7 +30,6 @@ function BULLET:Fire( self )
 	Bullet = pewpew:GetBullet("C4")
 	
 	ply = self.Owner
-	print("ply: " .. tostring(ply))
 	
 	if (!Bullet) then 
 		ply:ChatPrint("This server does not have C4.") 

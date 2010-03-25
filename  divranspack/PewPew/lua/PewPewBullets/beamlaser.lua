@@ -42,16 +42,16 @@ function BULLET:Fire( self )
 	-- Deal damage
 	local tr = {}
 	tr.start = startpos
-	tr.endpos = startpos + self.Entity:GetUp() * 10000
+	tr.endpos = startpos + self.Entity:GetUp() * 100000
 	tr.filter = self.Entity
 	local trace = util.TraceLine( tr )
 	
-	if (trace.Entity and trace.Entity:IsValid()) then
+	if (trace.Entity and trace.Entity:IsValid() and !pewpew:FindSafeZone( self.Entity:GetPos() )) then
 		pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
 	end
 	
 	local effectdata = EffectData()
-	effectdata:SetOrigin( trace.HitPos or ( startpos + self.Entity:GetUp() * 10000 )  )
+	effectdata:SetOrigin( trace.HitPos or ( startpos + self.Entity:GetUp() * 100000 )  )
 	effectdata:SetStart( startpos )
 	effectdata:SetEntity( self.Entity )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
