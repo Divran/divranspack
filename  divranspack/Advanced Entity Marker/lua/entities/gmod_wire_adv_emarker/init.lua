@@ -141,5 +141,6 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 		self:UpdateOutputs()
 	end
 	
+	ent:SetPlayer( ply )
 	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
 end

@@ -1,12 +1,12 @@
 "AddonInfo"
 {
-	"name"		"Adv Entity Marker"
+	"name"		"Holographic Text Screen"
 	"version"	"1"
 	"up_date"	""
 	"author_name"	"Divran"
 	"author_email"	""
 	"author_url"	""
 	
-	"info"		"Adv Entity Marker"
+	"info"		"Holographic Text Screen"
 	"override"	"0"
 }

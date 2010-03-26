@@ -125,6 +125,7 @@ function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 		ent:Remove()
 		return
 	end
+	ent:SetPlayer( ply )
 	ply:AddCount( "wire_holoscreens", ent )
 	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
 end

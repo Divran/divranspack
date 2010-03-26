@@ -33,11 +33,15 @@ function AddAdvEMarker( ent )
 end
 
 local function CheckRemovedEnt( ent )
-	for _, e in pairs( AdvEntityMarkers ) do
+	for index, e in pairs( AdvEntityMarkers ) do
 		if (e:IsValid()) then
-			local bool, index = e:CheckEnt( ent )
-			if (bool) then
-				e:RemoveEnt( ent )
+			if (e == ent) then
+				table.remove( AdvEntityMarkers, index )
+			else
+				local bool, index = e:CheckEnt( ent )
+				if (bool) then
+					e:RemoveEnt( ent )
+				end
 			end
 		end
 	end
@@ -54,6 +58,8 @@ if (SERVER) then
 		ent:SetModel( Model )
 		ent:SetPos( trace.HitPos - trace.HitNormal * ent:OBBMins().z )
 		ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
+		
+		ent:SetPlayer( ply )
 		
 		ent:Spawn()
 		ent:Activate()

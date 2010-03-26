@@ -22,7 +22,7 @@ local function CheckAllowed( ply, exitpoint, vehicle )
 		local exitpointowner = exitpoint:CPPIGetOwner()
 		local vehicleowner = vehicle:CPPIGetOwner()
 		
-		-- if the owner of the vehicle is the owner of the exit point
+		-- if the owner of the vehicle is equal to the owner of the exit point
 		if ( exitpointowner == vehicleowner ) then
 			return true
 		end

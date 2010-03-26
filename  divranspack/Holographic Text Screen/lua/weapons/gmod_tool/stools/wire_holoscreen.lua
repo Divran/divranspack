@@ -35,6 +35,8 @@ if (SERVER) then
 		ent:SetPos( trace.HitPos - trace.HitNormal * ent:OBBMins().z )
 		ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
 		
+		ent:SetPlayer( ply )
+		
 		ent:Spawn()
 		ent:Activate()
 		
@@ -87,8 +89,6 @@ function TOOL:UpdateGhostScreen( ent, ply )
 	
 	ent:SetNoDraw( false )
 end
-
-TOOL.viewing = nil
 
 function TOOL:Think()
 	local model = self:GetModel()
