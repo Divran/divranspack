@@ -60,6 +60,7 @@ end
 
 -- Point Damage - (Deals damage to 1 single entity)
 function pewpew:PointDamage( TargetEntity, Damage, DamageDealer )
+	if (!self.Damage) then return end
 	if (TargetEntity:IsPlayer()) then
 		if (DamageDealer and DamageDealer:IsValid()) then
 			TargetEntity:TakeDamage( Damage, DamageDealer )
@@ -545,11 +546,11 @@ local function ToggleDamage( ply, command, arg )
 		local msg = " has changed PewPew Damage and it is now "
 		if (pewpew.Damage) then
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "ON!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
 			end
 		else
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "OFF!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
 			end
 		end
 	end
@@ -568,11 +569,11 @@ local function ToggleFiring( ply, command, arg )
 		local msg = " has changed PewPew Firing and it is now "
 		if (pewpew.Firing) then
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "ON!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
 			end
 		else
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "OFF!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
 			end
 		end
 	end
@@ -591,11 +592,11 @@ local function ToggleNumpads( ply, command, arg )
 		local msg = " has changed PewPew Numpads and they are now "
 		if (pewpew.Numpads) then
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "ENABLED!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
 			end
 		else
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "DISABLED!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
 			end
 		end
 	end
@@ -611,7 +612,7 @@ local function DamageMul( ply, command, arg )
 		local msg = " has changed the PewPew Damage Multiplier to "
 		if (ply:IsValid()) then name = ply:Nick() end
 		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( name .. msg .. pewpew.DamageMul)
+			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.DamageMul)
 		end
 	end
 end
@@ -626,7 +627,7 @@ local function CoreDamageMul( ply, command, arg )
 		local msg = " has changed the PewPew Core Damage Multiplier to "
 		if (ply:IsValid()) then name = ply:Nick() end
 		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( name .. msg .. pewpew.CoreDamageMul)
+			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.CoreDamageMul)
 		end
 	end
 end
@@ -644,11 +645,11 @@ local function ToggleCoreDamageOnly( ply, command, arg )
 		local msg = " has changed PewPew Core Damage Only and it is now "
 		if (pewpew.CoreDamageOnly) then
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "ON!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
 			end
 		else
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg .. "OFF!")
+				v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
 			end
 		end
 	end
@@ -664,7 +665,7 @@ local function RepairToolHeal( ply, command, arg )
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed the speed at which the Repair Tool heals to "
 		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( name .. msg .. pewpew.RepairToolHeal)
+			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHeal)
 		end
 	end
 end
@@ -679,7 +680,7 @@ local function RepairToolHealCores( ply, command, arg )
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed the speed at which the Repair Tool heals cores to "
 		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( name .. msg .. pewpew.RepairToolHealCores)
+			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHealCores)
 		end
 	end
 end
@@ -698,11 +699,11 @@ local function ToggleEnergyUsage( ply, command, arg )
 			local msg = " has changed PewPew Energy Usage and it is now "
 			if (pewpew.EnergyUsage) then
 				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( name .. msg .. "ENABLED!")
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
 				end
 			else
 				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( name .. msg .. "DISABLED!")
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
 				end
 			end
 		else
@@ -710,7 +711,7 @@ local function ToggleEnergyUsage( ply, command, arg )
 			if (ply:IsValid()) then name = ply:Nick() end
 			local msg = " tried to enable PewPew Energy Usage, but the server does not have the required addons (Spacebuild 3 & co.)!"
 			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( name .. msg )
+				v:ChatPrint( "[PewPew] " .. name .. msg )
 			end
 		end
 	end

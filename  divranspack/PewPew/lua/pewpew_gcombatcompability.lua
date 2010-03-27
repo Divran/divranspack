@@ -74,6 +74,7 @@ function gcombat.hcghit( entity, damage, pierce, src, dest)
 		effectdata1:SetRadius( 100 )
 		util.Effect( "RPGShotDown", effectdata1 )
 	end
+	return attack
 end
 cbt_dealhcghit = gcombat.hcghit
 
@@ -111,6 +112,7 @@ function gcombat.nrghit( entity, damage, pierce, src, dest)
 		effectdata1:SetStart(dest)
 		util.Effect( "ener_fail", effectdata1 )
 	end
+	return attack
 end
 cbt_dealnrghit = gcombat.nrghit
 

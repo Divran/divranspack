@@ -51,16 +51,37 @@ BULLET.EnergyPerShot = 600
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	-- Get the start position
+	local startpos
+	local direction
+	
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 10)
+
+	if (self.Direction == 1) then -- Up
+		direction = self.Entity:GetUp()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.z/2)
+	elseif (self.Direction == 2) then -- Down
+		direction = self.Entity:GetUp() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.z/2)
+	elseif (self.Direction == 3) then -- Left
+		direction = self.Entity:GetRight() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.y/2)
+	elseif (self.Direction == 4) then -- Right
+		direction = self.Entity:GetRight()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.y/2)
+	elseif (self.Direction == 5) then -- Forward
+		direction = self.Entity:GetForward()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.x/2)
+	elseif (self.Direction == 6) then -- Back
+		direction = self.Entity:GetForward() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.x/2)
+	end
 	
 	-- Deal damage
 	local tr = {}
 	tr.start = startpos
-	tr.endpos = startpos + self.Entity:GetUp() * 100000 -- Whatever
+	tr.endpos = startpos + direction * 100000 -- Whatever
 	local trace = util.TraceLine( tr )
-	local HitPos = trace.HitPos or StartPos +self.Entity:GetUp() * 100000
+	local HitPos = trace.HitPos or StartPos + direction * 100000
 	if(trace.HitNonWorld and !pewpew:FindSafeZone(self.Entity:GetPos())) then
 		pewpew:PointDamage(trace.Entity, self.Bullet.Damage, self)
 	end
@@ -69,7 +90,7 @@ function BULLET:Fire( self )
 	self:EmitSound( self.Bullet.FireSound[1] )
 	
 	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * self.Bullet.SliceDistance)  )
+	effectdata:SetOrigin( HitPos or (startpos + direction * self.Bullet.SliceDistance)  )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 end

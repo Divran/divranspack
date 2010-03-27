@@ -33,6 +33,8 @@ function pewpew:GetBullet( BulletName )
 	return nil
 end
 
+------------------------------------------------------------------------------------------------------------
+
 -- Development number (this function doesn't quite work correctly yet)
 function pewpew:DevNum( BulletName )
 	local bullet = self:GetBullet( BulletName )

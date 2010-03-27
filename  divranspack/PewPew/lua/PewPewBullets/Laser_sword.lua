@@ -53,18 +53,39 @@ BULLET.EnergyPerShot = 75
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	-- Get the start position
+	local startpos
+	local Dir
+	
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 2)
+	
+	if (self.Direction == 1) then -- Up
+		Dir = self.Entity:GetUp()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2)
+	elseif (self.Direction == 2) then -- Down
+		Dir = self.Entity:GetUp() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2)
+	elseif (self.Direction == 3) then -- Left
+		Dir = self.Entity:GetRight() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2)
+	elseif (self.Direction == 4) then -- Right
+		Dir = self.Entity:GetRight()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2)
+	elseif (self.Direction == 5) then -- Forward
+		Dir = self.Entity:GetForward()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2)
+	elseif (self.Direction == 6) then -- Back
+		Dir = self.Entity:GetForward() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2)
+	end
 	
 	-- Deal damage
 	if (!pewpew:FindSafeZone(self.Entity:GetPos())) then
-		local HitPos = pewpew:SliceDamage( startpos, self.Entity:GetUp(), self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self.Entity )
+		local HitPos = pewpew:SliceDamage( startpos, Dir, self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self.Entity )
 	end
 	
 	local effectdata = EffectData()
 	effectdata:SetStart( startpos )
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * self.Bullet.SliceDistance) )
+	effectdata:SetOrigin( HitPos or (startpos + Dir * self.Bullet.SliceDistance) )
 	effectdata:SetEntity( self.Entity )
 	util.Effect( self.Bullet.FireEffect, effectdata )
 end

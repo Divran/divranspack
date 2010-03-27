@@ -53,13 +53,36 @@ BULLET.CustomOutputs = nil
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	-- Get the start position
+	-- Calculate initial position of bullet
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z / 2 + 10)
+	local startpos
+	local direction
 	
-	local spread = Angle(math.Rand(-BULLET.Spread,BULLET.Spread),math.Rand(-BULLET.Spread,BULLET.Spread),0)
-	local direction = self.Entity:GetUp()
-	direction:Rotate(spread)
+	if (self.Direction == 1) then -- Up
+		direction = self.Entity:GetUp()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.z/2)
+	elseif (self.Direction == 2) then -- Down
+		direction = self.Entity:GetUp() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.z/2)
+	elseif (self.Direction == 3) then -- Left
+		direction = self.Entity:GetRight() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.y/2)
+	elseif (self.Direction == 4) then -- Right
+		direction = self.Entity:GetRight()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.y/2)
+	elseif (self.Direction == 5) then -- Forward
+		direction = self.Entity:GetForward()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.x/2)
+	elseif (self.Direction == 6) then -- Back
+		direction = self.Entity:GetForward() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.x/2)
+	end
+	
+	local num = self.Bullet.Spread
+	if (num) then
+		local spread = Angle(math.Rand(-num,num),math.Rand(-num,num),0)
+		direction:Rotate(spread)
+	end
 	
 	-- Deal damage
 	local tr = {}

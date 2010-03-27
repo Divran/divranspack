@@ -15,22 +15,22 @@ function ENT:Initialize()
 	
 	-- Adjust wire inputs
 	if (self.Bullet.CustomInputs) then
-		self.Inputs = Wire_CreateInputs( self.Entity, self.Bullet.CustomInputs )
+		self.Inputs = WireLib.CreateInputs( self.Entity, self.Bullet.CustomInputs )
 		self.InputsChanged = self.Bullet.Name
 	else
 		if (!self.InputsChanged) then
-			self.Inputs = Wire_CreateInputs( self.Entity, { "Fire", "Reload" } )
+			self.Inputs = WireLib.CreateInputs( self.Entity, { "Fire", "Reload" } )
 			self.InputsChanged = "default"
 		end
 	end
 	
 	-- Adjust wire outputs
 	if (self.Bullet.CustomOutputs) then
-		self.Outputs = Wire_CreateOutputs( self.Entity, self.Bullet.CustomOutputs )
+		self.Outputs = WireLib.CreateOutputs( self.Entity, self.Bullet.CustomOutputs )
 		self.OutputsChanged = self.Bullet.Name
 	else
 		if (!self.OutputsChanged) then
-			self.Outputs = Wire_CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+			self.Outputs = WireLib.CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
 			self.OutputsChanged = "default"
 		end
 	end
@@ -39,14 +39,16 @@ function ENT:Initialize()
 	self.LastFired = 0
 	self.Firing = false
 	self.SoundTimer = 0
+	if (!self.Direction) then self.Direction = 1 end
 	
 	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	Wire_TriggerOutput( self.Entity, "Can Fire", 1 )
 end
 
-function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
+function ENT:SetOptions( BULLET, ply, firekey, reloadkey, FireDirection )
  	self.Bullet = table.Copy(BULLET)
 	self.Owner = ply
+	self.Direction = tonumber(FireDirection) or 1
 	
 	-- No ammo at all?
 	if (!self.Ammo) then
@@ -87,12 +89,12 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 	-- Adjust wire inputs
 	if (self.Bullet.CustomInputs) then
 		if (self.InputsChanged and self.InputsChanged != self.Bullet.Name) then
-			self.Inputs = Wire_AdjustInputs( self.Entity, self.Bullet.CustomInputs )
+			self.Inputs = WireLib.AdjustInputs( self.Entity, self.Bullet.CustomInputs )
 			self.InputsChanged = self.Bullet.Name
 		end
 	else
 		if (self.InputsChanged and self.InputsChanged != "default") then
-			self.Inputs = Wire_AdjustInputs( self.Entity, { "Fire", "Reload" } )
+			self.Inputs = WireLib.AdjustInputs( self.Entity, { "Fire", "Reload" } )
 			self.InputsChanged = "default"
 		end
 	end
@@ -100,12 +102,12 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey )
 	-- Adjust wire outputs
 	if (self.Bullet.CustomOutputs) then
 		if (self.OutputsChanged and self.OutputsChanged != self.Bullet.Name) then
-			self.Outputs = Wire_AdjustOutputs( self.Entity, self.Bullet.CustomOutputs )
+			self.Outputs = WireLib.AdjustOutputs( self.Entity, self.Bullet.CustomOutputs )
 			self.OutputsChanged = self.Bullet.Name
 		end
 	else
 		if (self.OutputsChanged and self.OutputsChanged != "default") then
-			self.Outputs = Wire_AdjustOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+			self.Outputs = WireLib.AdjustOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
 			self.OutputsChanged = "default"
 		end
 	end
@@ -137,25 +139,49 @@ function ENT:FireBullet()
 		ent:SetModel( self.Bullet.Model )
 		-- Set used bullet
 		ent:SetOptions( self.Bullet, self, self.Owner )
+		
 		-- Calculate initial position of bullet
 		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
 		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-		local Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z/2 + bulletboxsize.z/2)
+		local Pos
+		local Dir
+		
+		if (self.Direction == 1) then -- Up
+			Dir = self.Entity:GetUp()
+			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+bulletboxsize.z/2)
+		elseif (self.Direction == 2) then -- Down
+			Dir = self.Entity:GetUp() * -1
+			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+bulletboxsize.z/2)
+		elseif (self.Direction == 3) then -- Left
+			Dir = self.Entity:GetRight() * -1
+			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+bulletboxsize.y/2)
+		elseif (self.Direction == 4) then -- Right
+			Dir = self.Entity:GetRight()
+			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+bulletboxsize.y/2)
+		elseif (self.Direction == 5) then -- Forward
+			Dir = self.Entity:GetForward()
+			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+bulletboxsize.x/2)
+		elseif (self.Direction == 6) then -- Back
+			Dir = self.Entity:GetForward() * -1
+			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+bulletboxsize.x/2)
+		end
+	
 		ent:SetPos( Pos )
 		-- Add random angle offset
 		local num = self.Bullet.Spread or 0
 		local randomang = Angle(0,0,0)
-		if (num) then
+		if (num) then 
 			randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
+			Dir:Rotate(randomang)
 		end	
-		ent:SetAngles( self.Entity:GetAngles() + randomang )
+		ent:SetAngles( Dir:Angle() + Angle(90,0,0) )
 		-- Spawn
 		ent:Spawn()
 		ent:Activate()
 		
 		-- Recoil
 		if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
-			self.Entity:GetPhysicsObject():AddVelocity( self.Entity:GetUp() * -self.Bullet.RecoilForce )
+			self.Entity:GetPhysicsObject():AddVelocity( Dir * -self.Bullet.RecoilForce )
 		end
 		
 		-- Sound
@@ -173,7 +199,7 @@ function ENT:FireBullet()
 		if (self.Bullet.FireEffect) then
 			local effectdata = EffectData()
 			effectdata:SetOrigin( Pos )
-			effectdata:SetNormal( self:GetUp() )
+			effectdata:SetNormal( Dir )
 			util.Effect( self.Bullet.FireEffect, effectdata )
 		end
 		
@@ -342,6 +368,7 @@ function ENT:DupeInfoTable()
 	ret.BulletName = self.Bullet.Name
 	ret.FireKey = self.FireKey
 	ret.ReloadKey = self.ReloadKey
+	ret.Direction = self.Direction
 	local phys = self.Entity:GetPhysicsObject()
 	if (phys) then
 		ret.Mass = phys:GetMass()
@@ -358,12 +385,12 @@ function ENT:DupeSpawn( ply, ent, info )
 		local bullet = pewpew:GetBullet( info.pewpewInfo.BulletName )
 		if (bullet) then
 			if (bullet.AdminOnly and !ply:IsAdmin()) then 
-				ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+				ply:ChatPrint("[PewPew] You must be an admin to spawn this PewPew weapon.")
 				ent:Remove()
 				return false
 			end
 			if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
-				ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+				ply:ChatPrint("[PewPew] You must be a super admin to spawn this PewPew weapon.")
 				ent:Remove()
 				return false
 			end
@@ -375,10 +402,10 @@ function ENT:DupeSpawn( ply, ent, info )
 				AmmoReloadtime = 0,
 				FireOverride = true
 			}
-			function blt:Fire(self) self.Owner:ChatPrint("You must update this cannon with a valid bullet before you can fire.") end
-			ply:ChatPrint("PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
+			function blt:Fire(self) self.Owner:ChatPrint("[Pewpew] You must update this cannon with a valid bullet before you can fire.") end
+			ply:ChatPrint("[PewPew] PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
 		end
-		self:SetOptions( bullet, ply, info.pewpewInfo.FireKey or "1", info.pewpewInfo.ReloadKey or "2")
+		self:SetOptions( bullet, ply, info.pewpewInfo.FireKey or "1", info.pewpewInfo.ReloadKey or "2", info.pewpewInfo.Direction )
 		self:Initialize()
 	end
 	local phys = ent:GetPhysicsObject()

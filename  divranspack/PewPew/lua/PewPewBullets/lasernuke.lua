@@ -50,15 +50,36 @@ BULLET.EnergyPerShot = 11000000
 
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
-function BULLET:Fire( self )
-	-- Get the start position
+function BULLET:Fire( self, Pos, Dir )
+	local startpos
+	local Dir
+	
 	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos = self.Entity:GetPos() + self.Entity:GetUp() * (boxsize.z / 2 + 10)
+	
+	if (self.Direction == 1) then -- Up
+		Dir = self.Entity:GetUp()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2)
+	elseif (self.Direction == 2) then -- Down
+		Dir = self.Entity:GetUp() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2)
+	elseif (self.Direction == 3) then -- Left
+		Dir = self.Entity:GetRight() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2)
+	elseif (self.Direction == 4) then -- Right
+		Dir = self.Entity:GetRight()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2)
+	elseif (self.Direction == 5) then -- Forward
+		Dir = self.Entity:GetForward()
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2)
+	elseif (self.Direction == 6) then -- Back
+		Dir = self.Entity:GetForward() * -1
+		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2)
+	end
 	
 	-- Start a trace
 	local tr = {}
 	tr.start = startpos
-	tr.endpos = startpos + self.Entity:GetUp() * 50000
+	tr.endpos = startpos + Dir * 50000
 	tr.filter = self.Entity
 	local trace = util.TraceLine( tr )
 	
@@ -67,7 +88,7 @@ function BULLET:Fire( self )
 	-- Effects
 	self:EmitSound( self.Bullet.FireSound[1] )
 	local effectdata = EffectData()
-	effectdata:SetOrigin( HitPos or (startpos + self.Entity:GetUp() * 50000 ) )
+	effectdata:SetOrigin( HitPos or (startpos + Dir * 50000 ) )
 	effectdata:SetStart( startpos )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 	

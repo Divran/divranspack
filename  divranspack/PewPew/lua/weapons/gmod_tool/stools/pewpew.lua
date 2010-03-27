@@ -7,6 +7,7 @@ TOOL.ClientConVar[ "bulletname" ] = ""
 TOOL.ClientConVar[ "model" ] = "models/combatmodels/tank_gun.mdl"
 TOOL.ClientConVar[ "fire_key" ] = "1"
 TOOL.ClientConVar[ "reload_key" ] = "2"
+TOOL.ClientConVar[ "direction" ] = "1"
 
 cleanup.Register("pewpew")
 
@@ -41,7 +42,12 @@ if (SERVER) then
 		return name
 	end
 	
-	function TOOL:CreateCannon( ply, trace, Model, Bullet, fire, reload )
+	function TOOL:GetDirection()
+		local dir = tonumber(self:GetClientInfo("direction")) or 1
+		return dir
+	end
+	
+	function TOOL:CreateCannon( ply, trace, Model, Bullet, fire, reload, Dir )
 		if (!ply:CheckLimit("pewpew")) then return end
 		local ent = ents.Create( "pewpew_base_cannon" )
 		if (!ent:IsValid()) then return end
@@ -51,7 +57,7 @@ if (SERVER) then
 		ent:SetPos( trace.HitPos - trace.HitNormal * ent:OBBMins().z )
 		ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
 		
-		ent:SetOptions( Bullet, ply, fire, reload )
+		ent:SetOptions( Bullet, ply, fire, reload, Dir )
 		
 		ent:Spawn()
 		ent:Activate()
@@ -65,17 +71,17 @@ if (SERVER) then
 		-- Get the bullet
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
 		if (!bullet) then 
-			ply:ChatPrint("That PewPew bullet does not exist!")
+			ply:ChatPrint("[PewPew] That PewPew bullet does not exist!")
 			return 
 		end
 		
 		-- Check admin only
 		if (bullet.AdminOnly and !ply:IsAdmin()) then 
-			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+			ply:ChatPrint("[PewPew] You must be an admin to spawn this PewPew weapon.")
 			return false
 		end
 		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
-			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+			ply:ChatPrint("[PewPew] You must be a super admin to spawn this PewPew weapon.")
 			return false
 		end
 		
@@ -91,16 +97,16 @@ if (SERVER) then
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
 			if (traceent.Owner != ply and !ply:IsAdmin()) then
-				ply:ChatPrint("You are not allowed to update other people's cannons.")
+				ply:ChatPrint("[PewPew] You are not allowed to update other people's cannons.")
 				return
 			end
 			-- Update it
-			traceent:SetOptions( bullet, ply, fire, reload )
-			ply:ChatPrint("PewPew Cannon updated with bullet: " .. bullet.Name)
+			traceent:SetOptions( bullet, ply, fire, reload, self:GetDirection() )
+			ply:ChatPrint("[PewPew] PewPew Cannon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
 			
-			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload )
+			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload, self:GetDirection() )
 			if (!ent or !ent:IsValid()) then return end
 			
 			if (!traceent:IsWorld() and !traceent:IsPlayer()) then
@@ -129,17 +135,17 @@ if (SERVER) then
 		-- Get the bullet
 		local bullet = pewpew:GetBullet( self:GetBulletName() )
 		if (!bullet) then 
-			ply:ChatPrint("That PewPew bullet does not exist!")
+			ply:ChatPrint("[PewPew] That PewPew bullet does not exist!")
 			return 
 		end
 		
 		-- Check admin only
 		if (bullet.AdminOnly and !ply:IsAdmin()) then 
-			ply:ChatPrint("You must be an admin to spawn this PewPew weapon.")
+			ply:ChatPrint("[PewPew] You must be an admin to spawn this PewPew weapon.")
 			return false
 		end
 		if (bullet.SuperAdminOnly and !ply:IsSuperAdmin()) then
-			ply:ChatPrint("You must be a super admin to spawn this PewPew weapon.")
+			ply:ChatPrint("[PewPew] You must be a super admin to spawn this PewPew weapon.")
 			return false
 		end
 		
@@ -155,15 +161,15 @@ if (SERVER) then
 		local traceent = trace.Entity
 		if (traceent and traceent:IsValid() and traceent:GetClass() == "pewpew_base_cannon") then
 			if (traceent.Owner != ply and !ply:IsAdmin()) then
-				ply:ChatPrint("You are not allowed to update other people's cannons.")
+				ply:ChatPrint("[PewPew] You are not allowed to update other people's cannons.")
 				return
 			end
 			-- Update it
-			traceent:SetOptions( bullet, ply, fire, reload )
-			ply:ChatPrint("PewPew Weapon updated with bullet: " .. bullet.Name)
+			traceent:SetOptions( bullet, ply, fire, reload, self:GetDirection() )
+			ply:ChatPrint("[PewPew] PewPew Weapon updated with bullet: " .. bullet.Name)
 		else
 			-- else create a new one
-			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload )
+			local ent = self:CreateCannon( ply, trace, model, bullet, fire, reload, self:GetDirection() )
 			if (!ent) then return end	
 			
 			ply:AddCount( "pewpew",ent )
@@ -228,8 +234,20 @@ else
 			Category = "PewPew",
 			Models = PewPewModels
 		})
+		
+		-- Directions
+		local Directions = {}
+		Directions.Label = "Fire Direction"
+		Directions.Options = {}
+		Directions.Options["Up"] = { pewpew_direction = 1 }
+		Directions.Options["Down"] = { pewpew_direction = 2 }
+		Directions.Options["Left"] = { pewpew_direction = 3 }
+		Directions.Options["Right"] = { pewpew_direction = 4 }
+		Directions.Options["Forward"] = { pewpew_direction = 5 }
+		Directions.Options["Back"] = { pewpew_direction = 6 }
+		CPanel:AddControl("ComboBox",Directions)
 
-		-- Bullets	
+			-- Bullets	
 			local label = vgui.Create("DLabel")
 			label:SetText("Left click to select, right click for info.")
 			label:SizeToContents()

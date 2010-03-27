@@ -27,7 +27,33 @@ BULLET.AmmoReloadtime = 0
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	Bullet = pewpew:GetBullet("C4")
+	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
+	local Pos
+	local Dir
+	
+	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
+	
+	if (self.Direction == 1) then -- Up
+		Dir = self.Entity:GetUp()
+		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+10)
+	elseif (self.Direction == 2) then -- Down
+		Dir = self.Entity:GetUp() * -1
+		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+10)
+	elseif (self.Direction == 3) then -- Left
+		Dir = self.Entity:GetRight() * -1
+		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+10)
+	elseif (self.Direction == 4) then -- Right
+		Dir = self.Entity:GetRight()
+		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+10)
+	elseif (self.Direction == 5) then -- Forward
+		Dir = self.Entity:GetForward()
+		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+10)
+	elseif (self.Direction == 6) then -- Back
+		Dir = self.Entity:GetForward() * -1
+		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+10)
+	end
+	
+	local Bullet = pewpew:GetBullet("C4")
 	
 	ply = self.Owner
 	
@@ -42,10 +68,6 @@ function BULLET:Fire( self )
 	
 	-- Pos/Model/Angle
 	ent:SetModel( self.Bullet.Model )
-	
-	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-	local Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + self.Entity:GetUp() * (boxsize.z/2 + bulletboxsize.z/2)
 	
 	if (!util.IsInWorld(Pos)) then return end
 	

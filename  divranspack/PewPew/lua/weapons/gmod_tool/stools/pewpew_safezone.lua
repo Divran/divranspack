@@ -25,7 +25,7 @@ end
 if (SERVER) then
 	CreateConVar("sbox_maxpewpew_safezones", 2)
 
-	function TOOL:CreateShield( ply, trace, model )
+	function TOOL:CreateZone( ply, trace, model )
 		local ent = ents.Create( "pewpew_safezone" )
 		if (!ent:IsValid()) then return end
 		ent:SetModel( model )
@@ -42,7 +42,7 @@ if (SERVER) then
 		if (!ply:CheckLimit("pewpew_safezones")) then return end
 		local model = self:GetZoneModel()
 		if (!model) then return end
-		local ent = self:CreateShield( ply, trace, model )
+		local ent = self:CreateZone( ply, trace, model )
 		if (!ent) then return end
 		
 		local traceent = trace.Entity
@@ -93,7 +93,7 @@ if (SERVER) then
 else
 	language.Add( "Tool_pewpew_safezone_name", "PewPew Safe Zones" )
 	language.Add( "Tool_pewpew_safezone_desc", "Used to spawn PewPew Safe Zone." )
-	language.Add( "Tool_pewpew_safezone_0", "Primary: Spawn a PewPew Safe Zone and weld it, Secondary: Spawn a PewPew Safe Zone and don't weld it, Reload: Change the model of the Saef Zone." )
+	language.Add( "Tool_pewpew_safezone_0", "Primary: Spawn a PewPew Safe Zone and weld it, Secondary: Spawn a PewPew Safe Zone and don't weld it, Reload: Change the model of the Safe Zone." )
 	language.Add( "undone_pewpew_safezone", "Undone PewPew Safe Zone" )
 	language.Add( "Cleanup_pewpew_safezones", "PewPew Safe Zone" )
 	language.Add( "Cleaned_pewpew_safezones", "Cleaned up all PewPew Safe Zone" )
