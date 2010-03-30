@@ -1,0 +1,12 @@
+"AddonInfo"
+{
+	"name"		"Adv Entity Marker"
+	"version"	"1"
+	"up_date"	""
+	"author_name"	"Divran"
+	"author_email"	""
+	"author_url"	""
+	
+	"info"		"Adv Entity Marker"
+	"override"	"0"
+}
