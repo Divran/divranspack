@@ -94,7 +94,7 @@ function ENT:TriggerInput( name, value )
 		if (value == Vector(0,0,0)) then
 			value = self.Entity:GetPos() + self.Entity:GetUp() * ((self.Ghost:OBBMaxs().z-self.Ghost:OBBMins().z) / 2 + 30)
 		else
-			if (value:Distance(self.Entity:GetPos()) > math.max((self.Ghost:OBBMaxs()-self.Ghost:OBBMins()):Length(),500)) then
+			if (value:Distance(self.Entity:GetPos()) > 500) then
 				local Dir = value-self.Entity:GetPos()
 				value = self.Entity:GetPos() + Dir:GetNormalized() * 500
 			end
@@ -115,12 +115,15 @@ function ENT:TriggerInput( name, value )
 			end
 		end
 	elseif (name == "Hide Ghost") then
-		if (value != 0) then
-			self.HideGhost = true
-			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,0)
-		else
+		if (value == 0) then
 			self.HideGhost = false
 			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,self.Color.a)
+		elseif (value == 1) then
+			self.HideGhost = true
+			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,0)
+		elseif (value == 2) then
+			self.HideGhost = true
+			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,100)
 		end
 	end
 end
