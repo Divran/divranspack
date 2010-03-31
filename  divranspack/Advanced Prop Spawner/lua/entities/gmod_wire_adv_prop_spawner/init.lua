@@ -34,9 +34,9 @@ function ENT:Initialize()
 	self.Model = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 	self.Mass = 35
 	self.Gravity = true
-	self.GhostVisible = true
+	self.GhostAlpha = false
 	
-	self.Inputs = WireLib.CreateInputs( self.Entity, { "Position [VECTOR]", "Angle [ANGLE]", "Model [STRING]", "Color [VECTOR4]", "Material [STRING]", "Skin", "Mass", "No Gravity", "Hide Ghost", "Spawn", "Undo" } )
+	self.Inputs = WireLib.CreateInputs( self.Entity, { "Position [VECTOR]", "Angle [ANGLE]", "Model [STRING]", "Color [VECTOR4]", "Material [STRING]", "Skin", "Mass", "No Gravity", "Ghost Alpha", "Spawn", "Undo" } )
 	self.Outputs = WireLib.CreateOutputs( self.Entity, { "Amount", "LastSpawned [ENTITY]", "Props [ARRAY]" } )
 	self:SetOverlayText( "Active Props: 0" )
 end
@@ -66,10 +66,7 @@ function ENT:TriggerInput( name, value )
 		end
 	elseif (name == "Color") then
 		self.Color = Color(math.Clamp(value[1],0,255),math.Clamp(value[2],0,255),math.Clamp(value[3],0,255),math.Clamp(value[4],0,255))
-		self.Ghost:SetColor(self.Color.r, self.Color.g, self.Color.b, self.Color.a)
-		if (self.HideGhost) then
-			self.Ghost:SetColor(self.Color.r, self.Color.g, self.Color.b, 0)
-		else
+		if (!self.GhostAlpha) then
 			self.Ghost:SetColor(self.Color.r, self.Color.g, self.Color.b, self.Color.a)
 		end
 	elseif (name == "Material") then
@@ -80,7 +77,7 @@ function ENT:TriggerInput( name, value )
 		self.Ghost:SetSkin( value )
 	elseif (name == "Mass") then
 		self.Mass = math.Clamp(value,0.01,50000)
-	elseif (name == "NoGravity") then
+	elseif (name == "No Gravity") then
 		if (value != 0) then
 			self.Gravity = false
 		else
@@ -114,17 +111,10 @@ function ENT:TriggerInput( name, value )
 				end
 			end
 		end
-	elseif (name == "Hide Ghost") then
-		if (value == 0) then
-			self.HideGhost = false
-			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,self.Color.a)
-		elseif (value == 1) then
-			self.HideGhost = true
-			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,0)
-		elseif (value == 2) then
-			self.HideGhost = true
-			self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,100)
-		end
+	elseif (name == "Ghost Alpha") then
+		value = math.Clamp(value,0,255)
+		self.Ghost:SetColor(self.Color.r,self.Color.g,self.Color.b,value)
+		if (value == 255) then self.GhostAlpha = false else self.GhostAlpha = true end
 	end
 end
 
