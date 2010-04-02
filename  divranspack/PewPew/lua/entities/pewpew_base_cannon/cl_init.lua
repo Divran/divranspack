@@ -24,7 +24,7 @@ function ENT:Think()
 			return self.Bullet.CLCannonThinkFunc(self)
 		end
 		
-		if (self.Bullet.Reloadtime < 0.5) then
+		if (self.Bullet.Reloadtime and self.Bullet.Reloadtime < 0.5) then
 			-- Run more often!
 			self.Entity:NextThink(CurTime())
 			return true

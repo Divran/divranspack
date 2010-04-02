@@ -76,7 +76,7 @@ function BULLET:InitializeFunc( self )
 end
 
 -- Cannon Think (Is run on: Cannon)
-BULLET.CannonThinkOverride = true
+BULLET.CannonThinkOverride = false
 function BULLET:CannonThink( self )
 	-- Nothing
 end
@@ -91,6 +91,18 @@ end
 BULLET.ExplodeOverride = false
 function BULLET:Explode( self, trace )
 	-- Nothing
+end
+
+-- This is called when the cannon collides (Is run on: Cannon)
+BULLET.CannonPhysicsCollideOverride = false
+function BULLET:CannonPhysicsCollideFunc(Data, PhysObj)
+	-- Nothing
+end
+
+-- This is called when the cannon touches another entity (Is run on: Cannon)
+BULLET.CannonTouchOverride = false
+function BULLET:CannonTouchFunc(Ent)	
+
 end
 
 -- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics) (Is run on: Bullet)

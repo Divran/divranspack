@@ -259,11 +259,23 @@ function ENT:Think()
 				end
 			end
 		end
-		if (self.Bullet.Reloadtime < 0.5) then
+		if (self.Bullet.Reloadtime and self.Bullet.Reloadtime < 0.5) then
 			-- Run more often!
 			self.Entity:NextThink( CurTime() )
 			return true
 		end
+	end
+end
+
+function ENT:PhysicsCollide( data, physobj )
+	if (self.Bullet.CannonPhysicsCollideOverride) then
+		self.Bullet.CannonPhysicsCollideFunc( self, data, physobj )
+	end
+end
+
+function ENT:Touch( Ent )
+	if (self.Bullet.CannonTouchOverride) then
+		self.Bullet.CannonTouchFunc( self, Ent )
 	end
 end
 
