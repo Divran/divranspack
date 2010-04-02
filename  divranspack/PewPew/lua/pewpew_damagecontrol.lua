@@ -28,10 +28,14 @@ end
 -- Damage Blocked Table
 pewpew.SafeZones = {}
 
+-- Damage Log
+pewpew.DamageLog = {}
+pewpew.DamageLogSend = true
+
 ------------------------------------------------------------------------------------------------------------
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
-function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt )
+function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt, DamageDealer )
 		if (!self.Damage) then return end
 	if (!Radius or Radius <= 0) then return end
 	if (!Damage or Damage <= 0) then return end
@@ -46,13 +50,13 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 					distance = Position:Distance( ent:GetPos() )
 					dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
 					if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
-					self:DealDamageBase( ent, dmg )
+					self:DealDamageBase( ent, dmg, DamageDealer )
 				end
 			else
 				distance = Position:Distance( ent:GetPos() )
 				dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
 				if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
-				self:DealDamageBase( ent, dmg )
+				self:DealDamageBase( ent, dmg, DamageDealer )
 			end
 		end
 	end
@@ -66,7 +70,7 @@ function pewpew:PointDamage( TargetEntity, Damage, DamageDealer )
 			TargetEntity:TakeDamage( Damage, DamageDealer )
 		end
 	else
-		self:DealDamageBase( TargetEntity, Damage )
+		self:DealDamageBase( TargetEntity, Damage, DamageDealer )
 	end
 end
 
@@ -100,7 +104,7 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 				if (HitEnt:IsPlayer()) then
 					HitEnt:TakeDamage( Damage, DamageDealer ) -- deal damage to players
 				elseif (self:CheckValid( HitEnt )) then
-					self:DealDamageBase( HitEnt, Damage ) -- Deal damage to entities
+					self:DealDamageBase( HitEnt, Damage, DamageDealer ) -- Deal damage to entities
 				end
 				-- new trace
 				local tr = {}
@@ -215,7 +219,7 @@ end
 -- Base Code
 
 -- Base code for dealing damage
-function pewpew:DealDamageBase( TargetEntity, Damage )
+function pewpew:DealDamageBase( TargetEntity, Damage, DamageDealer )
 		if (!self.Damage) then return end
 	-- Check for errors
 	if (!Damage or Damage == 0) then return end
@@ -237,15 +241,8 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	if (!TargetEntity.pewpewHealth) then
 		self:SetHealth( TargetEntity )
 	end
-	-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
-	local phys = TargetEntity:GetPhysicsObject()
-	if (!phys:IsValid()) then return end
-	local mass = phys:GetMass() or 0
-	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
-	local volume = phys:GetVolume() / 1000
-	if (TargetEntity.pewpewHealth > mass / 5 + volume) then
-		TargetEntity.pewpewHealth = (mass / 5 + volume) * (mass/TargetEntity.pewpewMaxMass)
-	end
+	-- Check if the entity has too much health
+	self:ReduceHealth( TargetEntity )
 	-- Check if the entity has a core
 	if (TargetEntity.pewpew.Core and self:CheckValid(TargetEntity.pewpew.Core)) then
 		self:DamageCore( TargetEntity.pewpew.Core, Damage )
@@ -256,6 +253,99 @@ function pewpew:DealDamageBase( TargetEntity, Damage )
 	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
 	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
 	self:CheckIfDead( TargetEntity )
+	
+	-- Damage Log
+	pewpew:DamageLogAdd( TargetEntity, Damage, DamageDealer )
+end
+
+------------------------------------------------------------------------------------------------------------
+-- Damage Log
+
+function pewpew:DamageLogAdd( TargetEntity, Damage, DamageDealer )
+	Damage = Damage or "- Error -"
+	
+	local DealerName
+	if (DamageDealer and DamageDealer.Owner) then
+		DealerName = DamageDealer.Owner:Nick() or "- Error -"
+	else
+		DealerName = "- Error -"
+	end
+	
+	local Weapon
+	if (DamageDealer and DamageDealer.Bullet) then
+		Weapon = DamageDealer.Bullet.Name or "- Error -"
+	else
+		Weapon = "- Error -"
+	end
+	
+	local Victim
+	local VictimName
+	if (CPPI) then
+		if (TargetEntity and TargetEntity:CPPIGetOwner()) then
+			Victim = TargetEntity:CPPIGetOwner()
+			VictimName = TargetEntity:CPPIGetOwner():Nick() or "- Error -"
+		else
+			VictimName = "- Error -"
+		end
+	else
+		VictimName = "- CPPI Not Installed -"
+	end
+	
+	local DiedB = false
+	if (self:GetHealth( TargetEntity ) < Damage) then
+		DiedB = true
+	end
+	
+	local Time = os.date( "%c", os.time() )
+	
+	local Nr = #self.DamageLog
+	if (Nr > 0 and self.DamageLog[Nr] and self.DamageLog[Nr][2] and self.DamageLog[Nr][2] == TargetEntity:EntIndex()) then
+		self.DamageLog[Nr][1] = Time
+		local add = 0
+		if (self.DamageLog[Nr] and self.DamageLog[Nr][3]) then
+			add = self.DamageLog[Nr][3]
+		end
+		self.DamageLog[Nr][3] = Damage + add
+		self.DamageLog[Nr][4] = DealerName
+		self.DamageLog[Nr][6] = DiedB
+		if (self.DamageLogSend) then
+			umsg.Start( "PewPew_Admin_Tool_SendLog_Umsg" )
+				umsg.Short(Nr)
+				umsg.String(Time)
+				umsg.Long(math.Round(self.DamageLog[Nr][3]))
+				umsg.String(DealerName)
+				umsg.Bool(DiedB)
+			umsg.End()
+			--datastream.StreamToClients( player.GetAll(), "PewPew_Admin_Tool_SendLog", { Nr, Time, math.Round(self.DamageLog[Nr][3]), DealerName, Died } )
+		end
+		if (DiedB) then
+			timer.Simple(0.1,function()
+				pewpew.DamageLog[Nr][2] = "- Died -"
+			end)
+		end
+	else
+		local ID = TargetEntity:EntIndex()
+		if (DiedB) then ID = "- Died -" end
+		local tbl = { Time, ID, math.Round(Damage), DealerName, VictimName, DiedB } 
+		table.insert( self.DamageLog, tbl )
+		if (self.DamageLogSend) then
+			umsg.Start( "PewPew_Admin_Tool_SendLog_Umsg" )
+				umsg.Short(-1)
+				umsg.String(Time)
+				umsg.Short(TargetEntity:EntIndex())
+				umsg.Long(math.Round(Damage))
+				umsg.String(DealerName)
+				umsg.String(VictimName)
+				umsg.Bool(DiedB)
+			umsg.End()
+			--datastream.StreamToClients( player.GetAll(), "PewPew_Admin_Tool_SendLog", { false, tbl } )
+		end
+	end
+	
+	if (Nr > 150) then
+		table.remove( self.DamageLog )
+	end
+	
 end
 
 ------------------------------------------------------------------------------------------------------------
@@ -302,13 +392,7 @@ end
 function pewpew:SetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
 	if (!ent.pewpew) then ent.pewpew = {} end
-	local phys = ent:GetPhysicsObject()
-	if (!phys:IsValid()) then return end
-	local mass = phys:GetMass() or 0
-	local volume = 0
-	if (!phys:GetVolume()) then volume = 100 end
-	volume = phys:GetVolume() / 1000
-	local health = mass / 5 + volume
+	local health = self:GetHealth( ent )
 	ent.pewpewHealth = health
 	ent.pewpewMaxMass = mass
 	ent:SetNWInt("pewpewHealth",health)
@@ -324,12 +408,7 @@ function pewpew:RepairHealth( ent, amount )
 	if (!ent.pewpewHealth or !ent.pewpewMaxMass) then return end
 	if (!amount or amount == 0) then return end
 	-- Get the max allowed health
-	local phys = ent:GetPhysicsObject()
-	if (!phys:IsValid()) then return end
-	local mass = phys:GetMass() or 0
-	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
-	local volume = phys:GetVolume() / 1000
-	local maxhealth = (mass / 5 + volume)
+	local maxhealth = self:GetMaxHealth( ent )
 	-- Add health
 	ent.pewpewHealth = math.Clamp(ent.pewpewHealth+math.abs(amount),0,maxhealth)
 	-- Make the health changeable again with weight tool
@@ -343,13 +422,12 @@ end
 
 -- Returns the health of the entity without setting it
 function pewpew:GetHealth( ent )
-	if (!self:CheckValid( ent )) then return end
-	if (!self:CheckAllowed( ent )) then return end
+	if (!self:CheckValid( ent )) then return 0 end
+	if (!self:CheckAllowed( ent )) then return 0 end
 	if (!ent.pewpew) then ent.pewpew = {} end
 	local phys = ent:GetPhysicsObject()
-	if (!phys:IsValid()) then return end
+	if (!phys:IsValid()) then return 0 end
 	local mass = phys:GetMass() or 0
-	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
 	local volume = phys:GetVolume() / 1000
 	if (ent.pewpewHealth) then
 		-- Check if the entity has too much health (if the player changed the mass to something huge then back again)
@@ -364,16 +442,34 @@ end
 
 -- Returns the maximum health of the entity without setting it
 function pewpew:GetMaxHealth( ent )
-	if (!self:CheckValid( ent )) then return end
-	if (!self:CheckAllowed( ent )) then return end
+	if (!self:CheckValid( ent )) then return 0 end
+	if (!self:CheckAllowed( ent )) then return 0 end
 	local phys = ent:GetPhysicsObject()
-	if (!phys:IsValid()) then return end
+	if (!phys:IsValid()) then return 0 end
 	local volume = phys:GetVolume() / 1000
+	local mass = phys:GetMass() or 0
 	if (ent.pewpewMaxMass) then
-		return ent.pewpewMaxMass / 5 + volume
+		if (mass >= ent.pewpewMaxMass) then
+			return ent.pewpewMaxMass / 5 + volume
+		else
+			return (mass / 5 + volume) * (mass/ent.pewpewMaxMass)
+		end
 	else
 		local mass = phys:GetMass() or 0
 		return mass / 5 + volume
+	end
+end
+
+-- Reduce the health if it's too much (if the player changed the mass to something huge then back again)
+function pewpew:ReduceHealth( ent )
+	if (!self:CheckValid( ent )) then return end
+	if (!self:CheckAllowed( ent )) then return end
+	if (!ent.pewpewHealth) then return end
+	local maxhp = self:GetMaxHealth( ent )
+	if (ent.pewpewHealth > maxhp) then
+		ent.pewpewHealth = maxhp
+		ent:SetNWInt("pewpewHealth",ent.pewpewHealth or 0)
+		ent:SetNWInt("pewpewMaxHealth",maxhp or 0)
 	end
 end
 
@@ -540,17 +636,20 @@ local function ToggleDamage( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
+		local OldSetting = pewpew.Damage
 		pewpew.Damage = bool
 		local name = "Console"
 		if (ply:IsValid()) then name = ply:Nick() end
 		local msg = " has changed PewPew Damage and it is now "
-		if (pewpew.Damage) then
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-			end
-		else
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+		if (OldSetting != pewpew.Damage) then
+			if (pewpew.Damage) then
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
+				end
+			else
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+				end
 			end
 		end
 	end
@@ -563,17 +662,20 @@ local function ToggleFiring( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
+		local OldSetting = pewpew.Firing
 		pewpew.Firing = bool
-		local name = "Console"
-		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has changed PewPew Firing and it is now "
-		if (pewpew.Firing) then
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-			end
-		else
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+		if (OldSetting != pewpew.Firing) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed PewPew Firing and it is now "
+			if (pewpew.Firing) then
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
+				end
+			else
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+				end
 			end
 		end
 	end
@@ -586,17 +688,20 @@ local function ToggleNumpads( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
+		local OldSetting = pewpew.Numpads
 		pewpew.Numpads = bool
-		local name = "Console"
-		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has changed PewPew Numpads and they are now "
-		if (pewpew.Numpads) then
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
-			end
-		else
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
+		if (OldSetting != pewpew.Numpads) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed PewPew Numpads and they are now "
+			if (pewpew.Numpads) then
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
+				end
+			else
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
+				end
 			end
 		end
 	end
@@ -607,12 +712,15 @@ concommand.Add("PewPew_ToggleNumpads", ToggleNumpads)
 local function DamageMul( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
+		local OldSetting = pewpew.DamageMul
 		pewpew.DamageMul = math.max( arg[1], 0.01 )
-		local name = "Console"
-		local msg = " has changed the PewPew Damage Multiplier to "
-		if (ply:IsValid()) then name = ply:Nick() end
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.DamageMul)
+		if (OldSetting != pewpew.DamageMul) then
+			local name = "Console"
+			local msg = " has changed the PewPew Damage Multiplier to "
+			if (ply:IsValid()) then name = ply:Nick() end
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.DamageMul)
+			end
 		end
 	end
 end
@@ -622,12 +730,15 @@ concommand.Add("PewPew_DamageMul",DamageMul)
 local function CoreDamageMul( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
+		local OldSetting = pewpew.CoreDamageMul
 		pewpew.CoreDamageMul = math.max( arg[1], 0.01 )
-		local name = "Console"
-		local msg = " has changed the PewPew Core Damage Multiplier to "
-		if (ply:IsValid()) then name = ply:Nick() end
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.CoreDamageMul)
+		if (OldSetting != pewpew.CoreDamageMul) then
+			local name = "Console"
+			local msg = " has changed the PewPew Core Damage Multiplier to "
+			if (ply:IsValid()) then name = ply:Nick() end
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.CoreDamageMul)
+			end
 		end
 	end
 end
@@ -639,17 +750,20 @@ local function ToggleCoreDamageOnly( ply, command, arg )
 		if (!arg[1]) then return end
 		local bool = false
 		if (tonumber(arg[1]) != 0) then bool = true end
+		local OldSetting = pewpew.CoreDamageOnly
 		pewpew.CoreDamageOnly = bool
-		local name = "Console"
-		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has changed PewPew Core Damage Only and it is now "
-		if (pewpew.CoreDamageOnly) then
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-			end
-		else
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+		if (OldSetting != pewpew.CoreDamageOnly) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed PewPew Core Damage Only and it is now "
+			if (pewpew.CoreDamageOnly) then
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
+				end
+			else
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+				end
 			end
 		end
 	end
@@ -660,12 +774,15 @@ concommand.Add("PewPew_ToggleCoreDamageOnly", ToggleCoreDamageOnly)
 local function RepairToolHeal( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
+		local OldSetting = pewpew.RepairToolHeal
 		pewpew.RepairToolHeal = math.max( arg[1], 20 )
-		local name = "Console"
-		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has changed the speed at which the Repair Tool heals to "
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHeal)
+		if (OldSetting != pewpew.RepairToolHeal) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed the speed at which the Repair Tool heals to "
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHeal)
+			end
 		end
 	end
 end
@@ -675,12 +792,15 @@ concommand.Add("PewPew_RepairToolHeal",RepairToolHeal)
 local function RepairToolHealCores( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
 		if ( !arg[1] ) then return end
+		local OldSetting = pewpew.RepairToolHealCores
 		pewpew.RepairToolHealCores = math.max( arg[1], 20 )
-		local name = "Console"
-		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has changed the speed at which the Repair Tool heals cores to "
-		for _, v in pairs( player.GetAll() ) do
-			v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHealCores)
+		if (OldSetting != pewpew.RepairToolHealCores) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed the speed at which the Repair Tool heals cores to "
+			for _, v in pairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHealCores)
+			end
 		end
 	end
 end
@@ -693,27 +813,53 @@ local function ToggleEnergyUsage( ply, command, arg )
 			if (!arg[1]) then return end
 			local bool = false
 			if (tonumber(arg[1]) != 0) then bool = true end
+			local OldSetting = pewpew.EnergyUsage
 			pewpew.EnergyUsage = bool
-			local name = "Console"
-			if (ply:IsValid()) then name = ply:Nick() end
-			local msg = " has changed PewPew Energy Usage and it is now "
-			if (pewpew.EnergyUsage) then
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
-				end
-			else
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
+			if (OldSetting != pewpew.EnergyUsage) then
+				local name = "Console"
+				if (ply:IsValid()) then name = ply:Nick() end
+				local msg = " has changed PewPew Energy Usage and it is now "
+				if (pewpew.EnergyUsage) then
+					for _, v in pairs( player.GetAll() ) do
+						v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
+					end
+				else
+					for _, v in pairs( player.GetAll() ) do
+						v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
+					end
 				end
 			end
-		else
-			local name = "Console"
-			if (ply:IsValid()) then name = ply:Nick() end
-			local msg = " tried to enable PewPew Energy Usage, but the server does not have the required addons (Spacebuild 3 & co.)!"
-			for _, v in pairs( player.GetAll() ) do
-				v:ChatPrint( "[PewPew] " .. name .. msg )
-			end
+		elseif (arg[1] != "0") then
+			local msg = "You cannot enable Energy Usage, because the server does not have the required addons (Spacebuild 3 & co.)!"
+			ply:ChatPrint( "[PewPew] " .. msg )
 		end
 	end
 end
 concommand.Add("PewPew_ToggleEnergyUsage", ToggleEnergyUsage)
+
+-- Send Damage Log
+local function ToggleDamageLog( ply, command, arg )
+	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
+		if (!arg[1]) then return end
+		local bool = false
+		if (tonumber(arg[1]) != 0) then bool = true end
+		local OldSetting = pewpew.DamageLogSend
+		pewpew.DamageLogSend = bool
+		if (OldSetting != pewpew.DamageLogSend) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed Damage Log Sending and it is now "
+			if (pewpew.DamageLogSend) then
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
+				end
+				datastream.StreamToClients( ply, "PewPew_Admin_Tool_SendLog", { true, pewpew.DamageLog } )
+			else
+				for _, v in pairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+				end
+			end
+		end
+	end
+end
+concommand.Add("PewPew_ToggleDamageLogSending", ToggleDamageLog)

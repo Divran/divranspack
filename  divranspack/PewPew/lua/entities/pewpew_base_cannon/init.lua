@@ -113,6 +113,7 @@ function ENT:SetOptions( BULLET, ply, firekey, reloadkey, FireDirection )
 	end
 	
 	self:SetNWString( "BulletName", self.Bullet.Name )
+	self:SetNWString( "PewPew_OwnerName", ply:Nick() )
 end
 
 function ENT:FireBullet()

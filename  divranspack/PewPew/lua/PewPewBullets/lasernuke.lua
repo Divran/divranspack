@@ -110,10 +110,10 @@ function BULLET:Fire( self, Pos, Dir )
 	
 	if (pewpew.Damage and !pewpew:FindSafeZone( self.Entity:GetPos() )) then
 		if (trace.Entity and trace.Entity:IsValid()) then
-			pewpew:PointDamage( trace.Entity, self.Bullet.Damage )
-			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+			pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity, self )
 		else
-			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 		end
 		util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 	end

@@ -67,7 +67,7 @@ function BULLET:Fire( self )
 		if (pewpew.Damage) then
 			util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 		end
-		pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity )
+		pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 		
 		-- Still here?
 		if (self.Entity:IsValid()) then

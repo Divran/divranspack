@@ -99,9 +99,9 @@ function BULLET:Fire( self )
 	
 		if (trace.Entity and trace.Entity:IsValid()) then
 			pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
-			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity, self )
 		else
-			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+			pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, nil, self )
 		end
 		
 		-- Player Damage
@@ -158,7 +158,7 @@ function BULLET:ThinkFunc( self )
 			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew.Damage) then
 				util.BlastDamage(self.Entity, self.Entity, trace.HitPos, self.Bullet.PlayerDamageRadius / 2, self.Bullet.PlayerDamage / 6)
 			end
-			pewpew:BlastDamage(trace.HitPos, self.Bullet.Radius / 2, self.Bullet.Damage / 6, self.Bullet.RangeDamageMul)
+			pewpew:BlastDamage(trace.HitPos, self.Bullet.Radius / 2, self.Bullet.Damage / 6, self.Bullet.RangeDamageMul, nil, self )
 			
 			self.MoreLeft = 0
 		end

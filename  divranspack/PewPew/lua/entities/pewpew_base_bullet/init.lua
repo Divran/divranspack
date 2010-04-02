@@ -57,6 +57,7 @@ function ENT:SetOptions( BULLET, Cannon, ply )
 	self.Cannon = Cannon
 	self.Owner = ply
 	self.Entity:SetNWString("BulletName", self.Bullet.Name)
+	self:SetNWString( "PewPew_OwnerName", ply:Nick() )
 end
 
 function ENT:Explode(trace)
@@ -101,10 +102,10 @@ function ENT:Explode(trace)
 		if (damagetype and type(damagetype) == "string") then
 			if (damagetype == "BlastDamage") then
 				if (trace.Entity and trace.Entity:IsValid()) then
-					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
-					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity )
+					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
+					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity, self )
 				else
-					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul )
+					pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self )
 				end
 				
 				-- Player Damage
@@ -112,9 +113,9 @@ function ENT:Explode(trace)
 					util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 				end
 			elseif (damagetype == "PointDamage") then
-				pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self.Entity )
+				pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
 			elseif (damagetype == "SliceDamage") then
-				pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Entity )
+				pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self )
 			elseif (damagetype == "EMPDamage") then
 				pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
 			elseif (damagetyp == "DefenseDamage") then

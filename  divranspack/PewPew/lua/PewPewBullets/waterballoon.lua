@@ -66,7 +66,7 @@ function BULLET:Explode(self, trace)
 
 	if (pewpew.Damage) then
 		util.BlastDamage(self.Entity, self.Entity, Pos+Norm*10, self.Bullet.Damage, self.Bullet.Radius)
-		pewpew:BlastDamage(Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
+		pewpew:BlastDamage(Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 	end
 	
 	local vOffset = trace.HitPos+Vector(0,0,2)

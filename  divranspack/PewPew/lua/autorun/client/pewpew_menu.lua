@@ -1,5 +1,8 @@
 -- PewPew Use Menu
 
+local pewpew_frame
+local pewpew_list
+
 -- Use Menu
 local function CreateMenu()
 	pewpew_frame = vgui.Create("DFrame")
@@ -64,6 +67,8 @@ concommand.Add("PewPew_UseMenu", function( ply, cmd, arg )
 	OpenUseMenu( table.concat(arg, " ") )
 end)
 
+local pewpew_weaponframe
+
 -- Weapons Menu
 local function CreateMenu2()
 	-- Main frame
@@ -92,6 +97,7 @@ local function CreateMenu2()
 	list1:EnableVerticalScrollbar( true )
 
 	-- Loop through all categories
+	pewpew.CategoryControls = {}
 	for key, value in pairs( pewpew.Categories ) do
 		-- Create a Collapsible Category for each
 		local cat = vgui.Create( "DCollapsibleCategory" )
@@ -126,14 +132,14 @@ local function CreateMenu2()
 		end
 		
 		cat:SetContents( list )
-		--[[
-		function cat:OnMousePressed()
-			foreach cat in pewpew.Categories do
-				  if ( cat:GetExpanded() ) then cat:Toggle() end
-				  if ( cat == selectedCat ) then cat:SetExpanded( false ) cat:Toggle() end
+		cat.Header.OnMousePressed = function()
+			for k,v in pairs( pewpew.CategoryControls ) do
+				if ( v:GetExpanded() ) then v:Toggle() end
 			end
+			cat:SetExpanded( false )
+			cat:Toggle()
 		end
-		]]
+		table.insert( pewpew.CategoryControls, cat )
 		list1:AddItem( cat )
 	end
 end

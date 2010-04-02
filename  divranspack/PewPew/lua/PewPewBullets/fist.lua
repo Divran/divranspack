@@ -63,34 +63,36 @@ function BULLET:CannonThink( self ) end
 
 BULLET.CannonPhysicsCollideOverride = true
 function BULLET:CannonPhysicsCollideFunc( Data, PhysObj )
-	if (!self.LastHit) then self.LastHit = 0 end
-	if (CurTime() > self.LastHit) then
-		local Target = Data.HitEntity
-		
-		if (Target:IsWorld()) then return end
-		if (!pewpew:CheckValid(Target)) then return end
-		
-		local Ent = self.Entity
-		
-		-- Check constrained entities
-		if (constraint.HasConstraints( Target ) and constraint.HasConstraints( Ent )) then
-			local const = constraint.GetAllConstrainedEntities( Target )
-			if (table.Count(const)) then
-				for k,v in pairs(const) do
-					if (v == Ent) then return false end
+	if (pewpew.Firing and pewpew.Damage) then
+		if (!self.LastHit) then self.LastHit = 0 end
+		if (CurTime() > self.LastHit) then
+			local Target = Data.HitEntity
+			
+			if (Target:IsWorld()) then return end
+			if (!pewpew:CheckValid(Target)) then return end
+			
+			local Ent = self.Entity
+			
+			-- Check constrained entities
+			if (constraint.HasConstraints( Target ) and constraint.HasConstraints( Ent )) then
+				local const = constraint.GetAllConstrainedEntities( Target )
+				if (table.Count(const)) then
+					for k,v in pairs(const) do
+						if (v == Ent) then return false end
+					end
 				end
 			end
-		end
-		
-		local TargetVel = Data.TheirOldVelocity
-		local SelfVel = Data.OurOldVelocity
-		local Vel = (TargetVel - SelfVel):Length()
-		
-		local Damage = math.Clamp(Vel ^ 2 / 450,1,10000)
+			
+			local TargetVel = Data.TheirOldVelocity
+			local SelfVel = Data.OurOldVelocity
+			local Vel = (TargetVel - SelfVel):Length()
+			
+			local Damage = math.Clamp(Vel ^ 2 / 450,1,10000)
 
-		pewpew:PointDamage( Target, Damage )
-		
-		self.LastHit = CurTime() + 0.25
+			pewpew:PointDamage( Target, Damage, self )
+			
+			self.LastHit = CurTime() + 0.25
+		end
 	end
 end
 

@@ -60,7 +60,7 @@ function BULLET:Fire( self )
 	util.Effect( self.Bullet.ExplosionEffect, effectdata )
 	
 	-- Damage
-	pewpew:EMPDamage( Pos, self.Bullet.Radius, self.Bullet.Duration )
+	pewpew:EMPDamage( Pos, self.Bullet.Radius, self.Bullet.Duration, self )
 	
 	-- Still here?
 	if (self.Entity:IsValid()) then

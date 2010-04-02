@@ -100,7 +100,7 @@ function BULLET:ThinkFunc( self )
 			WorldSound(soundpath, self:GetPos(), 100, 100)
 		end
 		
-		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
+		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 		
 		self.Entity:Remove()
 	end

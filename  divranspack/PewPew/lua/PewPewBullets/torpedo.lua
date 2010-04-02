@@ -116,7 +116,7 @@ function BULLET:ThinkFunc( self )
 		if (pewpew.Damage) then
 			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
-		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
+		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 		
 		if (self.Bullet.ExplosionEffect) then
 			local effectdata = EffectData()

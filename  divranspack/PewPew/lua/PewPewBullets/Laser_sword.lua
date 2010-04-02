@@ -80,7 +80,7 @@ function BULLET:Fire( self )
 	
 	-- Deal damage
 	if (!pewpew:FindSafeZone(self.Entity:GetPos())) then
-		local HitPos = pewpew:SliceDamage( startpos, Dir, self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self.Entity )
+		local HitPos = pewpew:SliceDamage( startpos, Dir, self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self )
 	end
 	
 	local effectdata = EffectData()
