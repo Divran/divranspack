@@ -6,6 +6,7 @@ local TAB = {}
 TAB.Title = "Bans"
 TAB.Description = "Manage bans."
 TAB.Author = "Divran"
+TAB.Icon = "gui/silkicons/lock"
 
 TAB.Bans = {}
 
@@ -46,11 +47,11 @@ if (#self.Bans == 0) then return nil, {} end
 	return nil, {}
 end
 
-function TAB:Initialize()
-	self.Container = vgui.Create( "DPanel", evolve.menuContainer )
-	self.Container:SetSize( evolve.menuw - 10, evolve.menuh )
+function TAB:Initialize( pnl )
+	self.Container = vgui.Create( "DPanel", pnl )
+	self.Container:SetSize( pnl:GetParent():GetWide() - 10, pnl:GetParent():GetTall() )
 	self.Container.Paint = function() end
-	evolve.menuContainer:AddSheet( self.Title, self.Container, "gui/silkicons/lock", false, false, self.Description )
+	--evolve.menuContainer:AddSheet( self.Title, self.Container, "gui/silkicons/lock", false, false, self.Description )
 	local w, h = self.Container:GetWide(), self.Container:GetTall()
 	
 	self.BanList = vgui.Create( "DListView", self.Container )
@@ -138,4 +139,4 @@ function TAB:Initialize()
 	end
 end
 
-evolve:RegisterMenuTab( TAB )
+evolve:RegisterTab( TAB )

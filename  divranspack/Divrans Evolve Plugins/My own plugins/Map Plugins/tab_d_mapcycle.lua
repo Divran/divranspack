@@ -6,6 +6,7 @@ local TAB = {}
 TAB.Title = "Mapcycle"
 TAB.Description = "Automatic map cycle."
 TAB.Author = "Divran"
+TAB.Icon = "gui/silkicons/world"
 
 function TAB:Update()
 	if (evolve.MapCycle) then
@@ -53,11 +54,11 @@ local function CallUpdate( handler )
 end
 hook.Add("CompletedIncomingStream", "CallUpdate", CallUpdate)
 
-function TAB:Initialize()
-	self.Container = vgui.Create( "DPanel", evolve.menuContainer )
-	self.Container:SetSize( evolve.menuw - 10, evolve.menuh )
+function TAB:Initialize( pnl )
+	self.Container = vgui.Create( "DPanel", pnl )
+	self.Container:SetSize( pnl:GetParent():GetWide() - 10, pnl:GetParent():GetTall() )
 	self.Container.Paint = function() end
-	evolve.menuContainer:AddSheet( self.Title, self.Container, "gui/silkicons/world", false, false, self.Description )
+	--evolve.menuContainer:AddSheet( self.Title, self.Container, "gui/silkicons/world", false, false, self.Description )
 
 	self.MapList = vgui.Create( "DListView" )
 	self.MapList:SetParent( self.Container )
@@ -172,4 +173,4 @@ function TAB:Initialize()
 	if ( table.Count(evolve.Maps) ) then self.Block:SetPos( self.Block:GetWide(), 0 ) end
 end
 
-evolve:RegisterMenuTab( TAB )
+evolve:RegisterTab( TAB )
