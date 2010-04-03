@@ -46,18 +46,19 @@ function ENT:Think()
 	for _, ent in pairs( self.Props ) do
 		if (!ent.pewpew) then ent.pewpew = {} end
 		if (ent and pewpew:CheckValid( ent ) and pewpew:CheckAllowed( ent )) then
+			if (!ent.pewpewHealth or !ent.pewpewMaxMass) then pewpew:SetHealth( ent ) end
 			local entcore = ent.pewpew.Core
 			local health = self.PropHealth[ent:EntIndex()] or 0
 			local enthealth = pewpew:GetHealth( ent )
-			if (!entcore or !pewpew:CheckValid(entcore)) then -- if the entity has no core
+			if (!entcore or !entcore:IsValid()) then -- if the entity has no core
 				ent.pewpew.Core = self.Entity
 				self.PropHealth[ent:EntIndex()] = enthealth
 				hp = hp + enthealth
-			elseif (entcore and pewpew:CheckValid(entcore) and entcore == self.Entity and enthealth != health) then -- if the entity's health has changed
+			elseif (entcore and entcore == self.Entity and enthealth != health) then -- if the entity's health has changed
 				hp = hp - health -- subtract the old health
 				hp = hp + enthealth -- add the new health
 				self.PropHealth[ent:EntIndex()] = enthealth
-			elseif (entcore and pewpew:CheckValid( entcore ) and entcore != self.Entity) then -- if the entity already has a core
+			elseif (entcore and entcore != self.Entity) then -- if the entity already has a core
 				self.Owner:ChatPrint("You cannot have several cores in the same contraption. Core self-destructing.")
 					local effectdata = EffectData()
 					effectdata:SetOrigin( self.Entity:GetPos() )
@@ -72,6 +73,8 @@ function ENT:Think()
 	-- Set health
 	self.pewpew.CoreHealth = hp
 	self.pewpew.CoreMaxHealth = maxhp
+	
+	if (self.pewpew.CoreHealth > self.pewpew.CoreMaxHealth) then self.pewpew.CoreHealth = self.pewpew.CoreMaxHealth end
 	
 	
 	-- Set NW ints

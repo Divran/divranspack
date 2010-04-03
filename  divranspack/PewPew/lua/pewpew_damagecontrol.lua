@@ -393,6 +393,9 @@ function pewpew:SetHealth( ent )
 	if (!self:CheckValid( ent )) then return end
 	if (!ent.pewpew) then ent.pewpew = {} end
 	local health = self:GetHealth( ent )
+	local phys = ent:GetPhysicsObject()
+	if (!phys:IsValid()) then return 0 end
+	local mass = phys:GetMass() or 0
 	ent.pewpewHealth = health
 	ent.pewpewMaxMass = mass
 	ent:SetNWInt("pewpewHealth",health)
