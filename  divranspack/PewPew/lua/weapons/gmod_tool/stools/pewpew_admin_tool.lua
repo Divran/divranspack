@@ -88,6 +88,7 @@ else
 		CPanel:AddControl( "CheckBox", {Label="Toggle Firing",Description="Toggle Firing",Command="pewpew_cl_togglefiring"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Numpads",Description="Toggle Numpads",Command="pewpew_cl_togglenumpads"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Energy Usage",Description="Toggle Energy Usage",Command="pewpew_cl_toggleenergyusage"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Damage Log Sending",Description="Toggle Damage Log Sending",Command="pewpew_cl_toggledamagelog"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Core Damage Only",Description="Toggle Core Damage Only",Command="pewpew_cl_togglecoredamageonly"} )
 		CPanel:AddControl( "Slider", {Label="Damage Multiplier",Description="Damage Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cl_damagemul"} )
 		CPanel:AddControl( "Slider", {Label="Damage Core Multiplier",Description="Damage Core Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cl_damagecoremul"} )
@@ -150,6 +151,12 @@ else
 	end
 	concommand.Add("pewpew_cl_repairtoolhealcores",RepairCore)
 	
+	local damagelog = "1"
+	local function DmgLog( ply, cmd, args )
+		damagelog = args[1]
+	end
+	concommand.Add("pewpew_cl_toggledamagelog",DmgLog)
+	
 	local function Apply( ply, cmd, args )
 		RunConsoleCommand("pewpew_toggledamage",dmg)
 		RunConsoleCommand("pewpew_togglefiring",firing)
@@ -160,6 +167,7 @@ else
 		RunConsoleCommand("pewpew_coredamagemul",damagemulcores)
 		RunConsoleCommand("pewpew_repairtoolheal",repair)
 		RunConsoleCommand("pewpew_repairtoolhealcores",repaircores)
+		RunConsoleCommand("pewpew_toggledamagelogsending",damagelog)
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
 	
