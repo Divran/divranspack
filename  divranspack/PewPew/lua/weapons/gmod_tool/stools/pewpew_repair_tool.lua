@@ -82,7 +82,7 @@ else
 		if (!self.HealthVision) then return end
 		
 		-- Find all nearby entities
-		local ents = ents.FindInSphere( ply:GetPos(), 1000 )
+		local ents = ents.FindInSphere( ply:GetPos(), 2040 )
 		for _, ent in pairs( ents ) do
 			if (ent:GetMoveType() == MOVETYPE_VPHYSICS and ent:IsValid()) then
 				-- Get the health and maxhealth
@@ -106,7 +106,7 @@ else
 				surface.SetFont("ScoreboardText")
 				local length = surface.GetTextSize(txt)
 				-- Draw string
-				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(745-dist,0,255) ), Color( 50, 50, 50, math.Clamp(745-dist,0,255) ) )
+				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(2040-dist,0,255) ), Color( 50, 50, 50, math.Clamp(2040-dist,0,255) ) )
 			end
 		end
 	end

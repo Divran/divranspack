@@ -52,6 +52,10 @@ function gcombat.hcghit( entity, damage, pierce, src, dest)
 		attack = 2
 	end
 	
+	-- fix for Gau-8
+	if (type(src) != "Vector") then src = entity:GetPos() end
+	if (type(dest) != "Vector") then dest = entity:GetPos() + Vector(0,0,1) end
+	
 	if (attack == 2) then
 		local effectdata1 = EffectData()
 		effectdata1:SetOrigin(src)

@@ -30,9 +30,9 @@ BULLET.Spread = 2
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 100
-BULLET.Radius = 800
-BULLET.RangeDamageMul = 0.3
+BULLET.Damage = 400
+BULLET.Radius = 900
+BULLET.RangeDamageMul = 0.8
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 80
@@ -110,7 +110,13 @@ BULLET.PhysicsCollideOverride = true
 function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
 	if (not (self.Cannon:IsValid() and PhysObj == self.Cannon:GetPhysicsObject()) and not self.Burning) then
 		util.BlastDamage(self.Entity, self.Entity, CollisionData.HitPos, self.Bullet.Damage, self.Bullet.Radius)
-		pewpew:BlastDamage(CollisionData.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul)
+		if (pewpew:CheckValid(CollisionData.HitEntity)) then
+			pewpew:PointDamage(CollisionData.HitEntity,self.Bullet.Damage,self)
+			pewpew:BlastDamage(CollisionData.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul,CollisionData.HitEntity,self)
+		else
+			pewpew:BlastDamage(CollisionData.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul,nil,self)
+		end
+		
 		
 		if (self.Bullet.ExplosionEffect) then
 			local effectdata = EffectData()
@@ -169,7 +175,7 @@ function BULLET:CLThinkFunc()
 		end
 	end
 	
-	self.Entity:NextThink(CurTime())
+	self.Entity:NextThink(CurTime()+0.05)
 	return true
 end
 
