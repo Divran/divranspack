@@ -481,7 +481,7 @@ function pewpew:CheckIfDead( ent )
 	if (!ent.pewpew) then ent.pewpew = {} end
 	if (ent.pewpewHealth <= 0) then
 		local effectdata = EffectData()
-		effectdata:SetOrigin( ent:GetPos() )
+		effectdata:SetOrigin( ent:LocalToWorld(ent:OBBCenter()) )
 		effectdata:SetScale( (ent:OBBMaxs() - ent:OBBMins()):Length() )
 		util.Effect( "pewpew_deatheffect", effectdata )
 		ent:Remove()

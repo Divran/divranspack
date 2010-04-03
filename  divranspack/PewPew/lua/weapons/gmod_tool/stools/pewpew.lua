@@ -261,6 +261,7 @@ else
 			list1:EnableVerticalScrollbar( true )
 
 			-- Loop through all categories
+			pewpew.CategoryControls2 = {}
 			for key, value in pairs( pewpew.Categories ) do
 				-- Create a Collapsible Category for each
 				local cat = vgui.Create( "DCollapsibleCategory" )
@@ -292,6 +293,13 @@ else
 				end
 				
 				cat:SetContents( list )
+					function cat.Header:OnMousePressed()
+					for k,v in ipairs( pewpew.CategoryControls2 ) do
+						if ( v:GetExpanded() and v.Header != self ) then v:Toggle() end
+						if (!v:GetExpanded() and v.Header == self ) then v:Toggle() end
+					end
+				end
+				table.insert( pewpew.CategoryControls2, cat )
 				list1:AddItem( cat )
 			end
 			

@@ -132,12 +132,11 @@ local function CreateMenu2()
 		end
 		
 		cat:SetContents( list )
-		cat.Header.OnMousePressed = function()
-			for k,v in pairs( pewpew.CategoryControls ) do
-				if ( v:GetExpanded() ) then v:Toggle() end
+		function cat.Header:OnMousePressed()
+			for k,v in ipairs( pewpew.CategoryControls ) do
+				if ( v:GetExpanded() and v.Header != self ) then v:Toggle() end
+				if (!v:GetExpanded() and v.Header == self ) then v:Toggle() end
 			end
-			cat:SetExpanded( false )
-			cat:Toggle()
 		end
 		table.insert( pewpew.CategoryControls, cat )
 		list1:AddItem( cat )
