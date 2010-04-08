@@ -476,7 +476,7 @@ function pewpew:RemoveSafeZone( In )
 		if (self.SafeZones[In]) then
 			table.remove( self.SafeZones, In )
 		end
-	elseif (type(In) == "entity") then
+	elseif (type(In) == "Entity") then
 		for index,tbl in pairs( self.SafeZones ) do
 			if (tbl[3]) then
 				if (tbl[3]:IsValid()) then
