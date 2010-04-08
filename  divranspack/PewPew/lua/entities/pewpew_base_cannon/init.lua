@@ -142,30 +142,7 @@ function ENT:FireBullet()
 		ent:SetOptions( self.Bullet, self, self.Owner )
 		
 		-- Calculate initial position of bullet
-		local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-		local bulletboxsize = ent:OBBMaxs() - ent:OBBMins()
-		local Pos
-		local Dir
-		
-		if (self.Direction == 1) then -- Up
-			Dir = self.Entity:GetUp()
-			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+bulletboxsize.z/2)
-		elseif (self.Direction == 2) then -- Down
-			Dir = self.Entity:GetUp() * -1
-			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+bulletboxsize.z/2)
-		elseif (self.Direction == 3) then -- Left
-			Dir = self.Entity:GetRight() * -1
-			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+bulletboxsize.y/2)
-		elseif (self.Direction == 4) then -- Right
-			Dir = self.Entity:GetRight()
-			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+bulletboxsize.y/2)
-		elseif (self.Direction == 5) then -- Forward
-			Dir = self.Entity:GetForward()
-			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+bulletboxsize.x/2)
-		elseif (self.Direction == 6) then -- Back
-			Dir = self.Entity:GetForward() * -1
-			Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+bulletboxsize.x/2)
-		end
+		local Dir, Pos = pewpew:GetFireDirection( self.Direction, self, ent )
 	
 		ent:SetPos( Pos )
 		-- Add random angle offset

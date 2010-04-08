@@ -7,13 +7,6 @@ TOOL.Name = "Admin Tool"
 require("datastream")				
 if (SERVER) then
 	AddCSLuaFile("pewpew_repair_tool.lua")
-	
-	local function PlySpawn( ply )
-		if (pewpew.DamageLog and #pewpew.DamageLog > 0 and pewpew.DamageLogSend) then
-			datastream.StreamToClients( ply, "PewPew_Admin_Tool_SendLog", { true, pewpew.DamageLog } )
-		end
-	end
-	hook.Add("PlayerInitialSpawn","PewPew_Admin_Tool_InitialSpawn",PlySpawn)
 else
 	language.Add( "Tool_pewpew_admin_tool_name", "PewPew Admin Tool" )
 	language.Add( "Tool_pewpew_admin_tool_desc", "Administrate your server!" )
@@ -41,7 +34,7 @@ else
 						ent = "- Died -"
 					end
 				end
-				pewpew_loglist:AddLine( v[1], v[4], v[5], ent, v[3], v[6] )
+				pewpew_loglist:AddLine( v[1], v[5], v[6], ent, v[4], v[3], v[7] )
 			end			
 		end
 	end
@@ -67,17 +60,19 @@ else
 		pewpew_loglist:StretchToParent( 2, 23, 2, 2 )
 		local w = pewpew_loglist:GetWide()
 		local a = pewpew_loglist:AddColumn( "Time" )
-		a:SetWide(w*(1/5))
+		a:SetWide(w*(1/6))
 		local b = pewpew_loglist:AddColumn( "Damage Dealer" )
-		b:SetWide(w*(1/5))
+		b:SetWide(w*(1/6))
 		local c = pewpew_loglist:AddColumn( "Victim Entity Owner" )
-		c:SetWide(w*(1/5))
+		c:SetWide(w*(1/6))
 		local d = pewpew_loglist:AddColumn( "Victim Entity" )
-		d:SetWide(w*(1/5))
-		local e = pewpew_loglist:AddColumn( "Damage" )
-		e:SetWide(w*(0.6/5))
-		local f = pewpew_loglist:AddColumn( "Died?" )
-		f:SetWide(w*(0.4/5))
+		d:SetWide(w*(1/6))
+		local e = pewpew_loglist:AddColumn( "Weapon" )
+		e:SetWide(w*(1/6))
+		local f = pewpew_loglist:AddColumn( "Damage" )
+		f:SetWide(w*(0.5/6))
+		local g = pewpew_loglist:AddColumn( "Died?" )
+		g:SetWide(w*(0.5/6))
 	end
 	CreateLogMenu()
 	
@@ -170,48 +165,21 @@ else
 		RunConsoleCommand("pewpew_toggledamagelogsending",damagelog)
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
-	
-	datastream.Hook( "PewPew_Admin_Tool_SendLog", function( handler, id, encoded, decoded )
-		local What = decoded[1]
-		if (type(What) == "boolean" and What == true) then				
-			pewpew.DamageLog = decoded[2]
-		elseif (type(What) == "boolean" and What == false) then
-			table.insert( pewpew.DamageLog, decoded[2] )
-		elseif (type(What) == "number") then 
-			pewpew.DamageLog[What][1] = decoded[2] 
-			pewpew.DamageLog[What][3] = decoded[3]
-			pewpew.DamageLog[What][4] = decoded[4]
-			pewpew.DamageLog[What][6] = decoded[5]
-		end
-		UpdateLogMenu()
-	end)
-	
+
 	usermessage.Hook( "PewPew_Admin_Tool_SendLog_Umsg", function( um )
-		local What = um:ReadShort()
-		if (What == -1) then
+		local Amount = um:ReadShort()
+		for i=1,Amount do
 			local Time = um:ReadString()
 			local ID = um:ReadShort()
 			local Damage = um:ReadLong()
+			local Weapon = um:ReadString()
 			local DealerName = um:ReadString()
 			local VictimName = um:ReadString()
 			local DiedB = um:ReadBool()
 			local Died = "No"
 			if (DiedB) then Died = "Yes" end
-			if (DiedB) then ID = "- Died -" end
-			local tbl = { Time, ID, Damage, DealerName, VictimName, Died }
-			table.insert( pewpew.DamageLog, tbl )
-		else
-			local Time = um:ReadString()
-			local Damage = um:ReadLong()
-			local DealerName = um:ReadString()
-			local DiedB = um:ReadBool()
-			local Died = "No"
-			if (DiedB) then Died = "Yes" end
-			pewpew.DamageLog[What][1] = Time
-			pewpew.DamageLog[What][3] = Damage
-			pewpew.DamageLog[What][4] = DealerName
-			pewpew.DamageLog[What][6] = Died
-			if (DiedB) then pewpew.DamageLog[What][2] = "- Died -" end
+			tbl = { Time, ID, Damage, Weapon, DealerName, VictimName, Died }
+			table.insert(pewpew.DamageLog,tbl)
 		end
 		UpdateLogMenu()
 	end)

@@ -20,6 +20,7 @@ pewpew.CoreDamageOnly = false
 pewpew.RepairToolHeal = 75
 pewpew.RepairToolHealCores = 200
 pewpew.EnergyUsage = false
+pewpew.PropProtDamage = false
 
 if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
 	pewpew.EnergyUsage = true
@@ -27,10 +28,6 @@ end
 
 -- Damage Blocked Table
 pewpew.SafeZones = {}
-
--- Damage Log
-pewpew.DamageLog = {}
-pewpew.DamageLogSend = true
 
 ------------------------------------------------------------------------------------------------------------
 
@@ -249,6 +246,27 @@ function pewpew:DealDamageBase( TargetEntity, Damage, DamageDealer )
 		return
 	end
 	if (self.CoreDamageOnly) then return end
+	
+	-- If Prop Protection Damage is on, only deal damage if the owner of the damaged entity has the owner of the weapon in their PP friends list
+	if (self.PropProtDamage) then
+		local TargetEntityOwner = TargetEntity:CPPIGetOwner()
+		local Friends = TargetEntityOwner:CPPIGetFriends()
+		local WeaponOwner = DamageDealer.Owner
+		if (!TargetEntityOwner or !Friends or !WeaponOwner) then print("Prop Prot Damage error!") return end
+		local Found = false
+		if (TargetEntityOwner == WeaponOwner) then 
+			Found = true
+		else
+			for k,v in pairs( Friends ) do
+				if (v == WeaponOwner) then
+					Found = true
+					break
+				end
+			end
+		end
+		if (!Found) then return end
+	end
+	
 	-- Deal damage
 	TargetEntity.pewpewHealth = TargetEntity.pewpewHealth - math.abs(Damage)
 	TargetEntity:SetNWInt("pewpewHealth",TargetEntity.pewpewHealth)
@@ -258,95 +276,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage, DamageDealer )
 	pewpew:DamageLogAdd( TargetEntity, Damage, DamageDealer )
 end
 
-------------------------------------------------------------------------------------------------------------
--- Damage Log
 
-function pewpew:DamageLogAdd( TargetEntity, Damage, DamageDealer )
-	Damage = Damage or "- Error -"
-	
-	local DealerName
-	if (DamageDealer and DamageDealer.Owner) then
-		DealerName = DamageDealer.Owner:Nick() or "- Error -"
-	else
-		DealerName = "- Error -"
-	end
-	
-	local Weapon
-	if (DamageDealer and DamageDealer.Bullet) then
-		Weapon = DamageDealer.Bullet.Name or "- Error -"
-	else
-		Weapon = "- Error -"
-	end
-	
-	local Victim
-	local VictimName
-	if (CPPI) then
-		if (TargetEntity and TargetEntity:CPPIGetOwner()) then
-			Victim = TargetEntity:CPPIGetOwner()
-			VictimName = TargetEntity:CPPIGetOwner():Nick() or "- Error -"
-		else
-			VictimName = "- Error -"
-		end
-	else
-		VictimName = "- CPPI Not Installed -"
-	end
-	
-	local DiedB = false
-	if (self:GetHealth( TargetEntity ) < Damage) then
-		DiedB = true
-	end
-	
-	local Time = os.date( "%c", os.time() )
-	
-	local Nr = #self.DamageLog
-	if (Nr > 0 and self.DamageLog[Nr] and self.DamageLog[Nr][2] and self.DamageLog[Nr][2] == TargetEntity:EntIndex()) then
-		self.DamageLog[Nr][1] = Time
-		local add = 0
-		if (self.DamageLog[Nr] and self.DamageLog[Nr][3]) then
-			add = self.DamageLog[Nr][3]
-		end
-		self.DamageLog[Nr][3] = Damage + add
-		self.DamageLog[Nr][4] = DealerName
-		self.DamageLog[Nr][6] = DiedB
-		if (self.DamageLogSend) then
-			umsg.Start( "PewPew_Admin_Tool_SendLog_Umsg" )
-				umsg.Short(Nr)
-				umsg.String(Time)
-				umsg.Long(math.Round(self.DamageLog[Nr][3]))
-				umsg.String(DealerName)
-				umsg.Bool(DiedB)
-			umsg.End()
-			--datastream.StreamToClients( player.GetAll(), "PewPew_Admin_Tool_SendLog", { Nr, Time, math.Round(self.DamageLog[Nr][3]), DealerName, Died } )
-		end
-		if (DiedB) then
-			timer.Simple(0.1,function()
-				pewpew.DamageLog[Nr][2] = "- Died -"
-			end)
-		end
-	else
-		local ID = TargetEntity:EntIndex()
-		if (DiedB) then ID = "- Died -" end
-		local tbl = { Time, ID, math.Round(Damage), DealerName, VictimName, DiedB } 
-		table.insert( self.DamageLog, tbl )
-		if (self.DamageLogSend) then
-			umsg.Start( "PewPew_Admin_Tool_SendLog_Umsg" )
-				umsg.Short(-1)
-				umsg.String(Time)
-				umsg.Short(TargetEntity:EntIndex())
-				umsg.Long(math.Round(Damage))
-				umsg.String(DealerName)
-				umsg.String(VictimName)
-				umsg.Bool(DiedB)
-			umsg.End()
-			--datastream.StreamToClients( player.GetAll(), "PewPew_Admin_Tool_SendLog", { false, tbl } )
-		end
-	end
-	
-	if (Nr > 150) then
-		table.remove( self.DamageLog )
-	end
-	
-end
 
 ------------------------------------------------------------------------------------------------------------
 -- Core
@@ -630,6 +560,39 @@ end
 	return ret	
 end
 
+-- Get the fire direction
+function pewpew:GetFireDirection( Index, Ent, Bullet )
+	local Dir
+	local Pos
+	local boxsize = Ent:OBBMaxs()-Ent:OBBMins()
+	local bulletboxsize = Vector(0,0,0)
+	
+	if (Bullet) then
+		bulletboxsize = Bullet:OBBMaxs()-Bullet:OBBMins()
+	end
+	
+	if (Index == 1) then -- Up
+		Dir = Ent:GetUp()
+		Pos = Ent:LocalToWorld(Ent:OBBCenter()) + Dir * (boxsize.z/2+bulletboxsize.z/2)
+	elseif (Index == 2) then -- Down
+		Dir = Ent:GetUp() * -1
+		Pos = Ent:LocalToWorld(Ent:OBBCenter()) + Dir * (boxsize.z/2+bulletboxsize.z/2)
+	elseif (Index == 3) then -- Left
+		Dir = Ent:GetRight() * -1
+		Pos = Ent:LocalToWorld(Ent:OBBCenter()) + Dir * (boxsize.y/2+bulletboxsize.y/2)
+	elseif (Index == 4) then -- Right
+		Dir = Ent:GetRight()
+		Pos = Ent:LocalToWorld(Ent:OBBCenter()) + Dir * (boxsize.y/2+bulletboxsize.y/2)
+	elseif (Index == 5) then -- Forward
+		Dir = Ent:GetForward()
+		Pos = Ent:LocalToWorld(Ent:OBBCenter()) + Dir * (boxsize.x/2+bulletboxsize.x/2)
+	elseif (Index == 6) then -- Back
+		Dir = Ent:GetForward() * -1
+		Pos = Ent:LocalToWorld(Ent:OBBCenter()) + Dir * (boxsize.x/2+bulletboxsize.x/2)
+	end
+	
+	return Dir, Pos
+end
 
 
 ------------------------------------------------------------------------------------------------------------
@@ -840,29 +803,33 @@ local function ToggleEnergyUsage( ply, command, arg )
 end
 concommand.Add("PewPew_ToggleEnergyUsage", ToggleEnergyUsage)
 
--- Send Damage Log
-local function ToggleDamageLog( ply, command, arg )
+-- Toggle Prop Protection
+local function TogglePP( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
-		if (!arg[1]) then return end
-		local bool = false
-		if (tonumber(arg[1]) != 0) then bool = true end
-		local OldSetting = pewpew.DamageLogSend
-		pewpew.DamageLogSend = bool
-		if (OldSetting != pewpew.DamageLogSend) then
-			local name = "Console"
-			if (ply:IsValid()) then name = ply:Nick() end
-			local msg = " has changed Damage Log Sending and it is now "
-			if (pewpew.DamageLogSend) then
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-				end
-				datastream.StreamToClients( ply, "PewPew_Admin_Tool_SendLog", { true, pewpew.DamageLog } )
-			else
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+		if (CPPI) then
+			if (!arg[1]) then return end
+			local bool = false
+			if (tonumber(arg[1]) != 0) then bool = true end
+			local OldSetting = pewpew.PropProtDamage
+			pewpew.PropProtDamage = bool
+			if (OldSetting != pewpew.PropProtDamage) then
+				local name = "Console"
+				if (ply:IsValid()) then name = ply:Nick() end
+				local msg = " has changed PewPew Prop Protection Damage and it is now "
+				if (pewpew.PropProtDamage) then
+					for _, v in pairs( player.GetAll() ) do
+						v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
+					end
+				else
+					for _, v in pairs( player.GetAll() ) do
+						v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
+					end
 				end
 			end
+		elseif (arg[1] != "0") then
+			local msg = "You cannot enable Prop Protection Damage, because the server does not have the required addon(s)!"
+			ply:ChatPrint( "[PewPew] " .. msg )
 		end
 	end
 end
-concommand.Add("PewPew_ToggleDamageLogSending", ToggleDamageLog)
+concommand.Add("PewPew_TogglePP", TogglePP)

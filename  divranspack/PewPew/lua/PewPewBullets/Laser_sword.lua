@@ -53,30 +53,7 @@ BULLET.EnergyPerShot = 75
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	local startpos
-	local Dir
-	
-	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	
-	if (self.Direction == 1) then -- Up
-		Dir = self.Entity:GetUp()
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2)
-	elseif (self.Direction == 2) then -- Down
-		Dir = self.Entity:GetUp() * -1
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2)
-	elseif (self.Direction == 3) then -- Left
-		Dir = self.Entity:GetRight() * -1
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2)
-	elseif (self.Direction == 4) then -- Right
-		Dir = self.Entity:GetRight()
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2)
-	elseif (self.Direction == 5) then -- Forward
-		Dir = self.Entity:GetForward()
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2)
-	elseif (self.Direction == 6) then -- Back
-		Dir = self.Entity:GetForward() * -1
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2)
-	end
+	local Dir, startpos = pewpew:GetFireDirection( self.Direction, self )
 	
 	-- Deal damage
 	if (!pewpew:FindSafeZone(self.Entity:GetPos())) then

@@ -54,29 +54,7 @@ BULLET.CustomOutputs = nil
 BULLET.FireOverride = true
 function BULLET:Fire( self )
 	-- Calculate initial position of bullet
-	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local startpos
-	local direction
-	
-	if (self.Direction == 1) then -- Up
-		direction = self.Entity:GetUp()
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.z/2)
-	elseif (self.Direction == 2) then -- Down
-		direction = self.Entity:GetUp() * -1
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.z/2)
-	elseif (self.Direction == 3) then -- Left
-		direction = self.Entity:GetRight() * -1
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.y/2)
-	elseif (self.Direction == 4) then -- Right
-		direction = self.Entity:GetRight()
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.y/2)
-	elseif (self.Direction == 5) then -- Forward
-		direction = self.Entity:GetForward()
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.x/2)
-	elseif (self.Direction == 6) then -- Back
-		direction = self.Entity:GetForward() * -1
-		startpos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + direction * (boxsize.x/2)
-	end
+	local direction, startpos = pewpew:GetFireDirection( self.Direction, self )
 	
 	local num = self.Bullet.Spread
 	if (num) then

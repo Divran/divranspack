@@ -8,6 +8,8 @@ AddCSLuaFile("pewpew_damagecontrol.lua")
 include("pewpew_damagecontrol.lua")
 AddCSLuaFile("pewpew_weaponhandler.lua")
 include("pewpew_weaponhandler.lua")
+include("pewpew_damagelog.lua")
+
 
 -- Compability
 AddCSLuaFile("pewpew_gcombatcompability.lua")

@@ -27,31 +27,7 @@ BULLET.AmmoReloadtime = 0
 -- Fire (Is called before the cannon is about to fire)
 BULLET.FireOverride = true
 function BULLET:Fire( self )
-	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	local Pos
-	local Dir
-	
-	local boxsize = self.Entity:OBBMaxs() - self.Entity:OBBMins()
-	
-	if (self.Direction == 1) then -- Up
-		Dir = self.Entity:GetUp()
-		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+10)
-	elseif (self.Direction == 2) then -- Down
-		Dir = self.Entity:GetUp() * -1
-		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.z/2+10)
-	elseif (self.Direction == 3) then -- Left
-		Dir = self.Entity:GetRight() * -1
-		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+10)
-	elseif (self.Direction == 4) then -- Right
-		Dir = self.Entity:GetRight()
-		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.y/2+10)
-	elseif (self.Direction == 5) then -- Forward
-		Dir = self.Entity:GetForward()
-		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+10)
-	elseif (self.Direction == 6) then -- Back
-		Dir = self.Entity:GetForward() * -1
-		Pos = self.Entity:LocalToWorld(self.Entity:OBBCenter()) + Dir * (boxsize.x/2+10)
-	end
+	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self )
 	
 	local Bullet = pewpew:GetBullet("C4")
 	
