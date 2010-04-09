@@ -30,8 +30,11 @@ function ENT:Initialize()
 		self.OutputsChanged = self.Bullet.Name
 	else
 		if (!self.OutputsChanged) then
-			self.Outputs = WireLib.CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID" } )
+			self.Outputs = WireLib.CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID", "Cannon [ENTITY]" } )
 			self.OutputsChanged = "default"
+			Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+			Wire_TriggerOutput( self.Entity, "Can Fire", 1 )
+			Wire_TriggerOutput( self.Entity, "Cannon", self.Entity )
 		end
 	end
 	
@@ -40,9 +43,6 @@ function ENT:Initialize()
 	self.Firing = false
 	self.SoundTimer = 0
 	if (!self.Direction) then self.Direction = 1 end
-	
-	Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
-	Wire_TriggerOutput( self.Entity, "Can Fire", 1 )
 end
 
 function ENT:SetOptions( BULLET, ply, firekey, reloadkey, FireDirection )
