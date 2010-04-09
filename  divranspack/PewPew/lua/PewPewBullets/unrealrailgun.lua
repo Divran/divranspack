@@ -4,7 +4,6 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Unrealistic Railgun"
-BULLET.Category = "Other"
 BULLET.Author = "Divran"
 BULLET.Description = "An unrealistic railgun :)."
 BULLET.AdminOnly = false

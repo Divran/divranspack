@@ -6,10 +6,31 @@ function pewpew:LoadBullets()
 	self.bullets = {}
 	self.Categories = {}
 	
-	local bulletlist = file.FindInLua("PewPewBullets/*.lua")
-	for _, blt in ipairs( bulletlist ) do
-		include( "PewPewBullets/" .. blt )
-		if (SERVER) then AddCSLuaFile( "PewPewBullets/" .. blt ) end
+	self:LoadDirectory( "../lua/PewPewBullets" )
+end
+
+local CurrentCategory = ""
+
+function pewpew:LoadDirectory( Dir )
+	-- Get the dir used by include and AddCSLuaFile
+	local includedir = string.sub( Dir, 7, -1 )
+	
+	-- Get the category
+	CurrentCategory = string.Right( Dir, string.find( string.reverse( Dir ), "/", 1, true ) - 1 )
+	if (CurrentCategory == "PewPewBullets") then CurrentCategory = "Other" end
+	CurrentCategory = string.gsub( CurrentCategory, "_", " " )
+	
+	-- Load all files inside this directory
+	local files = file.FindInLua( Dir .. "/*.lua" )
+	for _, file in ipairs( files ) do
+		include( includedir .. "/" .. file )
+		if (SERVER) then AddCSLuaFile( includedir .. "/" .. file ) end
+	end
+	
+	-- Load all folders inside this directory
+	local folders = file.FindDir( Dir .. "/*" )
+	for _, folder in ipairs( folders ) do
+		self:LoadDirectory( Dir .. "/" .. folder )
 	end
 end
 
@@ -17,10 +38,11 @@ end
 function pewpew:AddBullet( bullet )
 	if (SERVER) then print("Added PewPew Bullet: " .. bullet.Name) end
 	table.insert( self.bullets, bullet )
-	if (!self.Categories[bullet.Category]) then
-		self.Categories[bullet.Category] = {}
+	if (!self.Categories[CurrentCategory]) then
+		self.Categories[CurrentCategory] = {}
 	end
-	table.insert( self.Categories[bullet.Category], bullet.Name )
+	bullet.Category = CurrentCategory
+	table.insert( self.Categories[CurrentCategory], bullet.Name )
 end
 
 -- Allows you to find a bullet

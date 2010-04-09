@@ -4,7 +4,6 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Smoke Emitter"
-BULLET.Category = "Other"
 BULLET.Author = "Divran"
 BULLET.Description = "Need to hide?"
 BULLET.AdminOnly = false

@@ -4,7 +4,6 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Torpedo"
-BULLET.Category = "Other"
 BULLET.Author = "Divran"
 BULLET.Description = "Launches a torpedo which can only travel under water."
 BULLET.AdminOnly = false

@@ -4,7 +4,6 @@ local BULLET = {}
 
 -- General Information
 BULLET.Name = "Example"
-BULLET.Category = "Cannons" -- This is the weapon Category. This is used in the Weapons Menu to choose weapons more easily.
 BULLET.Author = "Divran"
 BULLET.Description = "Aim away from face."
 BULLET.AdminOnly = false
