@@ -11,11 +11,16 @@ timer.Simple(1,function()
 		if (Attacker:GetClass() == "pewpew_base_bullet") then
 			-- Check if its name is valid
 			if (Attacker.Bullet and Attacker.Bullet.Name and Attacker.Bullet.Name != "") then
+				-- Get the owner of the weapon
+				local Addition = ""
+				if (Attacker.Owner) then
+					Addition = " (" .. Attacker.Owner:Nick() .. ")"
+				end
 				-- Send umsg
 				umsg.Start("PlayerKilled")
 					umsg.Entity( Victim )
 					umsg.String( "suicide" )
-					umsg.String( "(PewPew) " .. Attacker.Bullet.Name )
+					umsg.String( "(PewPew) " .. Attacker.Bullet.Name .. Addition )
 				umsg.End()
 			end
 			
@@ -29,11 +34,16 @@ timer.Simple(1,function()
 		if (Attacker:GetClass() == "pewpew_base_cannon") then
 			-- Check if its name is valid
 			if (Attacker.Bullet and Attacker.Bullet.Name and Attacker.Bullet.Name != "") then
+				-- Get the owner of the weapon
+				local Addition = ""
+				if (Attacker.Owner) then
+					Addition = " (" .. Attacker.Owner:Nick() .. ")"
+				end
 				-- Send umsg
 				umsg.Start("PlayerKilled")
 					umsg.Entity( Victim )
 					umsg.String( "suicide" )
-					umsg.String( "(PewPew) " .. Attacker.Bullet.Name )
+					umsg.String( "(PewPew) " .. Attacker.Bullet.Name .. Addition )
 				umsg.End()
 			end
 			
