@@ -16,11 +16,7 @@ end
 -- Returns the max health of the entity
 e2function number entity:pewMaxHealth()
 	if (!validPhysics(this)) then return 0 end
-	local mass = this:GetPhysicsObject():GetMass()
-	--local boxsize = TargetEntity:OBBMaxs() - TargetEntity:OBBMins()
-	local volume = phys:GetVolume() / 1000
-	local hp = (mass / 5 + volume)
-	return hp or 0
+	return pewpew:GetMaxHealth( this ) or 0
 end
 
 -- Returns the health of the core or the entity's core
