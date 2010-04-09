@@ -15,7 +15,7 @@ timer.Simple(1,function()
 				umsg.Start("PlayerKilled")
 					umsg.Entity( Victim )
 					umsg.String( "suicide" )
-					umsg.String( Attacker.Bullet.Name )
+					umsg.String( "(PewPew) " .. Attacker.Bullet.Name )
 				umsg.End()
 			end
 			
@@ -33,7 +33,7 @@ timer.Simple(1,function()
 				umsg.Start("PlayerKilled")
 					umsg.Entity( Victim )
 					umsg.String( "suicide" )
-					umsg.String( Attacker.Bullet.Name )
+					umsg.String( "(PewPew) " .. Attacker.Bullet.Name )
 				umsg.End()
 			end
 			
