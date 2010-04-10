@@ -18,6 +18,38 @@ if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support
 	pewpew.EnergyUsage = true
 end
 
+local function JoinCmds( ply )
+	-- 1/0
+	local val = "0"
+	if (pewpew.Damage) then val = "1" end
+	ply:ConCommand( "pewpew_cltgldamage " .. val )
+	local val = "0"
+	if (pewpew.Firing) then val = "1" end
+	ply:ConCommand( "pewpew_cltglfiring " .. val )
+	local val = "0"
+	if (pewpew.Numpads) then val = "1" end
+	ply:ConCommand( "pewpew_cltglnumpads " .. val )
+	local val = "0"
+	if (pewpew.EnergyUsage) then val = "1" end
+	ply:ConCommand( "pewpew_cltglenergyusage " .. val )
+	local val = "0"
+	if (pewpew.CoreDamageOnly) then val = "1" end
+	ply:ConCommand( "pewpew_cltglcoredamageonly " .. val )
+	local val = "0"
+	if (pewpew.DamageLogSend) then val = "1" end
+	ply:ConCommand( "pewpew_cltgldamagelog " .. val )
+	local val = "0"
+	if (pewpew.PropProtDamage) then val = "1" end
+	ply:ConCommand( "pewpew_cltglppdamage " .. val )
+	
+	-- Vars
+	ply:ConCommand( "pewpew_cldmgmul " .. pewpew.DamageMul )
+	ply:ConCommand( "pewpew_cldmgcoremul " .. pewpew.CoreDamageMul )
+	ply:ConCommand( "pewpew_clrepairtoolheal " .. pewpew.RepairToolHeal )
+	ply:ConCommand( "pewpew_clrepairtoolhealcores " .. pewpew.RepairToolHealCores )
+end
+hook.Add("PlayerInitialSpawn","PewPew_Convars_at_spawn",JoinCmds)
+		
 -- Toggle Damage
 local function ToggleDamage( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
@@ -26,18 +58,16 @@ local function ToggleDamage( ply, command, arg )
 		if (tonumber(arg[1]) != 0) then bool = true end
 		local OldSetting = pewpew.Damage
 		pewpew.Damage = bool
-		local name = "Console"
-		if (ply:IsValid()) then name = ply:Nick() end
-		local msg = " has changed PewPew Damage and it is now "
 		if (OldSetting != pewpew.Damage) then
-			if (pewpew.Damage) then
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-				end
-			else
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
-				end
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed PewPew Damage and it is now "
+			local onoff = "ON!"
+			local cmd = "1"
+			if (pewpew.Damage == false) then onoff = "OFF!" cmd = "0" end
+			for _,v in ipairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+				v:ConCommand( "pewpew_cltgldamage " .. cmd )
 			end
 		end
 	end
@@ -56,14 +86,12 @@ local function ToggleFiring( ply, command, arg )
 			local name = "Console"
 			if (ply:IsValid()) then name = ply:Nick() end
 			local msg = " has changed PewPew Firing and it is now "
-			if (pewpew.Firing) then
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-				end
-			else
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
-				end
+			local onoff = "ON!"
+			local cmd = "1"
+			if (pewpew.Firing == false) then onoff = "OFF!" cmd = "0" end
+			for _,v in ipairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+				v:ConCommand( "pewpew_cltglfiring " .. cmd )
 			end
 		end
 	end
@@ -82,14 +110,12 @@ local function ToggleNumpads( ply, command, arg )
 			local name = "Console"
 			if (ply:IsValid()) then name = ply:Nick() end
 			local msg = " has changed PewPew Numpads and they are now "
-			if (pewpew.Numpads) then
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
-				end
-			else
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
-				end
+			local onoff = "ENABLED!"
+			local cmd = "1"
+			if (pewpew.Numpads == false) then onoff = "DISABLED!" cmd = "0" end
+			for _,v in ipairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+				v:ConCommand( "pewpew_cltglnumpads " .. cmd )
 			end
 		end
 	end
@@ -108,6 +134,7 @@ local function DamageMul( ply, command, arg )
 			if (ply:IsValid()) then name = ply:Nick() end
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.DamageMul)
+				v:ConCommand( "pewpew_cldmgmul " .. tostring(pewpew.DamageMul) )
 			end
 		end
 	end
@@ -126,6 +153,7 @@ local function CoreDamageMul( ply, command, arg )
 			if (ply:IsValid()) then name = ply:Nick() end
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.CoreDamageMul)
+				v:ConCommand( "pewpew_cldmgcoremul " .. tostring(pewpew.CoreDamageMul) )
 			end
 		end
 	end
@@ -144,14 +172,12 @@ local function ToggleCoreDamageOnly( ply, command, arg )
 			local name = "Console"
 			if (ply:IsValid()) then name = ply:Nick() end
 			local msg = " has changed PewPew Core Damage Only and it is now "
-			if (pewpew.CoreDamageOnly) then
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-				end
-			else
-				for _, v in pairs( player.GetAll() ) do
-					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
-				end
+			local onoff = "ON!"
+			local cmd = "1"
+			if (pewpew.CoreDamageOnly == false) then onoff = "OFF!" cmd = "0" end
+			for _,v in ipairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+				v:ConCommand( "pewpew_cltglcoredamageonly " .. cmd )
 			end
 		end
 	end
@@ -170,6 +196,7 @@ local function RepairToolHeal( ply, command, arg )
 			local msg = " has changed the speed at which the Repair Tool heals to "
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHeal)
+				v:ConCommand( "pewpew_clrepairtoolheal " .. tostring(pewpew.RepairToolHeal) )
 			end
 		end
 	end
@@ -188,6 +215,7 @@ local function RepairToolHealCores( ply, command, arg )
 			local msg = " has changed the speed at which the Repair Tool heals cores to "
 			for _, v in pairs( player.GetAll() ) do
 				v:ChatPrint( "[PewPew] " .. name .. msg .. pewpew.RepairToolHealCores)
+				v:ConCommand( "pewpew_clrepairtoolhealcores " .. tostring(pewpew.RepairToolHealCores) )
 			end
 		end
 	end
@@ -207,14 +235,12 @@ local function ToggleEnergyUsage( ply, command, arg )
 				local name = "Console"
 				if (ply:IsValid()) then name = ply:Nick() end
 				local msg = " has changed PewPew Energy Usage and it is now "
-				if (pewpew.EnergyUsage) then
-					for _, v in pairs( player.GetAll() ) do
-						v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
-					end
-				else
-					for _, v in pairs( player.GetAll() ) do
-						v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
-					end
+				local onoff = "ENABLED!"
+				local cmd = "1"
+				if (pewpew.EnergyUsage == false) then onoff = "DISABLED!" cmd = "0" end
+				for _,v in ipairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+					v:ConCommand( "pewpew_cltglenergyusage " .. cmd )
 				end
 			end
 		elseif (arg[1] != "0") then
@@ -238,14 +264,12 @@ local function TogglePP( ply, command, arg )
 				local name = "Console"
 				if (ply:IsValid()) then name = ply:Nick() end
 				local msg = " has changed PewPew Prop Protection Damage and it is now "
-				if (pewpew.PropProtDamage) then
-					for _, v in pairs( player.GetAll() ) do
-						v:ChatPrint( "[PewPew] " .. name .. msg .. "ENABLED!")
-					end
-				else
-					for _, v in pairs( player.GetAll() ) do
-						v:ChatPrint( "[PewPew] " .. name .. msg .. "DISABLED!")
-					end
+				local onoff = "ENABLED!"
+				local cmd = "1"
+				if (pewpew.PropProtDamage == false) then onoff = "DISABLED!" cmd = "0" end
+				for _,v in ipairs( player.GetAll() ) do
+					v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+					v:ConCommand( "pewpew_cltglppdamage " .. cmd )
 				end
 			end
 		elseif (arg[1] != "0") then

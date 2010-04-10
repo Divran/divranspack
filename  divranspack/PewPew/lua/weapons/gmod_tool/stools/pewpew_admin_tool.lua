@@ -79,98 +79,44 @@ else
 	function TOOL.BuildCPanel( CPanel )
 		CPanel:AddControl( "Button", {Label="Log Menu",Description="Open the Log Menu",Text="Log Menu",Command="PewPew_OpenLogMenu"} )
 		CPanel:AddControl( "Label", {Text="Changing these if you're not admin is pointless.",Description="Changing these if you're not admin is pointless."} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Damage",Description="Toggle Damage",Command="pewpew_cl_toggledamage"} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Firing",Description="Toggle Firing",Command="pewpew_cl_togglefiring"} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Numpads",Description="Toggle Numpads",Command="pewpew_cl_togglenumpads"} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Energy Usage",Description="Toggle Energy Usage",Command="pewpew_cl_toggleenergyusage"} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Damage Log Sending",Description="Toggle Damage Log Sending",Command="pewpew_cl_toggledamagelog"} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Core Damage Only",Description="Toggle Core Damage Only",Command="pewpew_cl_togglecoredamageonly"} )
-		CPanel:AddControl( "CheckBox", {Label="Toggle Prop Prot. Dmg",Description="Toggle Prop Prot. Dmg",Command="pewpew_cl_toggleppdamage"} )
-		CPanel:AddControl( "Slider", {Label="Damage Multiplier",Description="Damage Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cl_damagemul"} )
-		CPanel:AddControl( "Slider", {Label="Damage Core Multiplier",Description="Damage Core Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cl_damagecoremul"} )
-		CPanel:AddControl( "Slider", {Label="Repair Tool Heal Rate",Description="Repair Tool Heal Rate",Type="Integer",Min="20",Max="10000",Command="pewpew_cl_repairtoolheal"} )
-		CPanel:AddControl( "Slider", {Label="Repair Tool Heal Rate vs Cores",Description="Repair Tool Heal Rate vs Cores",Type="Integer",Min="20",Max="10000",Command="pewpew_cl_repairtoolhealcores"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Damage",Description="Toggle Damage",Command="pewpew_cltgldamage"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Firing",Description="Toggle Firing",Command="pewpew_cltglfiring"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Numpads",Description="Toggle Numpads",Command="pewpew_cltglnumpads"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Energy Usage",Description="Toggle Energy Usage",Command="pewpew_cltglenergyusage"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Damage Log Sending",Description="Toggle Damage Log Sending",Command="pewpew_cltgldamagelog"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Core Damage Only",Description="Toggle Core Damage Only",Command="pewpew_cltglcoredamageonly"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Prop Prot. Dmg",Description="Toggle Prop Prot. Dmg",Command="pewpew_cltglppdamage"} )
+		CPanel:AddControl( "Slider", {Label="Damage Multiplier",Description="Damage Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cldmgmul"} )
+		CPanel:AddControl( "Slider", {Label="Damage Core Multiplier",Description="Damage Core Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cldmgcoremul"} )
+		CPanel:AddControl( "Slider", {Label="Repair Tool Heal Rate",Description="Repair Tool Heal Rate",Type="Integer",Min="20",Max="10000",Command="pewpew_clrepairtoolheal"} )
+		CPanel:AddControl( "Slider", {Label="Repair Tool Heal Rate vs Cores",Description="Repair Tool Heal Rate vs Cores",Type="Integer",Min="20",Max="10000",Command="pewpew_clrepairtoolhealcores"} )
 		CPanel:AddControl( "Button", {Label="Apply Changes",Description="Apply Changes",Text="Apply Changes",Command="pewpew_cl_applychanges"} )
 	end
 	
-	local dmg = "1"
-	local function Dmg( ply, cmd, args )
-		dmg = args[1]
-	end
-	concommand.Add("pewpew_cl_toggledamage", Dmg)
-	
-	local firing = "1"
-	local function Firing( ply, cmd, args )
-		firing = args[1]
-	end
-	concommand.Add("pewpew_cl_togglefiring", Firing)
-	
-	local numpads = "1"
-	local function Numpads( ply, cmd, args )
-		numpads = args[1]
-	end
-	concommand.Add("pewpew_cl_togglenumpads", Numpads)
-	
-	local energy = "0"
-	local function Energy( ply, cmd, args )
-		energy = args[1]
-	end
-	concommand.Add("pewpew_cl_toggleenergyusage", Energy)
-	
-	local coreonly = "0"
-	local function Core( ply, cmd, args )
-		coreonly = args[1]
-	end
-	concommand.Add("pewpew_cl_togglecoredamageonly", Core )
-	
-	local damagemul = "1"
-	local function DmgMul( ply, cmd, args )
-		damagemul = args[1]
-	end
-	concommand.Add("pewpew_cl_damagemul",DmgMul)
-	
-	local damagemulcores = "1"
-	local function DmgMulCores( ply, cmd, args )
-		damagemulcores = args[1]
-	end
-	concommand.Add("pewpew_cl_damagecoremul",DmgMulCores)
-	
-	local repair = "75"
-	local function Repair( ply, cmd, args )
-		repair = args[1]
-	end
-	concommand.Add("pewpew_cl_repairtoolheal",Repair)
-	
-	local repaircores = "200"
-	local function RepairCore( ply, cmd, args )
-		repaircores = args[1]
-	end
-	concommand.Add("pewpew_cl_repairtoolhealcores",RepairCore)
-	
-	local damagelog = "1"
-	local function DmgLog( ply, cmd, args )
-		damagelog = args[1]
-	end
-	concommand.Add("pewpew_cl_toggledamagelog",DmgLog)
-	
-	local ppdamage = "1"
-	local function PPDmg( ply, cmd, args )
-		ppdamage = args[1]
-	end
-	concommand.Add("pewpew_cl_toggleppdamage",PPDmg)
+	local dmg = CreateClientConVar("pewpew_cltgldamage","1",false,false)
+	local firing = CreateClientConVar("pewpew_cltglfiring","1",false,false)
+	local numpads = CreateClientConVar("pewpew_cltglnumpads","1",false,false)
+	local energy = CreateClientConVar("pewpew_cltglenergyusage","0",false,false)
+	local coreonly = CreateClientConVar("pewpew_cltglcoredamageonly","0",false,false)
+	local damagemul = CreateClientConVar("pewpew_cldmgmul","1",false,false)
+	local damagemulcores = CreateClientConVar("pewpew_cldmgcoremul","1",false,false)
+	local repair = CreateClientConVar("pewpew_clrepairtoolheal","75",false,false)
+	local repaircores = CreateClientConVar("pewpew_clrepairtoolhealcores","200",false,false)
+	local damagelog = CreateClientConVar("pewpew_cltgldamagelog","1",false,false)
+	local ppdamage = CreateClientConVar("pewpew_cltglppdamage","0",false,false)
 	
 	local function Apply( ply, cmd, args )
-		RunConsoleCommand("pewpew_toggledamage",dmg)
-		RunConsoleCommand("pewpew_togglefiring",firing)
-		RunConsoleCommand("pewpew_togglenumpads",numpads)
-		RunConsoleCommand("pewpew_toggleenergyusage",energyusage)
-		RunConsoleCommand("pewpew_togglecoredamageonly",coreonly)
-		RunConsoleCommand("pewpew_damagemul",damagemul)
-		RunConsoleCommand("pewpew_coredamagemul",damagemulcores)
-		RunConsoleCommand("pewpew_repairtoolheal",repair)
-		RunConsoleCommand("pewpew_repairtoolhealcores",repaircores)
-		RunConsoleCommand("pewpew_toggledamagelogsending",damagelog)
-		RunConsoleCommand("PewPew_TogglePP",ppdmg)
+		RunConsoleCommand("pewpew_toggledamage",dmg:GetString())
+		RunConsoleCommand("pewpew_togglefiring",firing:GetString())
+		RunConsoleCommand("pewpew_togglenumpads",numpads:GetString())
+		RunConsoleCommand("pewpew_toggleenergyusage",energy:GetString())
+		RunConsoleCommand("pewpew_togglecoredamageonly",coreonly:GetString())
+		RunConsoleCommand("pewpew_damagemul",damagemul:GetString())
+		RunConsoleCommand("pewpew_coredamagemul",damagemulcores:GetString())
+		RunConsoleCommand("pewpew_repairtoolheal",repair:GetString())
+		RunConsoleCommand("pewpew_repairtoolhealcores",repaircores:GetString())
+		RunConsoleCommand("pewpew_toggledamagelogsending",damagelog:GetString())
+		RunConsoleCommand("PewPew_TogglePP",ppdamage:GetString())
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
 

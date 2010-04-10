@@ -4,6 +4,7 @@
 
 if (!pewpew) then print("Fail.") return end
 pewpew.LogStack = {}
+pewpew.DamageLogSend = true
 
 -- Add to log
 function pewpew:DamageLogAdd( TargetEntity, Damage, DamageDealer )
@@ -66,6 +67,7 @@ end, pewpew)
 
 -- Send the log
 function pewpew:PopLogStack()
+	if (!pewpew.DamageLogSend) then return end
 	if (table.Count(self.LogStack) > 0) then
 		umsg.Start("PewPew_Admin_Tool_SendLog_Umsg")
 			umsg.Short(table.Count(self.LogStack))
@@ -105,10 +107,12 @@ local function ToggleDamageLog( ply, command, arg )
 			if (pewpew.DamageLogSend) then
 				for _, v in pairs( player.GetAll() ) do
 					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
+					V:ConCommand("pewpew_cltgldamagelog","1")
 				end
 			else
 				for _, v in pairs( player.GetAll() ) do
 					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
+					V:ConCommand("pewpew_cltgldamagelog","+")
 				end
 			end
 		end
