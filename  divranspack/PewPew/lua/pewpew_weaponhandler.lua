@@ -23,8 +23,8 @@ function pewpew:LoadDirectory( Dir )
 	-- Load all files inside this directory
 	local files = file.FindInLua( Dir .. "/*.lua" )
 	for _, file in ipairs( files ) do
-		include( includedir .. "/" .. file )
 		if (SERVER) then AddCSLuaFile( includedir .. "/" .. file ) end
+		include( includedir .. "/" .. file )
 	end
 	
 	-- Load all folders inside this directory
