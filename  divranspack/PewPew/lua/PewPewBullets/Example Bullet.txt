@@ -56,7 +56,7 @@ BULLET.CustomOutputs = nil -- Use a table here to replace the default wire outpu
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 -- I suggest you erase any functions you are not using to minimize file size.
 
--- Wire Input (This is called whenever a wire input is changed) (Is run on: Cannon)
+-- Wire Input (This is called whenever a wire input is changed. Also called whenever a numpad is pressed. "inputname" and "value" will automatically change to "Fire" or "Reload" and 1/0 when a numpad is pressed) (Is run on: Cannon)
 BULLET.WireInputOverride = false
 function BULLET:WireInput( self, inputname, value )
 	-- Nothing

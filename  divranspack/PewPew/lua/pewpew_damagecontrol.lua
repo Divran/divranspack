@@ -10,7 +10,6 @@ pewpew.DamageBlacklist = { "gmod_wire" }
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
 -- Default Values
-pewpew.Installed = true -- Yep it's installed :)
 pewpew.Damage = true
 pewpew.Firing = true
 pewpew.Numpads = true
@@ -833,3 +832,6 @@ local function TogglePP( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_TogglePP", TogglePP)
+
+-- If we got this far without errors, it's safe to assume the addon is installed.
+pewpew.Installed = true

@@ -300,25 +300,41 @@ end
 local function NumpadOn( ply, self )
 	if (!pewpew.Numpads) then return end
 	if (!self or !self:IsValid()) then return end
-	self:InputChange( "Fire", 1 )
+	if (self.Bullet.WireInputOverride) then
+		self.Bullet:WireInput( self, "Fire", 1 )
+	else
+		self:InputChange( "Fire", 1 )
+	end
 end
 
 local function NumpadOff( ply, self )
 	if (!pewpew.Numpads) then return end
 	if (!self or !self:IsValid()) then return end
-	self:InputChange( "Fire", 0 )
+	if (self.Bullet.WireInputOverride) then
+		self.Bullet:WireInput( self, "Fire", 0 )
+	else
+		self:InputChange( "Fire", 0 )
+	end
 end
 
 local function NumpadReloadOn( ply, self )
 	if (!pewpew.Numpads) then return end
 	if (!self or !self:IsValid()) then return end
-	self:InputChange( "Reload", 1 )
+	if (self.Bullet.WireInputOverride) then
+		self.Bullet:WireInput( self, "Reload", 1 )
+	else
+		self:InputChange( "Reload", 1 )
+	end
 end
 
 local function NumpadReloadOff( ply, self )
 	if (!pewpew.Numpads) then return end
 	if (!self or !self:IsValid()) then return end
-	self:InputChange( "Reload", 0 )
+	if (self.Bullet.WireInputOverride) then
+		self.Bullet:WireInput( self, "Reload", 0 )
+	else
+		self:InputChange( "Reload", 0 )
+	end
 end
 
 numpad.Register( "PewPew_Cannon_Fire_On", NumpadOn )
