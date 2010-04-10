@@ -2,6 +2,22 @@
 -- These functions add the admin only console commands
 ------------------------------------------------------------------------------------------------------------
 
+-- Default Values
+pewpew.Damage = true
+pewpew.Firing = true
+pewpew.Numpads = true
+pewpew.DamageMul = 1
+pewpew.CoreDamageMul = 1
+pewpew.CoreDamageOnly = false
+pewpew.RepairToolHeal = 75
+pewpew.RepairToolHealCores = 200
+pewpew.EnergyUsage = false
+pewpew.PropProtDamage = false
+
+if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+	pewpew.EnergyUsage = true
+end
+
 -- Toggle Damage
 local function ToggleDamage( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then

@@ -124,7 +124,7 @@ function ENT:FireBullet()
 	if (pewpew.EnergyUsage) then
 		local amount = self:GetResourceAmount("energy")
 		local req = self.Bullet.EnergyPerShot or 0
-		if (amount < req) then return end
+		if (amount < req and req > 0) then return end
 		self:ConsumeResource("energy",req)
 	end
 	

@@ -2,6 +2,9 @@
 -- These functions add safe zones
 ------------------------------------------------------------------------------------------------------------
 
+-- Damage Blocked Table
+pewpew.SafeZones = {}
+
 -- Add a Safe Zone. If you want to parent the safe zone to an entity, make sure the position is local.
 function pewpew:AddSafeZone( Position, Radius, ParentEntity )
 	if (!Position or !Radius) then 

@@ -9,25 +9,6 @@ pewpew.DamageBlacklist = { "gmod_wire" }
 -- Entity types in the whitelist will ALWAYS be harmed by PewPew weaponry, even if they are in the blacklist as well.
 pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_grabber" }
 
--- Default Values
-pewpew.Damage = true
-pewpew.Firing = true
-pewpew.Numpads = true
-pewpew.DamageMul = 1
-pewpew.CoreDamageMul = 1
-pewpew.CoreDamageOnly = false
-pewpew.RepairToolHeal = 75
-pewpew.RepairToolHealCores = 200
-pewpew.EnergyUsage = false
-pewpew.PropProtDamage = false
-
-if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
-	pewpew.EnergyUsage = true
-end
-
--- Damage Blocked Table
-pewpew.SafeZones = {}
-
 ------------------------------------------------------------------------------------------------------------
 
 -- Blast Damage (A normal explosion)  (The damage formula is "clamp(Damage - (distance * RangeDamageMul), 0, Damage)")
