@@ -23,7 +23,7 @@ local function CreateMenu()
 	local b = pewpew_list:AddColumn( "" )	
 	b:SetWide(pewpew_frame:GetWide()*(6.5/8))
 end
-timer.Simple( 0.5, CreateMenu )
+timer.Simple( 2, CreateMenu )
 
 local list = {}		
 local function SetTable( Bullet )

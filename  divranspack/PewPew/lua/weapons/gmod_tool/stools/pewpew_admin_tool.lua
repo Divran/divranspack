@@ -85,6 +85,7 @@ else
 		CPanel:AddControl( "CheckBox", {Label="Toggle Energy Usage",Description="Toggle Energy Usage",Command="pewpew_cl_toggleenergyusage"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Damage Log Sending",Description="Toggle Damage Log Sending",Command="pewpew_cl_toggledamagelog"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Core Damage Only",Description="Toggle Core Damage Only",Command="pewpew_cl_togglecoredamageonly"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Prop Prot. Dmg",Description="Toggle Prop Prot. Dmg",Command="pewpew_cl_toggleppdamage"} )
 		CPanel:AddControl( "Slider", {Label="Damage Multiplier",Description="Damage Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cl_damagemul"} )
 		CPanel:AddControl( "Slider", {Label="Damage Core Multiplier",Description="Damage Core Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cl_damagecoremul"} )
 		CPanel:AddControl( "Slider", {Label="Repair Tool Heal Rate",Description="Repair Tool Heal Rate",Type="Integer",Min="20",Max="10000",Command="pewpew_cl_repairtoolheal"} )
@@ -152,6 +153,12 @@ else
 	end
 	concommand.Add("pewpew_cl_toggledamagelog",DmgLog)
 	
+	local ppdamage = "1"
+	local function PPDmg( ply, cmd, args )
+		ppdamage = args[1]
+	end
+	concommand.Add("pewpew_cl_toggleppdamage",PPDmg)
+	
 	local function Apply( ply, cmd, args )
 		RunConsoleCommand("pewpew_toggledamage",dmg)
 		RunConsoleCommand("pewpew_togglefiring",firing)
@@ -163,6 +170,7 @@ else
 		RunConsoleCommand("pewpew_repairtoolheal",repair)
 		RunConsoleCommand("pewpew_repairtoolhealcores",repaircores)
 		RunConsoleCommand("pewpew_toggledamagelogsending",damagelog)
+		RunConsoleCommand("PewPew_TogglePP",ppdmg)
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
 

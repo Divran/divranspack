@@ -2,14 +2,26 @@
 -- Initialize variables
 pewpew = {}
 
-AddCSLuaFile("autorun/client/pewpew_menu.lua")
-AddCSLuaFile("pewpew_damagecontrol.lua")
+local function RequestWeaponsList( ply, cmd, args )
+	if (!ply:IsValid()) then return end
+	print(ply:Nick() .. " does not have PewPew installed. Sending Weapons List.")
+	datastream.StreamToClients( ply, "PewPew_WeaponsList", pewpew.Categories )
+end
+concommand.Add("PewPew_RequestWeaponsList",RequestWeaponsList)
+
+
 include("pewpew_damagecontrol.lua")
-AddCSLuaFile("pewpew_weaponhandler.lua")
+include("pewpew_safezones.lua")
+include("pewpew_convars.lua")
 include("pewpew_weaponhandler.lua")
 include("pewpew_damagelog.lua")
 include("pewpew_deathnotice.lua")
+
+AddCSLuaFile("pewpew_weaponhandler.lua")
+AddCSLuaFile("pewpew_damagecontrol.lua")
 AddCSLuaFile("autorun/client/pewpew_autorun_client.lua")
+AddCSLuaFile("autorun/client/pewpew_menu.lua")
+
 
 
 -- Compability
