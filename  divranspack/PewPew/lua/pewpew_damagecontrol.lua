@@ -480,6 +480,3 @@ function pewpew:GetFireDirection( Index, Ent, Bullet )
 	
 	return Dir, Pos
 end
-
--- If we got this far without errors, it's safe to assume the addon is installed.
-pewpew.Installed = true

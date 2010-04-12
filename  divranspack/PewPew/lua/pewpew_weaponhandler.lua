@@ -1,19 +1,37 @@
 -- PewPew Weapon Handler
 -- Takes care of adding and managing all the available bullets
 
+-- Send the server's weapon list to all clients
+require("datastream")
+if (SERVER) then
+	hook.Add("PlayerInitialSpawn","SendPewPewCategories",function(ply)
+		datastream.StreamToClients( ply, "PewPew_WeaponsList", pewpew.Categories )
+	end)
+else
+	datastream.Hook("PewPew_WeaponsList",function( handler,id,encoded,decoded )
+		pewpew.Categories = decoded
+	end)
+end
+
 -- Load all the bullet files
 function pewpew:LoadBullets()
 	self.bullets = {}
 	self.Categories = {}
 	
 	self:LoadDirectory( "../lua/PewPewBullets" )
+	
+	if (SERVER) then 
+		if (#player.GetAll() > 0) then
+			datastream.StreamToClients( player.GetAll(), "PewPew_WeaponsList", pewpew.Categories )
+		end
+	end
 end
 
 local CurrentCategory = ""
 
 function pewpew:LoadDirectory( Dir )
 	-- Get the dir used by include and AddCSLuaFile
-	local includedir = string.sub( Dir, 7, -1 )
+	local includedir = string.sub( Dir, 8, -1 )
 	
 	-- Get the category
 	CurrentCategory = string.Right( Dir, string.find( string.reverse( Dir ), "/", 1, true ) - 1 )
@@ -21,9 +39,11 @@ function pewpew:LoadDirectory( Dir )
 	CurrentCategory = string.gsub( CurrentCategory, "_", " " )
 	
 	-- Load all files inside this directory
-	local files = file.FindInLua( Dir .. "/*.lua" )
+	local files = file.FindInLua( includedir .. "/*.lua" )
 	for _, file in ipairs( files ) do
-		if (SERVER) then AddCSLuaFile( includedir .. "/" .. file ) end
+		if (SERVER) then 
+			AddCSLuaFile( includedir .. "/" .. file )
+		end
 		include( includedir .. "/" .. file )
 	end
 	
@@ -36,12 +56,11 @@ end
 
 -- Add the bullets to the bullet list
 function pewpew:AddBullet( bullet )
+	if (CLIENT) then return end
 	if (SERVER) then print("Added PewPew Bullet: " .. bullet.Name) end
-	if (CLIENT) then print("CLIENT Added PewPew Bullet: " .. bullet.Name) end
 	table.insert( self.bullets, bullet )
 	if (!self.Categories[CurrentCategory]) then
 		self.Categories[CurrentCategory] = {}
-		if (CLIENT) then print("CLIENT Added Category: " .. CurrentCategory) end
 	end
 	bullet.Category = CurrentCategory
 	table.insert( self.Categories[CurrentCategory], bullet.Name )
