@@ -14,24 +14,36 @@ function ENT:Initialize()
 	self.Active = false
 	self.Rate = 0
 	self.BurnResource = ""
-	self:SetOverlayText( "Resource Burner\nActive: No\nRate: 0\nResource:" )
+	self:SetNWString("OverlayText", "Resource Burner\nActive: No\nRate: 0\nResource:" )
+end
+
+function ENT:CheckValidResource( res )
+	local resources = CAF.GetAddon("Resource Distribution").GetAllRegisteredResources()
+	if (resources[res]) then return true end
+	return false			
 end
 
 function ENT:TriggerInput( name, value )
 	if (name == "Resource") then
-		self.BurnResource = value
+		value = string.lower(value)
 		local str = "No"
 		if (self.Active) then str = "Yes" end
-		self:SetOverlayText( "Resource Burner\nActive: " .. str .. "\nRate: "..self.Rate.."\nResource: " .. self.BurnResource )
+		local str2 = value
+		if (self:CheckValidResource( value )) then
+			self.BurnResource = value
+		else
+			str2 = "Invalid Resource"
+		end
+		self:SetNWString("OverlayText", "Resource Burner\nActive: " .. str .. "\nRate: "..self.Rate.."\nResource: " .. str2 )
 	elseif (name == "Burn") then
 		if (value == 0) then
 			self.Rate = 0
 			self.Active = false
-			self:SetOverlayText( "Resource Burner\nActive: No\nRate: 0\nResource: " .. self.BurnResource )
+			self:SetNWString("OverlayText", "Resource Burner\nActive: No\nRate: 0\nResource: " .. self.BurnResource )
 		else
 			self.Rate = value
 			self.Active = true
-			self:SetOverlayText( "Resource Burner\nActive: Yes\nRate: "..self.Rate.."\nResource: " .. self.BurnResource )
+			self:SetNWString("OverlayText", "Resource Burner\nActive: Yes\nRate: "..self.Rate.."\nResource: " .. self.BurnResource )
 		end
 	end
 end

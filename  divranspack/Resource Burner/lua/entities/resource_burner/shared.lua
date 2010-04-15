@@ -10,5 +10,3 @@ ENT.Contact     = ""
 
 ENT.Spawnable			= true
 ENT.AdminSpawnable		= true
-
-list.Set( "LSEntOverlayText" , "resource_burner", {HasOOO = false} )
