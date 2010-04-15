@@ -11,7 +11,7 @@ e2function void entity:burnResource( string resourcetype, number amount )
 	if (CheckValidResource( resourcetype )) then
 		local storage = this:GetResourceAmount(resourcetype)
 		if (storage) then
-			this:ConsumeResource( resourcetype, math.min( amount, storage ) )
+			this:ConsumeResource( resourcetype, math.min( math.abs(amount), storage ) )
 		end
 	end
 end

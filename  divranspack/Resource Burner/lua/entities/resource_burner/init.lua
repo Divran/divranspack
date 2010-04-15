@@ -64,7 +64,7 @@ function ENT:Think()
 		if (self.BurnResource and self.BurnResource != "" and self.Rate and self.Rate != 0) then
 			local amount = self:GetResourceAmount(self.BurnResource)
 			if (amount) then
-				self:ConsumeResource(self.BurnResource,math.min(self.Rate,amount))
+				self:ConsumeResource(self.BurnResource,math.min(math.abs(self.Rate),amount))
 			end
 		end
 	end
