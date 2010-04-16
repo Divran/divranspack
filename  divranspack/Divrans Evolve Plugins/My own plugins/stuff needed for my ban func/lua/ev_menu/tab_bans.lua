@@ -6,6 +6,7 @@ local TAB = {}
 TAB.Title = "Bans"
 TAB.Description = "Manage bans."
 TAB.Author = "Divran"
+TAB.Width = 520
 TAB.Icon = "gui/silkicons/lock"
 
 TAB.Bans = {}
@@ -49,9 +50,8 @@ end
 
 function TAB:Initialize( pnl )
 	self.Container = vgui.Create( "DPanel", pnl )
-	self.Container:SetSize( pnl:GetParent():GetWide() - 10, pnl:GetParent():GetTall() )
+	self.Container:SetSize( self.Width - 10, self.Height )
 	self.Container.Paint = function() end
-	--evolve.menuContainer:AddSheet( self.Title, self.Container, "gui/silkicons/lock", false, false, self.Description )
 	local w, h = self.Container:GetWide(), self.Container:GetTall()
 	
 	self.BanList = vgui.Create( "DListView", self.Container )
@@ -120,13 +120,13 @@ function TAB:Initialize( pnl )
 	self.LockButton:SetPos( w*(5/6)-5, h-52 )
 	self.LockButton:SetText( "Lock Menu" )
 	function self.LockButton:DoClick()
-		if (!evolve.MenuLocked) then
+		if (!evolve.MENU.MenuLocked) then
 			self:SetText("Close Menu")
-			evolve.MenuLocked = true
+			evolve.MENU.MenuLocked = true
 		else
-			evolve.MenuLocked = false
+			evolve.MENU.MenuLocked = false
 			self:SetText("Lock Menu")
-			evolve:CloseMenu()
+			evolve.MENU:Hide()
 		end
 	end
 	

@@ -6,6 +6,7 @@ local TAB = {}
 TAB.Title = "Mapcycle"
 TAB.Description = "Automatic map cycle."
 TAB.Author = "Divran"
+TAB.Width = 520
 TAB.Icon = "gui/silkicons/world"
 
 function TAB:Update()
@@ -56,9 +57,8 @@ hook.Add("CompletedIncomingStream", "CallUpdate", CallUpdate)
 
 function TAB:Initialize( pnl )
 	self.Container = vgui.Create( "DPanel", pnl )
-	self.Container:SetSize( pnl:GetParent():GetWide() - 10, pnl:GetParent():GetTall() )
+	self.Container:SetSize( self.Width - 10, pnl:GetParent():GetTall() )
 	self.Container.Paint = function() end
-	--evolve.menuContainer:AddSheet( self.Title, self.Container, "gui/silkicons/world", false, false, self.Description )
 
 	self.MapList = vgui.Create( "DListView" )
 	self.MapList:SetParent( self.Container )
@@ -95,7 +95,6 @@ function TAB:Initialize( pnl )
 	self.AddButton:SetText( "Add Map" )
 	function self.AddButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "add", TAB.MapList:GetLine(TAB.MapList:GetSelectedLine()):GetValue(1) )
-		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.RemoveButton = vgui.Create("DButton", self.Container )
@@ -104,7 +103,6 @@ function TAB:Initialize( pnl )
 	self.RemoveButton:SetText( "Remove Map" )
 	function self.RemoveButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "remove", TAB.CycleList:GetSelectedLine() )
-		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.MoveUpButton = vgui.Create("DButton", self.Container )
@@ -114,7 +112,6 @@ function TAB:Initialize( pnl )
 	self.MoveUpButton:SetText( "Move Up" )
 	function self.MoveUpButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "moveup", TAB.CycleList:GetSelectedLine() )
-		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.MoveDownButton = vgui.Create("DButton", self.Container )
@@ -123,7 +120,6 @@ function TAB:Initialize( pnl )
 	self.MoveDownButton:SetText( "Move Down" )
 	function self.MoveDownButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "movedown", TAB.CycleList:GetSelectedLine() )
-		--timer.Simple( 0.1, function() TAB:Update() end)
 	end
 	
 	self.TimeList = vgui.Create( "DMultiChoice", self.Container )
