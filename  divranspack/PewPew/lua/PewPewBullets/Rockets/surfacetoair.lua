@@ -68,10 +68,13 @@ function BULLET:WireInput( self, inputname, value )
 			self:FireBullet()
 		end
 	elseif (inputname == "X") then
+		if (!self.TargetPos) then self.TargetPos = Vector(0,0,0) end
 		self.TargetPos.x = value
 	elseif (inputname == "Y") then
+		if (!self.TargetPos) then self.TargetPos = Vector(0,0,0) end
 		self.TargetPos.y = value
 	elseif (inputname == "Z") then
+		if (!self.TargetPos) then self.TargetPos = Vector(0,0,0) end
 		self.TargetPos.z = value
 	elseif (inputname == "XYZ") then
 		self.TargetPos = value

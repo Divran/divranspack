@@ -7,9 +7,17 @@ if (SERVER) then
 	hook.Add("PlayerInitialSpawn","SendPewPewCategories",function(ply)
 		datastream.StreamToClients( ply, "PewPew_WeaponsList", pewpew.Categories )
 	end)
+	concommand.Add("PewPew_RequestCategories",function( ply, cmd, args )
+		datastream.StreamToClients( ply, "PewPew_WeaponsList", pewpew.Categories )
+	end)
 else
 	datastream.Hook("PewPew_WeaponsList",function( handler,id,encoded,decoded )
 		pewpew.Categories = decoded
+	end)
+	timer.Simple( 3, function()
+		if (!pewpew.Categories) then
+			RunConsoleCommand("PewPew_RequestCategories")
+		end
 	end)
 end
 
