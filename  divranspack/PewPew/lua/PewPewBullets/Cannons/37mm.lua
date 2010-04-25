@@ -29,7 +29,7 @@ BULLET.Spread = 0
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 225
+BULLET.Damage = 525
 BULLET.Radius = 300
 BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil

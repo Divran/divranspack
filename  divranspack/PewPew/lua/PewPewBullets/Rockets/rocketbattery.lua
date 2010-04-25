@@ -34,7 +34,7 @@ BULLET.Spread = 0.4
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 350
+BULLET.Damage = 200
 BULLET.Radius = 145
 BULLET.RangeDamageMul = 0.9
 BULLET.PlayerDamage = 50
