@@ -1,5 +1,5 @@
--- Repair Tool
--- This tool repairs stuff
+-- Admin Tool
+-- This tool has admin options and a button to open the damage log
 
 TOOL.Category = "PewPew"
 TOOL.Name = "Admin Tool"

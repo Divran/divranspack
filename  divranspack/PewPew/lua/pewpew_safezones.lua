@@ -58,7 +58,7 @@ function pewpew:ModifySafeZone( In, Position, Radius, ParentEntity )
 		end
 	elseif (type(In) == "number") then
 		self.SafeZones[In] = { Position, Radius, ParentEntity }
-	elseif (type(In) == "entity") then
+	elseif (type(In) == "Entity") then
 		for index,tbl in pairs( self.SafeZones ) do
 			if (tbl[3]) then
 				if (tbl[3]:IsValid()) then

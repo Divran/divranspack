@@ -1,71 +1,59 @@
 -- PewPew Weapon Handler
 -- Takes care of adding and managing all the available bullets
 
--- Send the server's weapon list to all clients
-require("datastream")
-if (SERVER) then
-	hook.Add("PlayerInitialSpawn","SendPewPewCategories",function(ply)
-		datastream.StreamToClients( ply, "PewPew_WeaponsList", pewpew.Categories )
-	end)
-	concommand.Add("PewPew_RequestCategories",function( ply, cmd, args )
-		datastream.StreamToClients( ply, "PewPew_WeaponsList", pewpew.Categories )
-	end)
-else
-	datastream.Hook("PewPew_WeaponsList",function( handler,id,encoded,decoded )
-		pewpew.Categories = decoded
-	end)
-	timer.Simple( 3, function()
-		if (!pewpew.Categories) then
-			RunConsoleCommand("PewPew_RequestCategories")
-		end
-	end)
-end
-
 -- Load all the bullet files
 function pewpew:LoadBullets()
 	self.bullets = {}
 	self.Categories = {}
 	
-	self:LoadDirectory( "../lua/PewPewBullets" )
-	
-	if (SERVER) then 
-		if (#player.GetAll() > 0) then
-			datastream.StreamToClients( player.GetAll(), "PewPew_WeaponsList", pewpew.Categories )
+	self:LoadDirectory( "PewPewBullets" )
+end
+
+-- Reloads all weapons on the map (useful if you've just updated several weapons and done pewpew:LoadBullets())
+function pewpew:ReloadWeapons()
+	local weps = ents.FindByClass("pewpew_base_cannon")
+	for k,v in ipairs( weps ) do
+		if (v:IsValid()) then
+			local name = v.Bullet.Name
+			v.Bullet = table.Copy( pewpew:GetBullet( name ) )
+			print( "[PewPew] Reloaded weapon: " .. tostring(v) .. " with bullet: " .. name )
 		end
 	end
 end
 
 local CurrentCategory = ""
 
-function pewpew:LoadDirectory( Dir )
-	-- Get the dir used by include and AddCSLuaFile
-	local includedir = string.sub( Dir, 8, -1 )
-	
+function pewpew:LoadDirectory( Dir ) -- Thanks to Jcw87 for fixing this function
 	-- Get the category
-	CurrentCategory = string.Right( Dir, string.find( string.reverse( Dir ), "/", 1, true ) - 1 )
-	if (CurrentCategory == "PewPewBullets") then CurrentCategory = "Other" end
-	CurrentCategory = string.gsub( CurrentCategory, "_", " " )
-	
-	-- Load all files inside this directory
-	local files = file.FindInLua( includedir .. "/*.lua" )
-	for _, file in ipairs( files ) do
-		if (SERVER) then 
-			AddCSLuaFile( includedir .. "/" .. file )
-		end
-		include( includedir .. "/" .. file )
+	if (string.find(Dir, "/")) then
+		CurrentCategory = string.Right( Dir, string.find( string.reverse( Dir ), "/", 1, true ) - 1 )
+		CurrentCategory = string.gsub( CurrentCategory, "_", " " )
+	else
+		CurrentCategory = "Other"
 	end
 	
-	-- Load all folders inside this directory
-	local folders = file.FindDir( Dir .. "/*" )
-	for _, folder in ipairs( folders ) do
-		self:LoadDirectory( Dir .. "/" .. folder )
+	local entries = file.FindInLua( Dir .. "/*")
+	for _, entry in ipairs ( entries ) do
+		-- If entry is a file
+		if (string.find(entry, "%.")) then
+			-- If entry is a lua file
+			if (string.sub(entry, -4) == ".lua") then
+				if (SERVER) then 
+					AddCSLuaFile( Dir .. "/" .. entry )
+				end
+				include( Dir .. "/" .. entry )
+			end
+		-- If entry is a directory
+		else 
+			self:LoadDirectory( Dir .. "/" .. entry )
+		end
 	end
 end
 
+
 -- Add the bullets to the bullet list
 function pewpew:AddBullet( bullet )
-	if (CLIENT) then return end
-	if (SERVER) then print("Added PewPew Bullet: " .. bullet.Name) end
+	if (SERVER) then print("[PewPew] Added Bullet: " .. bullet.Name) end
 	table.insert( self.bullets, bullet )
 	if (!self.Categories[CurrentCategory]) then
 		self.Categories[CurrentCategory] = {}
