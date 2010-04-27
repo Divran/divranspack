@@ -1,0 +1,12 @@
+"AddonInfo"
+{
+	"name"		"NoCollide Remover Tool"
+	"version"	"1"
+	"up_date"	""
+	"author_name"	"Divran"
+	"author_email"	""
+	"author_url"	""
+	
+	"info"		"NoCollide Remover Tool"
+	"override"	"0"
+}

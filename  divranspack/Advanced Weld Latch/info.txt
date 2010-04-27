@@ -1,0 +1,12 @@
+"AddonInfo"
+{
+	"name"		"Adv Weld Latch"
+	"version"	"1"
+	"up_date"	""
+	"author_name"	"Divran"
+	"author_email"	""
+	"author_url"	""
+	
+	"info"		"Adv Weld Latch"
+	"override"	"0"
+}
