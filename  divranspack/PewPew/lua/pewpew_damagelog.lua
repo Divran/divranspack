@@ -66,9 +66,12 @@ timer.Create( "PewPew_PopLogStack", 2.5, 0, function(self)
 end, pewpew)
 
 -- Send the log
+require("datastream")
 function pewpew:PopLogStack()
 	if (!pewpew.DamageLogSend) then return end
 	if (table.Count(self.LogStack) > 0) then
+		datastream.StreamToClients( player.GetAll(), "PewPew_Admin_Tool_SendLog", self.LogStack )
+		--[[ Old broken umsg
 		umsg.Start("PewPew_Admin_Tool_SendLog_Umsg")
 			umsg.Short(table.Count(self.LogStack))
 			for k,v in pairs( self.LogStack ) do
@@ -88,6 +91,7 @@ function pewpew:PopLogStack()
 				umsg.Bool(DiedB)
 			end
 		umsg.End()
+		]]
 		self.LogStack = {}
 	end
 end
@@ -107,12 +111,12 @@ local function ToggleDamageLog( ply, command, arg )
 			if (pewpew.DamageLogSend) then
 				for _, v in pairs( player.GetAll() ) do
 					v:ChatPrint( "[PewPew] " .. name .. msg .. "ON!")
-					V:ConCommand("pewpew_cltgldamagelog","1")
+					v:ConCommand("pewpew_cltgldamagelog","1")
 				end
 			else
 				for _, v in pairs( player.GetAll() ) do
 					v:ChatPrint( "[PewPew] " .. name .. msg .. "OFF!")
-					V:ConCommand("pewpew_cltgldamagelog","+")
+					v:ConCommand("pewpew_cltgldamagelog","0")
 				end
 			end
 		end

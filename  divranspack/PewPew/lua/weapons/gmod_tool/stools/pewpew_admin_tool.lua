@@ -20,11 +20,7 @@ else
 	local function UpdateLogMenu()
 		if (pewpew.DamageLog and #pewpew.DamageLog > 0) then
 			pewpew_loglist:Clear()
-			local tbl = {}
 			for k,v in ipairs( pewpew.DamageLog ) do
-				table.insert( tbl, 1, v )
-			end
-			for k,v in ipairs( tbl ) do
 				local ent = v[2]
 				if (type(ent) == "number") then
 					if (Entity(ent):IsValid()) then
@@ -119,7 +115,16 @@ else
 		RunConsoleCommand("PewPew_TogglePP",ppdamage:GetString())
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
+	
+	datastream.Hook( "PewPew_Admin_Tool_SendLog", function( handler, id, encoded, decoded )
+		for k,v in pairs( decoded ) do
+			if (v[7] == true) then v[7] = "Yes" else v[7] = "No" end
+			table.insert( pewpew.DamageLog, 1, v )
+		end
+		UpdateLogMenu()
+	end)
 
+	--[[ Old broken umsg
 	usermessage.Hook( "PewPew_Admin_Tool_SendLog_Umsg", function( um )
 		local Amount = um:ReadShort()
 		for i=1,Amount do
@@ -137,6 +142,7 @@ else
 		end
 		UpdateLogMenu()
 	end)
+	]]
 	
 	function TOOL:DrawHUD()
 		local cannons = ents.FindByClass("pewpew_base_cannon")
