@@ -402,14 +402,19 @@ function ENT:DupeSpawn( ply, ent, info )
 			end
 		else
 			local blt = {
-				Name = "Dummy bullet",
+				Name = info.pewpewInfo.BulletName,
 				Reloadtime = 2,
 				Ammo = 0,
 				AmmoReloadtime = 0,
 				FireOverride = true
 			}
-			function blt:Fire(self) self.Owner:ChatPrint("[Pewpew] You must update this cannon with a valid bullet before you can fire.") end
-			ply:ChatPrint("[PewPew] PewPew Bullet named '" .. info.BulletName .. "' not found! Used a dummy bullet instead.")
+			function blt:Fire(self) 
+				self.Owner:ChatPrint("[Pewpew] This server does not have a bullet named '" .. info.pewpewInfo.BulletName .. "'.\nIn order to fire, you must update this cannon with a valid bullet.")
+				self.Owner:ChatPrint("You may also leave it like this, and it might work on other servers (which have this bullet) after adv duplicating and uploading it to that server.")
+			end
+			ply:ChatPrint("[Pewpew] This server does not have a bullet named '" .. info.pewpewInfo.BulletName .. "'.\nIn order to fire, you must update this cannon with a valid bullet.")
+			ply:ChatPrint("You may also leave it like this, and it might work on other servers (which have this bullet) after adv duplicating and uploading it to that server.\n--------------------")
+			bullet = blt
 		end
 		self:SetOptions( bullet, ply, info.pewpewInfo.FireKey or "1", info.pewpewInfo.ReloadKey or "2", info.pewpewInfo.Direction )
 		self:Initialize()

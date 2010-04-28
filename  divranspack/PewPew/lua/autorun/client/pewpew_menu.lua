@@ -6,8 +6,8 @@ local pewpew_list
 -- Use Menu
 local function CreateMenu()
 	pewpew_frame = vgui.Create("DFrame")
-	pewpew_frame:SetPos( ScrW()/2-400,ScrH()/2+345/2 )
-	pewpew_frame:SetSize( 800, 350 )
+	pewpew_frame:SetPos( ScrW()/2+100,ScrH()/2-420/2 )
+	pewpew_frame:SetSize( 600, 420 )
 	pewpew_frame:SetTitle( "PewPew Cannon Information" )
 	pewpew_frame:SetVisible( false )
 	pewpew_frame:SetDraggable( true )
@@ -16,12 +16,11 @@ local function CreateMenu()
 	pewpew_frame:SetScreenLock( true )
 	pewpew_frame:MakePopup()
 	
-	pewpew_list = vgui.Create( "DListView", pewpew_frame )
+	pewpew_list = vgui.Create( "DPanelList", pewpew_frame )
 	pewpew_list:StretchToParent( 2, 23, 2, 2 )
-	local a = pewpew_list:AddColumn( "" )
-	a:SetWide(pewpew_frame:GetWide()*(1.5/8))
-	local b = pewpew_list:AddColumn( "" )	
-	b:SetWide(pewpew_frame:GetWide()*(6.5/8))
+	pewpew_list:SetSpacing( 2 )
+	pewpew_list:EnableHorizontal( true )
+	pewpew_list:EnableVerticalScrollbar( true )
 end
 timer.Simple( 2, CreateMenu )
 
@@ -55,7 +54,22 @@ local function OpenUseMenu( bulletname )
 		pewpew_list:Clear()
 		SetTable( Bullet )
 		for _, value in ipairs( list ) do
-			pewpew_list:AddLine( value[1], tostring(value[2] or "- none -") or "- none -" )
+			local pnl = vgui.Create("DPanel")
+			pnl:SetSize( 594, 20 )
+			--function pnl:Paint() return true end
+		
+			local label = vgui.Create("DLabel",pnl)
+			label:SetPos( 4, 4 )
+			label:SetText( value[1] )
+			label:SizeToContents()
+			
+			local box = vgui.Create("DTextEntry",pnl)
+			box:SetPos( 135, 0 )
+			box:SetText( tostring(value[2] or "- none -") or "- none -" )
+			box:SetWidth( 592 )
+			box:SetMultiline( false )
+			
+			pewpew_list:AddItem( pnl )
 		end
 		pewpew_frame:SetVisible( true )
 	else
