@@ -5,9 +5,7 @@ TOOL.Category = "PewPew"
 TOOL.Name = "Admin Tool"
 				
 require("datastream")				
-if (SERVER) then
-	AddCSLuaFile("pewpew_repair_tool.lua")
-else
+if (CLIENT) then
 	language.Add( "Tool_pewpew_admin_tool_name", "PewPew Admin Tool" )
 	language.Add( "Tool_pewpew_admin_tool_desc", "Administrate your server!" )
 	language.Add( "Tool_pewpew_admin_tool_0", "-nothing-" )
@@ -82,6 +80,7 @@ else
 		CPanel:AddControl( "CheckBox", {Label="Toggle Damage Log Sending",Description="Toggle Damage Log Sending",Command="pewpew_cltgldamagelog"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Core Damage Only",Description="Toggle Core Damage Only",Command="pewpew_cltglcoredamageonly"} )
 		CPanel:AddControl( "CheckBox", {Label="Toggle Prop Prot. Dmg",Description="Toggle Prop Prot. Dmg",Command="pewpew_cltglppdamage"} )
+		CPanel:AddControl( "CheckBox", {Label="Toggle Weapon Designer",Description="Toggle Weapon Designer",Command="pewpew_cltglweapondesigner"} )
 		CPanel:AddControl( "Slider", {Label="Damage Multiplier",Description="Damage Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cldmgmul"} )
 		CPanel:AddControl( "Slider", {Label="Damage Core Multiplier",Description="Damage Core Multiplier",Type="Float",Min="0.01",Max="10",Command="pewpew_cldmgcoremul"} )
 		CPanel:AddControl( "Slider", {Label="Repair Tool Heal Rate",Description="Repair Tool Heal Rate",Type="Integer",Min="20",Max="10000",Command="pewpew_clrepairtoolheal"} )
@@ -100,6 +99,7 @@ else
 	local repaircores = CreateClientConVar("pewpew_clrepairtoolhealcores","200",false,false)
 	local damagelog = CreateClientConVar("pewpew_cltgldamagelog","1",false,false)
 	local ppdamage = CreateClientConVar("pewpew_cltglppdamage","0",false,false)
+	local weapondesigner = CreateClientConVar("pewpew_cltglweapondesigner","0",false,false)
 	
 	local function Apply( ply, cmd, args )
 		RunConsoleCommand("pewpew_toggledamage",dmg:GetString())
@@ -113,6 +113,7 @@ else
 		RunConsoleCommand("pewpew_repairtoolhealcores",repaircores:GetString())
 		RunConsoleCommand("pewpew_toggledamagelogsending",damagelog:GetString())
 		RunConsoleCommand("PewPew_TogglePP",ppdamage:GetString())
+		RunConsoleCommand("PewPew_ToggleWeaponDesigner",weapondesigner:GetString())
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
 	

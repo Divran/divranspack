@@ -13,6 +13,7 @@ pewpew.RepairToolHeal = 75
 pewpew.RepairToolHealCores = 200
 pewpew.EnergyUsage = false
 pewpew.PropProtDamage = false
+pewpew.WeaponDesigner = false
 
 if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
 	pewpew.EnergyUsage = true
@@ -279,3 +280,27 @@ local function TogglePP( ply, command, arg )
 	end
 end
 concommand.Add("PewPew_TogglePP", TogglePP)
+
+-- Weapon Designer
+local function ToggleWeaponDesigner( ply, command, arg )
+	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
+		if (!arg[1]) then return end
+		local bool = false
+		if (tonumber(arg[1]) != 0) then bool = true end
+		local OldSetting = pewpew.WeaponDesigner
+		pewpew.WeaponDesigner = bool
+		if (OldSetting != pewpew.WeaponDesigner) then
+			local name = "Console"
+			if (ply:IsValid()) then name = ply:Nick() end
+			local msg = " has changed PewPew Weapon Designer and it is now "
+			local onoff = "ENABLED!"
+			local cmd = "1"
+			if (pewpew.WeaponDesigner == false) then onoff = "DISABLED!" cmd = "0" end
+			for _,v in ipairs( player.GetAll() ) do
+				v:ChatPrint( "[PewPew] " .. name .. msg .. onoff )
+				v:ConCommand( "pewpew_cltglweapondesigner " .. cmd )
+			end
+		end
+	end
+end
+concommand.Add("PewPew_ToggleWeaponDesigner", ToggleWeaponDesigner)
