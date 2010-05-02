@@ -242,7 +242,7 @@ if (SERVER) then
 	
 	-- Save the cycle to the file
 	function PLUGIN:SaveCycle()
-		file.Write( "ev_mapcycle.txt", glon.encode( { self.Enabled, self.MapChangeInterval, self.Cycle } ))
+		file.Write( "evolve/ev_mapcycle.txt", glon.encode( { self.Enabled, self.MapChangeInterval, self.Cycle } ))
 	end
 	
 	-- Load the cycle from the file
