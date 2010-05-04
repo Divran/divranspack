@@ -24,7 +24,11 @@ function PLUGIN:OpenMotd( ply )
 	end
 end
 
-if (SERVER) then resource.AddFile("data/evolve/motd.html") end
+if (SERVER) then 
+	if (file.Exists("evolvemotd.html")) then
+		resource.AddFile("data/evolvemotd.html")
+	end
+end
 
 
 if (CLIENT) then
@@ -72,7 +76,7 @@ if (CLIENT) then
 		
 		self.MotdBox = vgui.Create("HTML",self.MotdPanel)
 		self.MotdBox:StretchToParent( 4,25,4,4 )
-		self.MotdBox:SetHTML( file.Read( "evolve/motd.html") )
+		self.MotdBox:SetHTML( file.Read( "evolvemotd.html") )
 	end
 	timer.Simple( 0.1, function() PLUGIN:CreateMenu() end)
 	
