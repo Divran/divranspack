@@ -16,6 +16,8 @@ ENJOY
 
 -----------
 
+REMEMBER! When you launch it, you must enter your name (and then click Enter) before you can play.
+
 The highscores are saved at:
     * Windows XP: C:\Documents and Settings\user\Application Data\Love\ or %appdata%\Love\
     * Windows Vista and 7: C:\Users\user\AppData\Roaming\LOVE or %appdata%\Love\
