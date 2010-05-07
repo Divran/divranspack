@@ -64,7 +64,7 @@ function BULLET:WireInput( self, inputname, value )
 		if (value != 0 and self.CanFire == true) then
 			self.LastFired = CurTime()
 			self.CanFire = false
-			Wire_TriggerOutput(self.Entity, "Can Fire", 0)
+			WireLib.TriggerOutput(self.Entity, "Can Fire", 0)
 			self:FireBullet()
 		end
 	elseif (inputname == "X") then

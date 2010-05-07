@@ -26,10 +26,11 @@ BULLET.Speed = 135
 BULLET.Gravity = 0.06
 BULLET.RecoilForce = 400
 BULLET.Spread = 1
+BULLET.AffectedBySBGravity = true
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 300
+BULLET.Damage = 250
 BULLET.Radius = 850
 BULLET.RangeDamageMul = 0.5
 BULLET.NumberOfSlices = nil

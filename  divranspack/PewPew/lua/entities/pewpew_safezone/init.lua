@@ -12,9 +12,9 @@ function ENT:Initialize()
 	
 	pewpew:AddSafeZone( Vector(0,0,0), 1000, self.Entity )
 	self.On = true
-	Wire_TriggerOutput( self.Entity, "IsOn", 1 )
+	WireLib.TriggerOutput( self.Entity, "IsOn", 1 )
 	self.Radius = 1000
-	Wire_TriggerOutput( self.Entity, "CurrentRadius", 1000 )
+	WireLib.TriggerOutput( self.Entity, "CurrentRadius", 1000 )
 	self.ChangeDelay = 0
 end
 
@@ -29,7 +29,7 @@ function ENT:TriggerInput( name, value )
 				-- Turn on
 				pewpew:AddSafeZone( Vector(0,0,0), self.Radius, self.Entity )
 				self.On = true
-				Wire_TriggerOutput( self.Entity, "IsOn", 1 )
+				WireLib.TriggerOutput( self.Entity, "IsOn", 1 )
 				self.ChangeDelay = CurTime() + 2
 			end
 		else -- If value is 0
@@ -37,7 +37,7 @@ function ENT:TriggerInput( name, value )
 				-- Turn off
 				pewpew:RemoveSafeZone( self.Entity )
 				self.On = false
-				Wire_TriggerOutput( self.Entity, "IsOn", 0 )
+				WireLib.TriggerOutput( self.Entity, "IsOn", 0 )
 				self.ChangeDelay = CurTime() + 2
 			end
 		end
@@ -46,7 +46,7 @@ function ENT:TriggerInput( name, value )
 		if (self.Radius != value) then -- If radius is not already equal to value
 			self.Radius = value
 			pewpew:ModifySafeZone( self.Entity, Vector(0,0,0), self.Radius, self.Entity )
-			Wire_TriggerOutput( self.Entity, "CurrentRadius", self.Radius )
+			WireLib.TriggerOutput( self.Entity, "CurrentRadius", self.Radius )
 			self.ChangeDelay = CurTime() + 2
 		end
 	end

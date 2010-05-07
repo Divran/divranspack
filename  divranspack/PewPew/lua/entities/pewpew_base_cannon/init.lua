@@ -32,9 +32,9 @@ function ENT:Initialize()
 		if (!self.OutputsChanged) then
 			self.Outputs = WireLib.CreateOutputs( self.Entity, { "Can Fire", "Ammo", "Last Fired [ENTITY]", "Last Fired EntID", "Cannon [ENTITY]" } )
 			self.OutputsChanged = "default"
-			Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
-			Wire_TriggerOutput( self.Entity, "Can Fire", 1 )
-			Wire_TriggerOutput( self.Entity, "Cannon", self.Entity )
+			WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
+			WireLib.TriggerOutput( self.Entity, "Can Fire", 1 )
+			WireLib.TriggerOutput( self.Entity, "Cannon", self.Entity )
 		end
 	end
 	
@@ -183,10 +183,10 @@ function ENT:FireBullet()
 		
 		if (self.Bullet.Ammo and self.Bullet.Ammo > 0) then
 			self.Ammo = self.Ammo - 1
-			Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+			WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
 		end
-		Wire_TriggerOutput( self.Entity, "Last Fired", ent or nil )
-		Wire_TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+		WireLib.TriggerOutput( self.Entity, "Last Fired", ent or nil )
+		WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
 	end
 end
 
@@ -212,17 +212,17 @@ function ENT:Think()
 					end			
 				end
 				self.CanFire = false
-				Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+				WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
 				if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
 					self.Ammo = self.Bullet.Ammo
-					Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+					WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
 					self.CanFire = true
 					if (self.Firing) then 
 						self.LastFired = CurTime()
 						self.CanFire = false
 						self:FireBullet()
 					else
-						Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+						WireLib.TriggerOutput( self.Entity, "Can Fire", 1)
 					end
 				end
 			else
@@ -233,7 +233,7 @@ function ENT:Think()
 					self.CanFire = false
 					self:FireBullet()
 				else
-					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+					WireLib.TriggerOutput( self.Entity, "Can Fire", 1)
 				end
 			end
 		end
@@ -267,7 +267,7 @@ function ENT:InputChange( name, value )
 		if (value != 0 and self.CanFire == true) then
 			self.LastFired = CurTime()
 			self.CanFire = false
-			Wire_TriggerOutput(self.Entity, "Can Fire", 0)
+			WireLib.TriggerOutput(self.Entity, "Can Fire", 0)
 			self:FireBullet()
 		end
 	elseif (name == "Reload") then
@@ -278,8 +278,8 @@ function ENT:InputChange( name, value )
 						self.Ammo = 0
 						self.LastFired = CurTime() + self.Bullet.Reloadtime
 						self.CanFire = false					
-						Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-						Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+						WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
+						WireLib.TriggerOutput( self.Entity, "Ammo", 0 )
 					end
 				end
 			end

@@ -27,6 +27,7 @@ BULLET.Speed = 100
 BULLET.Gravity = 0.15
 BULLET.RecoilForce = 400
 BULLET.Spread = 0.5
+BULLET.AffectedBySBGravity = true
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 0.5

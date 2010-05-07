@@ -65,8 +65,8 @@ function BULLET:Fire( self )
 		undo.SetPlayer( ply )
 	undo.Finish()
 	
-	Wire_TriggerOutput( self.Entity, "Last Fired", ent or nil )
-	Wire_TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+	WireLib.TriggerOutput( self.Entity, "Last Fired", ent or nil )
+	WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
 end
 
 pewpew:AddBullet( BULLET )

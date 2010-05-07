@@ -16,8 +16,8 @@ function ENT:Initialize()
 	self.pewpew.CoreMaxHealth = 1
 	self.Entity.Core = self
 	
-	Wire_TriggerOutput( self.Entity, "Health", self.pewpew.CoreHealth or 0 )
-	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpew.CoreMaxHealth or 0 )
+	WireLib.TriggerOutput( self.Entity, "Health", self.pewpew.CoreHealth or 0 )
+	WireLib.TriggerOutput( self.Entity, "Total Health", self.pewpew.CoreMaxHealth or 0 )
 	
 	self.Entity:NextThink( CurTime() + 1 )
 	return true
@@ -88,10 +88,10 @@ function ENT:Think()
 	end
 	
 	-- Wire Output
-	Wire_TriggerOutput( self.Entity, "Health", self.pewpew.CoreHealth or 0 )
-	Wire_TriggerOutput( self.Entity, "Total Health", self.pewpew.CoreMaxHealth or 0 )
+	WireLib.TriggerOutput( self.Entity, "Health", self.pewpew.CoreHealth or 0 )
+	WireLib.TriggerOutput( self.Entity, "Total Health", self.pewpew.CoreMaxHealth or 0 )
 	
-	-- Run again in 1 second
+	-- Run again in 5 seconds
 	self.Entity:NextThink( CurTime() + 5 )
 	return true
 end

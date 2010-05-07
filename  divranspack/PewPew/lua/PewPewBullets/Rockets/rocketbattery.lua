@@ -145,10 +145,10 @@ function BULLET:Fire( self )
 	
 	if (self.Bullet.Ammo and self.Bullet.Ammo > 0) then
 		self.Ammo = self.Ammo - 1
-		Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+		WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
 	end
-	Wire_TriggerOutput( self.Entity, "Last Fired", ent or nil )
-	Wire_TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+	WireLib.TriggerOutput( self.Entity, "Last Fired", ent or nil )
+	WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
 end
 
 -- Think (Is run on: Bullet)

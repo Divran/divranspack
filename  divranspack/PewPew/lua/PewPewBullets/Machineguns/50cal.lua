@@ -27,6 +27,7 @@ BULLET.Speed = 115
 BULLET.Gravity = 0.15
 BULLET.RecoilForce = 50
 BULLET.Spread = 0.4
+BULLET.AffectedBySBGravity = true
 
 -- Damage
 BULLET.DamageType = "PointDamage"

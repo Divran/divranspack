@@ -31,10 +31,11 @@ BULLET.PitchChange = 0
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 BULLET.Gravity = 0.03
+BULLET.AffectedBySBGravity = true
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 380
+BULLET.Damage = 280
 BULLET.Radius = 500
 BULLET.RangeDamageMul = 0.6
 BULLET.NumberOfSlices = nil

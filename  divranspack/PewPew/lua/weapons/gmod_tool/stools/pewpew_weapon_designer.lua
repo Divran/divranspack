@@ -139,6 +139,47 @@ else
 	
 	local Menu = nil
 	
+	local function GetVal( Text, Type, Type2 )
+		if (Type == "String") then
+			return Text
+		elseif (Type == "Number") then
+			return tonumber(Text)
+		elseif (Type == "Table") then
+			if (Type2 == "String") then
+				return { Text }
+			elseif (Type2 == "Number") then
+				return { tonumber(Text) }
+			end
+		end
+	end
+	
+	
+	local Tbl1 = { 	[1]={Txt = "DamageType", 				Default = "PointDamage", 	Desc = "", Type="String"},
+					[2]={Txt = "Damage", 					Default = "100", 			Desc = "", Type="Number"},
+					[3]={Txt = "Radius",					Default = "100", 			Desc = "", Type="Number"},
+					[4]={Txt = "RangeDamageMul",		 	Default = "0.5", 			Desc = "Only used in BlastDamage. Must be between 0 and 1", Type="Number"},
+					[5]={Txt = "PlayerDamage",				Default = "",				Desc = "Only used in BlastDamage", Type="Number"},
+					[6]={Txt = "PlayerDamageRadius",		Default = "", 				Desc = "Only used in BlastDamage", Type="Number"},
+					[7]={Txt = "NumberOfSlices",			Default = "", 				Desc = "Only used in SliceDamage", Type="Number"},
+					[8]={Txt = "SliceDistance",				Default = "", 				Desc = "Only used in SliceDamage", Type="Number"},
+					[9]={Txt = "Duration",					Default = "", 				Desc = "Only used in EMPDamage", Type="Number"},
+					[10]={Txt = "Speed",					Default = "70", 			Desc = "", Type="Number"},
+					[11]={Txt = "Gravity",					Default = "0.1", 			Desc = "", Type="Number"},
+					[12]={Txt = "RecoilForce",				Default = "1000", 			Desc = "", Type="Number"},
+					[13]={Txt = "Spread",					Default = "0.1", 			Desc = "", Type="Number"} }
+	
+	local Tbl2 = { 	[1]={Txt = "Reloadtime", 				Default = "1", 				Desc = "", Type="Number"},
+					[2]={Txt = "Ammo", 						Default = "0", 				Desc = "If you set this to 0, it will have infinite ammo", Type="Number"},
+					[3]={Txt = "AmmoReloadtime", 			Default = "0", 				Desc = "", Type="Number"},
+					[4]={Txt = "EnergyPerShot", 			Default = "1000", 			Desc = "", Type="Number"},
+					[5]={Txt = "Model",						Default = "models/combatmodels/tankshell.mdl", Desc = "", Type="String"},
+					[6]={Txt = "ExplosionEffect",			Default = "big_splosion", 	Desc = "", Type="String"},
+					[7]={Txt = "FireEffect", 				Default = "cannon_flare", 	Desc = "", Type="String"},
+					[8]={Txt = "FireSound", 				Default = "arty/37mm.wav", 	Desc = "", Type="Table", Type2 = "String"},
+					[9]={Txt = "ExplosionSound", 			Default = "weapons/explode1.wav", 	Desc = "", Type="Table", Type2 = "String"},}
+					
+	--local Tbl3 = { 	1={Txt = "Radius",					Desc = ""},
+	
 	local function CreateWeaponDesignerMenu()
 		Menu = vgui.Create("DFrame")
 		local w,h = 800, 400
@@ -157,6 +198,16 @@ else
 		CreateButton:SetSize( 50, 20 )
 		CreateButton:SetText( "OK" )
 		function CreateButton:DoClick()
+			for k,v in ipairs( Tbl1 ) do
+				if (v.textbox) then
+					Weapon[v.Txt] = GetVal( v.textbox:GetValue(), v.Type, v.Type2 )
+				end
+			end
+			for k,v in ipairs( Tbl2 ) do
+				if (v.textbox) then
+					Weapon[v.Txt] = GetVal( v.textbox:GetValue(), v.Type, v.Type2 )
+				end
+			end
 			datastream.StreamToServer("PewPew_WeaponDesigner",Weapon,
 				function() 
 					LocalPlayer():ChatPrint("[PewPew] Weapon loaded.") 
@@ -172,33 +223,7 @@ else
 		local TabHolder = vgui.Create("DPropertySheet",Menu)
 		TabHolder:SetPos( 2, 24 )
 		TabHolder:SetSize( w - 4, h - 24 - 2 )
-		
-		local Tbl1 = { 	[1]={Txt = "DamageType", 				Default = "PointDamage", 	Desc = "", Type="String"},
-						[2]={Txt = "Damage", 					Default = "100", 			Desc = "", Type="Number"},
-						[3]={Txt = "Radius",					Default = "100", 			Desc = "", Type="Number"},
-						[4]={Txt = "RangeDamageMul",		 	Default = "0.5", 			Desc = "Only used in BlastDamage. Must be between 0 and 1", Type="Number"},
-						[5]={Txt = "PlayerDamage",				Default = "",				Desc = "Only used in BlastDamage", Type="Number"},
-						[6]={Txt = "PlayerDamageRadius",		Default = "", 				Desc = "Only used in BlastDamage", Type="Number"},
-						[7]={Txt = "NumberOfSlices",			Default = "", 				Desc = "Only used in SliceDamage", Type="Number"},
-						[8]={Txt = "SliceDistance",				Default = "", 				Desc = "Only used in SliceDamage", Type="Number"},
-						[9]={Txt = "Duration",					Default = "", 				Desc = "Only used in EMPDamage", Type="Number"},
-						[10]={Txt = "Speed",					Default = "70", 			Desc = "", Type="Number"},
-						[11]={Txt = "Gravity",					Default = "0.1", 			Desc = "", Type="Number"},
-						[12]={Txt = "RecoilForce",				Default = "1000", 			Desc = "", Type="Number"},
-						[13]={Txt = "Spread",					Default = "0.1", 			Desc = "", Type="Number"} }
-		
-		local Tbl2 = { 	[1]={Txt = "Reloadtime", 				Default = "1", 				Desc = "", Type="Number"},
-						[2]={Txt = "Ammo", 						Default = "0", 				Desc = "If you set this to 0, it will have infinite ammo", Type="Number"},
-						[3]={Txt = "AmmoReloadtime", 			Default = "0", 				Desc = "", Type="Number"},
-						[4]={Txt = "EnergyPerShot", 			Default = "1000", 			Desc = "", Type="Number"},
-						[5]={Txt = "Model",						Default = "models/combatmodels/tankshell.mdl", Desc = "", Type="String"},
-						[6]={Txt = "ExplosionEffect",			Default = "big_splosion", 	Desc = "", Type="String"},
-						[7]={Txt = "FireEffect", 				Default = "cannon_flare", 	Desc = "", Type="String"},
-						[8]={Txt = "FireSound", 				Default = "arty/37mm.wav", 	Desc = "", Type="Table", Type2 = "String"},
-						[9]={Txt = "ExplosionSound", 			Default = "weapons/explode1.wav", 	Desc = "", Type="Table", Type2 = "String"},}
-						
-		--local Tbl3 = { 	1={Txt = "Radius",					Desc = ""},
-						
+	
 		local function CreateTextBoxes( TargetTab, TargetTable )
 			local list = vgui.Create("DPanelList",TargetTab)
 			list:SetSize( w - 6, h - 6 )
@@ -222,32 +247,13 @@ else
 				box:SetText( v.Default )
 				-- Default values
 				if (v.Default and v.Default != "") then 
-					if (v.Type == "String") then
-						Weapon[v.Txt] = v.Default
-					elseif (v.Type == "Number") then
-						Weapon[v.Txt] = tonumber(v.Default)
-					elseif (v.Type == "Table") then
-						if (v.Type2 == "String") then
-							Weapon[v.Txt] = { v.Default }
-						elseif (v.Type2 == "Number") then
-							Weapon[v.Txt] = { tonumber(v.Default) }
-						end
-					end
+					Weapon[v.Txt] = GetVal( v.Default, v.Type, v.Type2 )
 				end
 				box:SetMultiline( false )
 				function box:OnEnter()
-					if (v.Type == "String") then
-						Weapon[v.Txt] = self:GetValue()
-					elseif (v.Type == "Number") then
-						Weapon[v.Txt] = tonumber(self:GetValue())
-					elseif (v.Type == "Table") then
-						if (v.Type2 == "String") then
-							Weapon[v.Txt] = { self:GetValue() }
-						elseif (v.Type2 == "Number") then
-							Weapon[v.Txt] = { tonumber(self:GetValue()) }
-						end
-					end
+					Weapon[v.Txt] = GetVal( self:GetValue(), v.Type, v.Type2 )
 				end
+				v.textbox = box
 				
 				local label2 = vgui.Create("DLabel",pnl)
 				label2:SetPos( 200 + 135 + 4 + 10, 4 )

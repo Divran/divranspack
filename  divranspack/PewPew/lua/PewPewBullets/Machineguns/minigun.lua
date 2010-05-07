@@ -26,6 +26,7 @@ BULLET.Speed = 100
 BULLET.Gravity = 0.1
 BULLET.RecoilForce = 35
 BULLET.Spread = 0.5
+BULLET.AffectedBySBGravity = true
 
 -- Damage
 BULLET.DamageType = "PointDamage"
@@ -51,7 +52,7 @@ function BULLET:WireInput( self, name, value )
 		if (value != 0 and self.CanFire == true) then
 			self.LastFired = CurTime()
 			self.CanFire = false
-			Wire_TriggerOutput(self.Entity, "Can Fire", 0)
+			WireLib.TriggerOutput(self.Entity, "Can Fire", 0)
 		end
 	elseif (name == "Reload") then
 		if (self.Ammo and self.Ammo > 0 and self.Ammo < self.Bullet.Ammo) then
@@ -61,8 +62,8 @@ function BULLET:WireInput( self, name, value )
 						self.Ammo = 0
 						self.LastFired = CurTime() + self.Bullet.Reloadtime
 						self.CanFire = false					
-						Wire_TriggerOutput( self.Entity, "Can Fire", 0)
-						Wire_TriggerOutput( self.Entity, "Ammo", 0 )
+						WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
+						WireLib.TriggerOutput( self.Entity, "Ammo", 0 )
 					end
 				end
 			end
@@ -92,16 +93,16 @@ function BULLET:CannonThink( self )
 				end			
 			end
 			self.CanFire = false
-			Wire_TriggerOutput( self.Entity, "Can Fire", 0)
+			WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
 			if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
 				self.Ammo = self.Bullet.Ammo
-				Wire_TriggerOutput( self.Entity, "Ammo", self.Ammo )
+				WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
 				self.CanFire = true
 				if (self.Firing) then 
 					self.LastFired = CurTime()
 					self.CanFire = false
 				else
-					Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+					WireLib.TriggerOutput( self.Entity, "Can Fire", 1)
 				end
 			end
 		else
@@ -120,7 +121,7 @@ function BULLET:CannonThink( self )
 				end
 				self.ChargeSound:ChangePitch(math.max(self.ChargeUpTime,1))
 			else
-				Wire_TriggerOutput( self.Entity, "Can Fire", 1)
+				WireLib.TriggerOutput( self.Entity, "Can Fire", 1)
 
 			end
 		end

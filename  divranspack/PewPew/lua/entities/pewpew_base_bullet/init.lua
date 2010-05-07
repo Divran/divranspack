@@ -9,6 +9,16 @@ function ENT:Initialize()
 		self.Bullet.Damage = 0
 	end
 	
+	-- Spacebuild 3 is way too slow at this.
+	if (self.Bullet.AffectedBySBGravity) then
+		if (CAF and CAF.GetAddon("Spacebuild")) then
+			CAF.GetAddon("Spacebuild").PerformEnvironmentCheckOnEnt(self.Entity)
+			CAF.GetAddon("Spacebuild").OnEnvironmentChanged(self.Entity)
+			self.Entity.environment:UpdateGravity(self.Entity)
+			self.Entity.environment:UpdatePressure(self.Entity)
+		end
+	end
+	
 	if (self.Bullet.InitializeOverride) then
 		-- Allows you to override the Initialize function
 		self.Bullet:InitializeFunc( self )
@@ -135,7 +145,21 @@ function ENT:Think()
 	else
 		-- Make it fly
 		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-		self.FlightDirection = self.FlightDirection - Vector(0,0,(self.Bullet.Gravity or 0) / (self.Bullet.Speed or 1))
+		local grav = self.Bullet.Gravity or 0
+		
+		-- Make the bullet not fall down in space
+		if (self.Bullet.AffectedByNoGrav) then
+			if (CAF and CAF.GetAddon("Spacebuild")) then
+				if (self.environment) then
+					grav = grav * self.environment:GetGravity()
+				end
+			end
+		end
+		
+		if (grav and grav != 0) then -- Only pull it down if needed
+			self.FlightDirection = self.FlightDirection - Vector(0,0,grav / (self.Bullet.Speed or 1))
+		end
+			
 		self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 		
 		-- Lifetime

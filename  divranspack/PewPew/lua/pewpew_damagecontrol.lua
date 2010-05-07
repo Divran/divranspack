@@ -26,17 +26,28 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 				if (ent != IgnoreEnt) then
 					distance = Position:Distance( ent:GetPos() )
 					dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-					if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
+					--if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
+					dmg = self:ReduceBlastDamageVsCores( ent.Core, dmg )
 					self:DealDamageBase( ent, dmg, DamageDealer )
 				end
 			else
 				distance = Position:Distance( ent:GetPos() )
 				dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-				if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
+				--if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
+				dmg = self:ReduceBlastDamageVsCores( ent.Core, dmg )
 				self:DealDamageBase( ent, dmg, DamageDealer )
 			end
 		end
 	end
+end
+
+-- Sub function. Used by BlastDamage
+function pewpew:ReduceBlastDamageVsCores( Core, Damage )
+	if (!Core or !Core:IsValid()) then return Damage end
+	if (!Damage or Damage == 0) then return 0 end
+	local NrOfProps = math.max(table.Count(Core.Props)-5,2)
+	Damage = Damage / NrOfProps
+	return Damage
 end
 
 -- Point Damage - (Deals damage to 1 single entity)
@@ -269,7 +280,7 @@ function pewpew:DamageCore( ent, Damage )
 	ent.pewpew.CoreHealth = ent.pewpew.CoreHealth - math.abs(Damage) * self.CoreDamageMul
 	ent:SetNWInt("pewpewHealth",ent.pewpew.CoreHealth)
 	-- Wire Output
-	Wire_TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )
+	WireLib.TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )
 	self:CheckIfDeadCore( ent )
 end
 
@@ -285,7 +296,7 @@ function pewpew:RepairCoreHealth( ent, amount )
 	ent.pewpew.CoreHealth = math.Clamp(ent.pewpew.CoreHealth+math.abs(amount),0,ent.pewpew.CoreMaxHealth)
 	ent:SetNWInt("pewpewHealth",ent.pewpew.CoreHealth or 0)
 		-- Wire Output
-	Wire_TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )
+	WireLib.TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )
 end
 
 function pewpew:CheckIfDeadCore( ent )

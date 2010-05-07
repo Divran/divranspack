@@ -26,11 +26,12 @@ BULLET.Speed = 145
 BULLET.Gravity = 0.1
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
+BULLET.AffectedBySBGravity = true
 
 -- Damage
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 1000
-BULLET.Radius = 800
+BULLET.Radius = 600
 BULLET.RangeDamageMul = 0.8
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
