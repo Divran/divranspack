@@ -35,6 +35,7 @@ BULLET.Radius = nil
 BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = 3
 BULLET.SliceDistance = 500
+BULLET.ReducedDamagePerSlice = 0
 BULLET.Duration = nil
 BULLET.PlayerDamage = nil
 BULLET.PlayerDamageRadius = nil
@@ -56,7 +57,7 @@ function BULLET:Fire( self )
 	
 	-- Deal damage
 	if (!pewpew:FindSafeZone(self.Entity:GetPos())) then
-		local HitPos = pewpew:SliceDamage( startpos, Dir, self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self )
+		local HitPos = pewpew:SliceDamage( startpos, Dir, self.Bullet.Damage, self.Bullet.NumberOfSlices, self.Bullet.SliceDistance, self.Bullet.ReducedDamagePerSlice, self )
 	end
 	
 	local effectdata = EffectData()

@@ -16,36 +16,33 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 		if (!self.Damage) then return end
 	if (!Radius or Radius <= 0) then return end
 	if (!Damage or Damage <= 0) then return end
-	local ents = ents.FindInSphere( Position, Radius )
-	if (!ents or table.Count(ents) == 0) then return end
-	local dmg = 0
-	local distance = 0
-	for _, ent in pairs( ents ) do
-		if (self:CheckValid( ent )) then 
+	local targets = ents.FindInSphere( Position, Radius )
+	if (!targets or table.Count(targets) == 0) then return end
+	local DamagedProps = {}
+	for _, ent in ipairs( targets ) do
+		if (self:CheckValid( ent )) then
 			if (IgnoreEnt) then
 				if (ent != IgnoreEnt) then
-					distance = Position:Distance( ent:GetPos() )
-					dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-					--if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
-					dmg = self:ReduceBlastDamageVsCores( ent.Core, dmg )
-					self:DealDamageBase( ent, dmg, DamageDealer )
+					table.insert( DamagedProps, ent )
 				end
 			else
-				distance = Position:Distance( ent:GetPos() )
-				dmg = math.Clamp(Damage - (distance * RangeDamageMul), 0, Damage)
-				--if (ent.Core and ent.Core:IsValid()) then dmg = dmg / 2 end
-				dmg = self:ReduceBlastDamageVsCores( ent.Core, dmg )
-				self:DealDamageBase( ent, dmg, DamageDealer )
+				table.insert( DamagedProps, ent )
 			end
 		end
+	end
+	
+	for _, ent in ipairs( DamagedProps ) do
+		local Distance = Position:Distance( ent:GetPos() )
+		local Dmg = math.Clamp( Damage - (Distance * RangeDamageMul), 0, Damage )
+		Dmg = self:ReduceBlastDamage( Dmg, #DamagedProps )
+		self:DealDamageBase( ent, Dmg, DamageDealer )
 	end
 end
 
 -- Sub function. Used by BlastDamage
-function pewpew:ReduceBlastDamageVsCores( Core, Damage )
-	if (!Core or !Core:IsValid()) then return Damage end
+function pewpew:ReduceBlastDamage( Damage, NumberOfProps )
 	if (!Damage or Damage == 0) then return 0 end
-	local NrOfProps = math.max(table.Count(Core.Props)-5,2)
+	local NrOfProps = math.max(NumberOfProps-5,2)
 	Damage = Damage / NrOfProps
 	return Damage
 end
@@ -63,7 +60,7 @@ function pewpew:PointDamage( TargetEntity, Damage, DamageDealer )
 end
 
 -- Slice damage - (Deals damage to a number of entities in a line. It is stopped by the world)
-function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange, DamageDealer )
+function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRange, ReducedDamagePerSlice, DamageDealer )
 	-- First trace
 	local tr = {}
 	tr.start = StartPos
@@ -94,6 +91,12 @@ function pewpew:SliceDamage( StartPos, Direction, Damage, NumberOfSlices, MaxRan
 				elseif (self:CheckValid( HitEnt )) then
 					self:DealDamageBase( HitEnt, Damage, DamageDealer ) -- Deal damage to entities
 				end
+				-- Reduce damage after hit
+				if (ReducedDamagePerSlice != 0) then
+					Damage = Damage - ReducedDamagePerSlice
+					if (Damage <= 0) then return HitPos end
+				end
+				
 				-- new trace
 				local tr = {}
 				tr.start = HitPos

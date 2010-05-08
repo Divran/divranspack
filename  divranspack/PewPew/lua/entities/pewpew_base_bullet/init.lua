@@ -125,7 +125,7 @@ function ENT:Explode(trace)
 			elseif (damagetype == "PointDamage") then
 				pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
 			elseif (damagetype == "SliceDamage") then
-				pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self )
+				pewpew:SliceDamage( trace.HitPos, self.FlightDirection, self.Bullet.Damage, self.Bullet.NumberOfSlices or 1, self.Bullet.SliceDistance or 50, self.Bullet.ReducedDamagePerSlice or 0, self )
 			elseif (damagetype == "EMPDamage") then
 				pewpew:EMPDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Duration )
 			elseif (damagetyp == "DefenseDamage") then
