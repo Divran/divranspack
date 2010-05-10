@@ -1,39 +1,55 @@
--- C4 Spawner
+-- Naval Mine
 
 local BULLET = {}
 
 -- General Information
-BULLET.Name = "C4 Spawner"
+BULLET.Name = "Naval Mine Spawner"
 BULLET.Author = "Divran"
-BULLET.Description = "Spawns C4s so that you can applyForce them with E2."
+BULLET.Description = "Deploy in water. Mines will hover at designated height until touched. If height = 0, they will hover where spawned."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/Items/grenadeAmmo.mdl"
+BULLET.Model = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 
 -- Effects / Sounds
 BULLET.FireSound = {"npc/attack_helicopter/aheli_mine_drop1.wav"}
 
+-- Damage
+BULLET.DamageType = "BlastDamage"
+
 -- Reloading/Ammo
-BULLET.Reloadtime = 3
+BULLET.Reloadtime = 5
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
--- Custom Functions 
--- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
+-- Other
+BULLET.Lifetime = {0,0}
+BULLET.ExplodeAfterDeath = true
+BULLET.EnergyPerShot = 10000
 
--- Fire (Is called before the cannon is about to fire)
+BULLET.CustomInputs = { "Fire", "Height" }
+
+BULLET.WireInputOverride = true
+function BULLET:WireInput( self, inputname, value )
+	if (inputname == "Height") then
+		self.TargetHeight = math.max( value, 0 )
+		if (self.TargetHeight == 0) then self.TargetHeight = nil end
+	elseif (inputname == "Fire") then
+		self:InputChange( "Fire", value )
+	end		
+end
+
 BULLET.FireOverride = true
 function BULLET:Fire( self )
 	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self )
 	
-	local Bullet = pewpew:GetBullet("C4")
+	local Bullet = pewpew:GetBullet("Naval Mine")
 	
 	ply = self.Owner
 	
 	if (!Bullet) then 
-		ply:ChatPrint("This server does not have C4.") 
+		ply:ChatPrint("This server does not have Naval Mines.") 
 		return 
 	end
 	
@@ -49,13 +65,18 @@ function BULLET:Fire( self )
 	ent:SetPos( Pos )
 	ent:SetAngles( self.Entity:GetAngles() )
 
-	ent:SetOptions( Bullet, ply, fire, reload )
 	
+	ent:SetOptions( Bullet, ply, fire, reload )
 	ent:Spawn()
 	ent:Activate()
 	
+	ent.TargetHeight = self.TargetHeight
+	
 	local phys = ent:GetPhysicsObject()
 	phys:Wake()
+	
+	phys:AddVelocity( Dir * 500 )
+	self.Entity:GetPhysicsObject():ApplyForceCenter( Dir * -500 )
 	
 	ply:AddCount("pewpew",ent)
 	ply:AddCleanup ( "pewpew", ent )
