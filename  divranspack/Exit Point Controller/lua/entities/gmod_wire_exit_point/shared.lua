@@ -5,5 +5,5 @@ ENT.PrintName   = "Exit Point Controller"
 ENT.Author      = "Divran"
 ENT.Contact     = ""
 
-ENT.Spawnable = true
+ENT.Spawnable = false
 ENT.AdminSpawnable = false

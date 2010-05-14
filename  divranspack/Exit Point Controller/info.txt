@@ -1,12 +1,12 @@
 "AddonInfo"
 {
-	"name"		"Exit Point"
+	"name"		"Multi Exit Point Controller"
 	"version"	"1"
 	"up_date"	""
 	"author_name"	"Divran"
 	"author_email"	""
 	"author_url"	""
 	
-	"info"		"Exit Point"
+	"info"		"Multi Exit Point Controller"
 	"override"	"0"
 }

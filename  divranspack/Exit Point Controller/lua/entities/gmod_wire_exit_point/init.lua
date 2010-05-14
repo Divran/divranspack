@@ -51,58 +51,6 @@ function ENT:TriggerInput( name, value )
 	end
 end
 
-function ENT:SpawnFunction( ply, trace )
-	if (!trace or !trace.Hit) then return end
-	if (!ply:CheckLimit("wire_exit_points")) then return end
-	local ent = ents.Create("gmod_wire_exit_point")
-	if (!ent) then return end
-	ent:SetModel( "models/jaanus/thruster_flat.mdl" )
-	ent:SetPos( trace.HitPos - trace.HitNormal * ent:OBBMins().z )
-	ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
-	ent:SetPlayer( ply )
-	ent:Spawn()
-	ent:Activate()
-	ply:AddCount( "wire_exit_points", ent )
-	return ent
-end
-
---[[
-function ENT:BuildDupeInfo()
-	local info = self.BaseClass.BuildDupeInfo(self) or {}
-	
-	if (#self.Entities) then
-		local tbl = {}
-		for index, e in pairs( self.Entities ) do
-			tbl[index] = e:EntIndex()
-		end
-		
-		info.entities = tbl
-	end
-	
-	return info
-end
-
-function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
-	if (!ply:CheckLimit("wire_adv_emarkers")) then 
-		ent:Remove()
-		return
-	end
-	ply:AddCount( "wire_adv_emarkers", ent )
-	
-	if (info.entities) then
-		local tbl = info.entities
-		
-		if (!self.Entities) then self.Entities = {} end
-		
-		for index, entindex in pairs( tbl ) do
-			self.Entities[index] = GetEntByID(entindex) or ents.GetByIndex(entindex)
-		end
-	end
-	
-	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
-end
-]]
-
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 	if (!ply:CheckLimit("wire_exit_points")) then 
 		ent:Remove()
