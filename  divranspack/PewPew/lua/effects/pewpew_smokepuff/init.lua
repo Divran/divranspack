@@ -7,7 +7,7 @@ function EFFECT:Init( data )
 	local emitter = ParticleEmitter( Pos )
 	
 	for i=0, NumParticles do
-		particle = emitter:Add( "particles/smokey", Pos )
+		local particle = emitter:Add( "particles/smokey", Pos )
 		if (particle) then
 			particle:SetVelocity( VectorRand() * 2000 )
 			particle:SetLifeTime( 0 )
