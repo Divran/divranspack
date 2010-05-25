@@ -99,6 +99,7 @@ end
 -- Add support for EVERY SINGLE type. Yeah!!
 for k,v in pairs( wire_expression_types ) do
 	if (k == "NORMAL") then k = "NUMBER" end
+	k = string.lower(k)
 	
 	__e2setcost(100)
 
@@ -106,7 +107,7 @@ for k,v in pairs( wire_expression_types ) do
 	registerFunction("dsSendDirect","se"..v[1],"n",function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
-		return E2toE2( rv1, self.entity, rv2, rv3, string.lower(k) )
+		return E2toE2( rv1, self.entity, rv2, rv3, k )
 	end)
 	
 	__e2setcost(1)
@@ -116,7 +117,7 @@ for k,v in pairs( wire_expression_types ) do
 		local op1, op2 = args[2], args[3]
 		local rv1, rv2 = op1[1](self, op1),op2[1](self, op2)
 		CreateTable(self.entity)
-		return E2toGroup( rv1, self.entity, nil, nil, rv2, string.lower(k) )
+		return E2toGroup( rv1, self.entity, nil, nil, rv2, k )
 	end)
 	
 	-- Send a ds to the E2s group in scope <rv2>
@@ -124,7 +125,7 @@ for k,v in pairs( wire_expression_types ) do
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
 		CreateTable(self.entity)
-		return E2toGroup( rv1, self.entity, nil, rv2, rv3, string.lower(k) )
+		return E2toGroup( rv1, self.entity, nil, rv2, rv3, k )
 	end)
 	
 	-- Send a ds to the group <rv2> in the E2s scope
@@ -132,7 +133,7 @@ for k,v in pairs( wire_expression_types ) do
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
 		CreateTable(self.entity)
-		return E2toGroup( rv1, self.entity, rv2, nil, rv3, string.lower(k) )
+		return E2toGroup( rv1, self.entity, rv2, nil, rv3, k )
 	end)
 	
 	-- Send a ds to the group <rv2> in scope <rv3>
@@ -140,14 +141,14 @@ for k,v in pairs( wire_expression_types ) do
 		local op1, op2, op3, op4 = args[2], args[3], args[4], args[5]
 		local rv1, rv2, rv3, rv4 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3),op4[1](self,op4)
 		CreateTable(self.entity)
-		return E2toGroup( rv1, self.entity, rv2, rv3, rv4, string.lower(k) )
+		return E2toGroup( rv1, self.entity, rv2, rv3, rv4, k )
 	end)
 	
 	__e2setcost(5)
 	
 	-- Get variable
 	registerFunction("dsGet" .. upperfirst( k ), "", v[1], function(self,args)
-		if (datatype != string.lower(k)) then return v[2] end -- If the type is not that type, return the type's default value
+		if (datatype != k) then return v[2] end -- If the type is not that type, return the type's default value
 		return data
 	end)
 	
