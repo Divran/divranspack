@@ -30,6 +30,8 @@ local function E2toE2( name, from, to, var, vartype ) -- For sending from an E2 
 	if (!var) then return 0 end -- Failed
 	if (!vartype) then return 0 end -- Failed
 	
+	from.context.prf = from.context.prf + 80 -- Add 80 to ops
+	
 	signalname = name
 	runbydatasignal = 1
 	data = var
@@ -70,7 +72,6 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 			local toent = Entity(k) -- Get the entity
 			if (IsAllowed( scope, from, v.scope, toent )) then -- Same scope?
 				local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
-				from.context.prf = from.context.prf + 100 -- Add 50 to ops
 				if (tempret == 0) then -- Did the send fail?
 					ret = 0
 				end
@@ -101,7 +102,7 @@ for k,v in pairs( wire_expression_types ) do
 	if (k == "NORMAL") then k = "NUMBER" end
 	k = string.lower(k)
 	
-	__e2setcost(100)
+	__e2setcost(10)
 
 	-- Send a signal directly to another E2
 	registerFunction("dsSendDirect","se"..v[1],"n",function(self,args)
@@ -110,8 +111,8 @@ for k,v in pairs( wire_expression_types ) do
 		return E2toE2( rv1, self.entity, rv2, rv3, k )
 	end)
 	
-	__e2setcost(1)
-
+	__e2setcost(20)
+	
 	-- Send a ds to the E2s group in the E2s scope
 	registerFunction("dsSend","s"..v[1],"n",function(self,args)
 		local op1, op2 = args[2], args[3]
