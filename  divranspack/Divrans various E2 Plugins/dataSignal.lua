@@ -97,14 +97,14 @@ end
 for k,v in pairs( wire_expression_types ) do
 
 	-- Send a signal directly to another E2
-	registerFunction("dsToE2","se"..v[1],"n",function(self,args)
+	registerFunction("dsSendDirect","se"..v[1],"n",function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
 		return E2toE2( rv1, self.entity, rv2, rv3, string.lower(k) )
 	end)
 
 	-- Send a ds to the E2s group in the E2s scope
-	registerFunction("dsToGroup","s"..v[1],"n",function(self,args)
+	registerFunction("dsSend","s"..v[1],"n",function(self,args)
 		local op1, op2 = args[2], args[3]
 		local rv1, rv2 = op1[1](self, op1),op2[1](self, op2)
 		CreateTable(self.entity)
@@ -112,7 +112,7 @@ for k,v in pairs( wire_expression_types ) do
 	end)
 	
 	-- Send a ds to the E2s group in scope <rv2>
-	registerFunction("dsToGroup","sn" .. v[1], "n", function(self,args)
+	registerFunction("dsSend","sn" .. v[1], "n", function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
 		CreateTable(self.entity)
@@ -120,7 +120,7 @@ for k,v in pairs( wire_expression_types ) do
 	end)
 	
 	-- Send a ds to the group <rv2> in the E2s scope
-	registerFunction("dsToGroup","ss"..v[1],"n",function(self,args)
+	registerFunction("dsSend","ss"..v[1],"n",function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
 		CreateTable(self.entity)
@@ -128,7 +128,7 @@ for k,v in pairs( wire_expression_types ) do
 	end)
 	
 	-- Send a ds to the group <rv2> in scope <rv3>
-	registerFunction("dsToGroup","ssn"..v[1],"n",function(self,args)
+	registerFunction("dsSend","ssn"..v[1],"n",function(self,args)
 		local op1, op2, op3, op4 = args[2], args[3], args[4], args[5]
 		local rv1, rv2, rv3, rv4 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3),op4[1](self,op4)
 		CreateTable(self.entity)
@@ -141,6 +141,12 @@ for k,v in pairs( wire_expression_types ) do
 		return data
 	end)
 	
+end
+
+-- Special case for number
+e2function normal dsGetNumber()
+	if (datatype != "normal") then return 0 end
+	return data
 end
 
 -- Set group
