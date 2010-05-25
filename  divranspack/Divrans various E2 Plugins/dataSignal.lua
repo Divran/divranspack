@@ -154,7 +154,7 @@ for k,v in pairs( wire_expression_types ) do
 	
 end
 
-__e2setcost(2)
+__e2setcost(5)
 
 -- Set group
 e2function void dsSetGroup( string groupname )
@@ -183,6 +183,8 @@ end
 
 ----------------
 -- Get functions
+
+__e2setcost(2)
 
 -- Check if the current execution was caused by ANY datasignal
 e2function number dsClk()
