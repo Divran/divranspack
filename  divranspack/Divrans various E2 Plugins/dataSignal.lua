@@ -26,6 +26,7 @@ local groups = {}
 local function E2toE2( name, from, to, var, vartype ) -- For sending from an E2 to another E2
 	if (!from or !from:IsValid() or from:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!to or !to:IsValid() or to:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
+	if (from == to) then return 0 end -- Failed
 	if (!var) then return 0 end -- Failed
 	if (!vartype) then return 0 end -- Failed
 	
@@ -45,6 +46,7 @@ local function E2toE2( name, from, to, var, vartype ) -- For sending from an E2 
 end
 
 local function IsAllowed( fromscope, froment, toscope, toent )
+	if (froment == toent) then return false end
 	if (fromscope == 0) then -- If scope is 0, only send to E2s you own
 		return E2Lib.isOwner( froment, toent )
 	elseif (fromscope == 1) then -- If scope is 1, send to friends
@@ -68,6 +70,7 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 			local toent = Entity(k) -- Get the entity
 			if (IsAllowed( scope, from, v.scope, toent )) then -- Same scope?
 				local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
+				from.context.prf = from.context.prf + 100 -- Add 50 to ops
 				if (tempret == 0) then -- Did the send fail?
 					ret = 0
 				end
@@ -95,6 +98,9 @@ end
 
 -- Add support for EVERY SINGLE type. Yeah!!
 for k,v in pairs( wire_expression_types ) do
+	if (k == "NORMAL") then k = "NUMBER" end
+	
+	__e2setcost(100)
 
 	-- Send a signal directly to another E2
 	registerFunction("dsSendDirect","se"..v[1],"n",function(self,args)
@@ -102,6 +108,8 @@ for k,v in pairs( wire_expression_types ) do
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
 		return E2toE2( rv1, self.entity, rv2, rv3, string.lower(k) )
 	end)
+	
+	__e2setcost(1)
 
 	-- Send a ds to the E2s group in the E2s scope
 	registerFunction("dsSend","s"..v[1],"n",function(self,args)
@@ -135,6 +143,8 @@ for k,v in pairs( wire_expression_types ) do
 		return E2toGroup( rv1, self.entity, rv2, rv3, rv4, string.lower(k) )
 	end)
 	
+	__e2setcost(5)
+	
 	-- Get variable
 	registerFunction("dsGet" .. upperfirst( k ), "", v[1], function(self,args)
 		if (datatype != string.lower(k)) then return v[2] end -- If the type is not that type, return the type's default value
@@ -143,11 +153,7 @@ for k,v in pairs( wire_expression_types ) do
 	
 end
 
--- Special case for number
-e2function normal dsGetNumber()
-	if (datatype != "normal") then return 0 end
-	return data
-end
+__e2setcost(2)
 
 -- Set group
 e2function void dsSetGroup( string groupname )
@@ -202,6 +208,8 @@ e2function entity dsGetSender()
 	if (!sender or !sender:IsValid()) then return nil end
 	return sender
 end
+
+__e2setcost(nil)
 
 ---------------------------------------------
 -- When an E2 is removed, clear it from the groups table
