@@ -61,7 +61,7 @@ local function CheckQueue( ent )
 			if (v.to == ent) then -- Find a signal which is supposed to be sent to this E2
 				local s = v
 				table.remove( queue, k )
-				E2toE2( s.name, s.from, s.to, s.var, s.vartype, true ) -- Send it
+				local ret = E2toE2( s.name, s.from, s.to, s.var, s.vartype, true ) -- Send it
 				return -- Abort
 			end
 		end
