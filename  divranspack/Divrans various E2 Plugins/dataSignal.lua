@@ -22,13 +22,76 @@ local datatype = nil
 local runbydatasignal = 0
 
 local groups = {}
+local queue = {}
 
-local function E2toE2( name, from, to, var, vartype ) -- For sending from an E2 to another E2
+-----------------
+-- Defaults
+local function CreateTable( ent )
+	if (!groups[ent:EntIndex()]) then
+		groups[ent:EntIndex()] = {}
+		groups[ent:EntIndex()].groupname = "default" -- Only recieve signals in the default group
+		groups[ent:EntIndex()].scope = 0 -- Only recieve signals from your E2s
+	end
+end
+
+-----------------
+-- Check if the signal should be allowed
+local function IsAllowed( fromscope, froment, toscope, toent )
+	if (fromscope == 0) then -- If scope is 0, only send to E2s you own
+		return E2Lib.isOwner( froment, toent )
+	elseif (fromscope == 1) then -- If scope is 1, send to friends and E2s you own
+		return (E2Lib.isOwner( froment, toent ) or E2Lib.isFriend( froment.player, toent.player ))
+	elseif (fromscope == 2) then -- If scope is 2, send to everyone
+		if (E2Lib.isOwner( froment, toent )) then -- If you are the owner, go ahead
+			return true
+		else
+			return toscope == 2 -- Check if the recieving E2 allows you to send signals to it
+		end
+	end
+	return false
+end
+
+local E2toE2
+
+--------------
+-- Queue
+local function CheckQueue( ent )
+	if (#queue>0) then
+		for k,v in ipairs( queue ) do
+			if (v.to == ent) then -- Find a signal which is supposed to be sent to this E2
+				local s = v
+				table.remove( queue, k )
+				E2toE2( s.name, s.from, s.to, s.var, s.vartype, true ) -- Send it
+				return -- Abort
+			end
+		end
+	end
+
+end
+
+
+registerCallback("postexecute",function(self)
+	CheckQueue(self.entity)
+end)
+
+------------
+-- Sending from one E2 to another
+
+function E2toE2( name, from, to, var, vartype, skipthischeck ) -- For sending from an E2 to another E2
 	if (!from or !from:IsValid() or from:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!to or !to:IsValid() or to:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
-	if (from == to) then return 0 end -- Failed
-	if (!var) then return 0 end -- Failed
-	if (!vartype) then return 0 end -- Failed
+	if (!from.context or !to.context) then return 0 end -- OSHI-
+	CreateTable(from)
+	CreateTable(to)
+	if (!IsAllowed( groups[from:EntIndex()].scope, from, groups[to:EntIndex()].scope, to )) then return 0 end -- Not allowed.
+	if (!var or !vartype) then return 0 end -- Failed
+	
+	if (runbydatasignal == 1 or (#queue > 0 and !skipthischeck)) then -- If a ds is already being transmitted, add it to the queue instead
+		table.insert( queue, { name = name, from = from, to = to, var = var, vartype = vartype } ) -- Add to queue
+		timer.Simple(0,CheckQueue,to)
+		return 1
+	end
+	
 	
 	from.context.prf = from.context.prf + 80 -- Add 80 to ops
 	
@@ -47,21 +110,8 @@ local function E2toE2( name, from, to, var, vartype ) -- For sending from an E2 
 	return 1 -- Transfer successful
 end
 
-local function IsAllowed( fromscope, froment, toscope, toent )
-	if (froment == toent) then return false end
-	if (fromscope == 0) then -- If scope is 0, only send to E2s you own
-		return E2Lib.isOwner( froment, toent )
-	elseif (fromscope == 1) then -- If scope is 1, send to friends
-		return E2Lib.isFriend( froment.player, toent.player )
-	elseif (fromscope == 2) then -- If scope is 2, send to everyone
-		if (E2Lib.isOwner( froment, toent )) then -- If you are the owner, go ahead
-			return true
-		else
-			return toscope == 2 -- Check if the recieving E2 allows you to send signals to it
-		end
-	end
-end
-
+---------------------
+-- Send from one E2 to an entire group of E2s
 local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- For sending from an E2 to an entire group. Returns 0 if ANY of the sends failed
 	if (groupname == nil) then groupname = groups[from:EntIndex()].groupname end
 	if (scope == nil) then scope = groups[from:EntIndex()].scope end
@@ -70,7 +120,7 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 	for k,v in pairs( groups ) do
 		if (v.groupname == groupname) then -- Same group?
 			local toent = Entity(k) -- Get the entity
-			if (IsAllowed( scope, from, v.scope, toent )) then -- Same scope?
+			if (toent != from) then
 				local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
 				if (tempret == 0) then -- Did the send fail?
 					ret = 0
@@ -81,18 +131,11 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 	return ret
 end
 
-local function CreateTable( ent )
-	if (!groups[ent:EntIndex()]) then
-		groups[ent:EntIndex()] = {}
-		groups[ent:EntIndex()].groupname = "default" -- Only recieve signals in the default group
-		groups[ent:EntIndex()].scope = 0 -- Only recieve signals from your E2s
-	end
-end
 
+-- Upperfirst, used by the E2 functions below
 local function upperfirst( word )
 	return word:Left(1):upper() .. word:Right(-2):lower()
 end
-
 
 ---------------------------------------------
 -- E2 functions
@@ -193,7 +236,7 @@ e2function number dsClk()
 end
 
 -- Check if the current execution was caused by a datasignal named <name>
-e2function number dsClk( name )
+e2function number dsClk( string name )
 	if (signalname == name) then return 1 else return 0 end
 end
 
@@ -203,11 +246,11 @@ e2function string dsClkName()
 end
 
 -- Get the type of the current data
-e2function string dsType()
+e2function string dsGetType()
 	return datatype or ""
 end
 
--- Get which E2 sent the data
+-- Get the which E2 sent the data
 e2function entity dsGetSender()
 	if (!sender or !sender:IsValid()) then return nil end
 	return sender
@@ -218,9 +261,14 @@ __e2setcost(nil)
 ---------------------------------------------
 -- When an E2 is removed, clear it from the groups table
 registerCallback("destruct",function(self)
-	if (type(self) == "Entity") then -- not having this sometimes caused MAHOOSIVE error spam
+	if (type(self) == "Entity") then -- not having this sometimes caused MAHOOSIVE error spam (but it might not be needed - was probably just a temporary bug)
 		if (groups[self.entity:EntIndex()]) then
 			table.remove( groups, self.entity:EntIndex() )
 		end
 	end
+end)
+
+-- When an E2 is spawned, set its group and scope to the defaults
+registerCallback("construct",function(self)
+	CreateTable(self.entity)
 end)
