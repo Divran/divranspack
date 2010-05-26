@@ -222,7 +222,7 @@ e2function number dsGetScope()
 	return self.datasignal.scope
 end
 
-e2function void dSetGroupScope( string groupname, number scope )
+e2function void dsSetGroupScope( string groupname, number scope )
 	-- group:
 	groups[self.datasignal.group][self.entity:EntIndex()] = nil
 	
