@@ -22,17 +22,8 @@ local datatype = nil
 local runbydatasignal = 0
 
 local groups = {}
+groups.default = {}
 local queue = {}
-
------------------
--- Defaults
-local function CreateTable( ent )
-	if (!groups[ent:EntIndex()]) then
-		groups[ent:EntIndex()] = {}
-		groups[ent:EntIndex()].groupname = "default" -- Only recieve signals in the default group
-		groups[ent:EntIndex()].scope = 0 -- Only recieve signals from your E2s
-	end
-end
 
 -----------------
 -- Check if the signal should be allowed
@@ -54,21 +45,26 @@ end
 local E2toE2
 
 --------------
--- Queue
+-- Queue (Thanks to Syranide for helping)
+local QueueBusy = false
+local QueueIndex = 0
+
 local function CheckQueue( ent )
-	if (#queue>0) then
-		for k,v in ipairs( queue ) do
-			if (v.to == ent) then -- Find a signal which is supposed to be sent to this E2
-				local s = v
-				table.remove( queue, k )
-				local ret = E2toE2( s.name, s.from, s.to, s.var, s.vartype, true ) -- Send it
-				return -- Abort
-			end
-		end
+	if (QueueBusy) then return end
+	QueueBusy = true
+
+	while true do
+		if (QueueIndex == #queue) then break end
+		if (queue[QueueIndex] == nil) then break end -- :(
+		local s = queue[QueueIndex]
+		local ret = E2toE2( s.name, s.from, s.to, s.var, s.vartype, true ) -- Send it
+		QueueIndex = QueueIndex + 1 
 	end
 
+	QueueBusy = false
+	QueueIndex = 0
+	queue = {}
 end
-
 
 registerCallback("postexecute",function(self)
 	CheckQueue(self.entity)
@@ -81,15 +77,11 @@ function E2toE2( name, from, to, var, vartype, skipthischeck ) -- For sending fr
 	if (!from or !from:IsValid() or from:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!to or !to:IsValid() or to:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!from.context or !to.context) then return 0 end -- OSHI-
-	CreateTable(from)
-	CreateTable(to)
-	if (!IsAllowed( groups[from:EntIndex()].scope, from, groups[to:EntIndex()].scope, to )) then return 0 end -- Not allowed.
+	if (!IsAllowed( from.context.datasignal.scope, from, to.context.datasignal.scope, to )) then return 0 end -- Not allowed.
 	if (!var or !vartype) then return 0 end -- Failed
 	
-	if (runbydatasignal == 1 or (#queue > 0 and !skipthischeck)) then -- If a ds is already being transmitted, add it to the queue instead
-		table.insert( queue, { name = name, from = from, to = to, var = var, vartype = vartype } ) -- Add to queue
-		timer.Simple(0,CheckQueue,to)
-		return 1
+	if (!skipthischeck) then -- if skipthischeck is not nil, then this function has been called from the queue check function
+		queue[#queue] = { name = name, from = from, to = to, var = var, vartype = vartype } -- Add to queue
 	end
 	
 	
@@ -113,20 +105,24 @@ end
 ---------------------
 -- Send from one E2 to an entire group of E2s
 local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- For sending from an E2 to an entire group. Returns 0 if ANY of the sends failed
-	if (groupname == nil) then groupname = groups[from:EntIndex()].groupname end
-	if (scope == nil) then scope = groups[from:EntIndex()].scope end
+	if (groupname == nil) then groupname = from.context.datasignal.group end
+	if (scope == nil) then scope = from.context.datasignal.scope end
 	
 	local ret = 1
-	for k,v in pairs( groups ) do
-		if (v.groupname == groupname) then -- Same group?
-			local toent = Entity(k) -- Get the entity
-			if (toent != from) then
-				local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
-				if (tempret == 0) then -- Did the send fail?
-					ret = 0
+	if (groups[groupname]) then
+		for k,v in pairs( groups[groupname] ) do
+			if (v.groupname == groupname) then -- Same group?
+				local toent = Entity(k) -- Get the entity
+				if (toent != from) then
+					local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
+					if (tempret == 0) then -- Did the send fail?
+						ret = 0
+					end
 				end
 			end
 		end
+	else
+		return 0
 	end
 	return ret
 end
@@ -160,7 +156,6 @@ for k,v in pairs( wire_expression_types ) do
 	registerFunction("dsSend","s"..v[1],"n",function(self,args)
 		local op1, op2 = args[2], args[3]
 		local rv1, rv2 = op1[1](self, op1),op2[1](self, op2)
-		CreateTable(self.entity)
 		return E2toGroup( rv1, self.entity, nil, nil, rv2, k )
 	end)
 	
@@ -168,7 +163,6 @@ for k,v in pairs( wire_expression_types ) do
 	registerFunction("dsSend","sn" .. v[1], "n", function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
-		CreateTable(self.entity)
 		return E2toGroup( rv1, self.entity, nil, rv2, rv3, k )
 	end)
 	
@@ -176,7 +170,6 @@ for k,v in pairs( wire_expression_types ) do
 	registerFunction("dsSend","ss"..v[1],"n",function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
-		CreateTable(self.entity)
 		return E2toGroup( rv1, self.entity, rv2, nil, rv3, k )
 	end)
 	
@@ -184,7 +177,6 @@ for k,v in pairs( wire_expression_types ) do
 	registerFunction("dsSend","ssn"..v[1],"n",function(self,args)
 		local op1, op2, op3, op4 = args[2], args[3], args[4], args[5]
 		local rv1, rv2, rv3, rv4 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3),op4[1](self,op4)
-		CreateTable(self.entity)
 		return E2toGroup( rv1, self.entity, rv2, rv3, rv4, k )
 	end)
 	
@@ -202,27 +194,50 @@ __e2setcost(5)
 
 -- Set group
 e2function void dsSetGroup( string groupname )
-	CreateTable(self.entity)
-	groups[self.entity:EntIndex()].groupname = groupname
+	groups[self.datasignal.group][self.entity:EntIndex()] = nil
+	
+	if (table.Count(groups[self.datasignal.group]) == 0) then
+		groups[self.datasignal.group] = nil
+	end
+	
+	self.datasignal.group = groupname
+	if (!groups[groupname]) then
+		groups[groupname] = {}
+	end
+	groups[groupname][self.entity:EntIndex()] = true
 end
 
 -- Get group
 e2function string dsGetGroup()
-	CreateTable(self.entity)
-	return groups[self.entity:EntIndex()].groupname
+	return self.datasignal.group
 end
 
 -- 0 = only you, 1 = only pp friends, 2 = everyone
 e2function void dsSetScope( number scope )
-	CreateTable(self.entity)
-	scope = math.Clamp(scope,0,2)
-	groups[self.entity:EntIndex()].scope = scope
+	self.datasignal.scope = math.Clamp(math.Round(scope),0,2)
 end
 
 -- Get current scope
 e2function number dsGetScope()
-	CreateTable(self.entity)
-	return groups[self.entity:EntIndex()].scope
+	return self.datasignal.scope
+end
+
+e2function void dSetGroupScope( string groupname, number scope )
+	-- group:
+	groups[self.datasignal.group][self.entity:EntIndex()] = nil
+	
+	if (table.Count(groups[self.datasignal.group]) == 0) then
+		groups[self.datasignal.group] = nil
+	end
+	
+	self.datasignal.group = groupname
+	if (!groups[groupname]) then
+		groups[groupname] = {}
+	end
+	groups[groupname][self.entity:EntIndex()] = true
+	
+	-- scope:
+	self.datasignal.scope = math.Clamp(math.Round(scope),0,2)
 end
 
 ----------------
@@ -261,14 +276,13 @@ __e2setcost(nil)
 ---------------------------------------------
 -- When an E2 is removed, clear it from the groups table
 registerCallback("destruct",function(self)
-	if (type(self) == "Entity") then -- not having this sometimes caused MAHOOSIVE error spam (but it might not be needed - was probably just a temporary bug)
-		if (groups[self.entity:EntIndex()]) then
-			table.remove( groups, self.entity:EntIndex() )
-		end
-	end
+	groups[self.datasignal.group][self.entity:EntIndex()] = nil
 end)
 
 -- When an E2 is spawned, set its group and scope to the defaults
 registerCallback("construct",function(self)
-	CreateTable(self.entity)
+	self.datasignal = {}
+	self.datasignal.group = "default"
+	self.datasignal.scope = 0
+	groups.default[self.entity:EntIndex()] = true
 end)
