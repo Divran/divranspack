@@ -297,7 +297,12 @@ e2function array dsProbe( string groupname )
 	return GetE2s( self.entity, groupname, self.datasignal.scope )
 end
 
--- Get all E2s which would have recieved a signal if you had sent it to this group
+-- get all E2s which would have recieved a signal if you had sent it to the E2s group and this scope
+e2function array dsProbe( number scope )
+	return GetE2s( self.entity, self.datasignal.group, math.Clamp(math.Round(scope),0,2) )
+end
+
+-- Get all E2s which would have recieved a signal if you had sent it to this group and scope
 e2function array dsProbe( string groupname, number scope )
 	return GetE2s( self.entity, groupname, math.Clamp(math.Round(scope),0,2) )
 end
