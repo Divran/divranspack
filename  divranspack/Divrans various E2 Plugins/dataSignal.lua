@@ -163,8 +163,9 @@ local function GetE2s( froment, groupname, scope )
 			if (!toent or !toent:IsValid() or toent:GetClass() != "gmod_wire_expression2") then
 				groups[groupname][k] = nil
 			else
-			if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
-				table.insert( ret, ent )
+				if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
+					table.insert( ret, ent )
+				end
 			end
 		end
 	end
