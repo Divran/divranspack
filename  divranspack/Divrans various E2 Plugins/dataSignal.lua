@@ -160,7 +160,7 @@ local function GetE2s( froment, groupname, scope )
 	if (groups[groupname]) then
 		for k,v in pairs( groups[groupname] ) do
 			local ent = Entity(k)
-			if (!toent or !toent:IsValid() or toent:GetClass() != "gmod_wire_expression2") then
+			if (!ent or !ent:IsValid() or ent:GetClass() != "gmod_wire_expression2") then
 				groups[groupname][k] = nil
 			else
 				if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
