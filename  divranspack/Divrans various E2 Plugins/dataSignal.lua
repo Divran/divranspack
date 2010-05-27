@@ -1,6 +1,7 @@
 --[[
 dataSignal
 Made by Divran
+Thanks to Syranide for helping.
 
 dataSignals are a combination of signals and gvars. 
 Instead of using one to trigger the E2, and the other
@@ -45,10 +46,11 @@ end
 local E2toE2
 
 --------------
--- Queue (Thanks to Syranide for helping)
+-- Queue
 local QueueIndex = 1
 
 local function CheckQueue( ent )
+	if (#queue == 0) then return end
 	if (runbydatasignal == 1) then return end
 	runbydatasignal = 1
 
@@ -286,17 +288,17 @@ e2function entity dsGetSender()
 end
 
 -- Get all E2s which would have recieved a signal if you had sent it to the E2s group and scope
-e2function array dsGroupMembers()
+e2function array dsProbe()
 	return GetE2s( self.entity, self.datasignal.group, self.datasignal.scope )
 end
 
 -- Get all E2s which would have recieved a signal if you had sent it to this group and the E2s scope
-e2function array dsGroupMembers( string groupname )
+e2function array dsProbe( string groupname )
 	return GetE2s( self.entity, groupname, self.datasignal.scope )
 end
 
 -- Get all E2s which would have recieved a signal if you had sent it to this group
-e2function array dsGroupMembers( string groupname, number scope )
+e2function array dsProbe( string groupname, number scope )
 	return GetE2s( self.entity, groupname, math.Clamp(math.Round(scope),0,2) )
 end
 
