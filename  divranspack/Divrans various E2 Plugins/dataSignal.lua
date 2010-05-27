@@ -74,7 +74,7 @@ local function CheckQueue( ent )
 
 	data = nil
 	datatype = nil
-	sender = 0
+	sender = nil
 	signalname = ""
 	
 	runbydatasignal = 0
