@@ -46,23 +46,37 @@ local E2toE2
 
 --------------
 -- Queue (Thanks to Syranide for helping)
-local QueueBusy = false
-local QueueIndex = 0
+local QueueIndex = 1
 
 local function CheckQueue( ent )
-	if (QueueBusy) then return end
-	QueueBusy = true
+	if (runbydatasignal == 1) then return end
+	runbydatasignal = 1
 
 	while true do
-		if (QueueIndex == #queue) then break end
-		if (queue[QueueIndex] == nil) then break end -- :(
+		if (QueueIndex > #queue) then break end
+		if (queue[QueueIndex] == nil) then break end
 		local s = queue[QueueIndex]
-		local ret = E2toE2( s.name, s.from, s.to, s.var, s.vartype, true ) -- Send it
+			if (s.to and s.to:IsValid()) then
+				signalname = s.name
+				data = s.var
+				datatype = s.vartype
+				sender = s.from
+				s.to:Execute()
+				
+				if (s.from and s.from:IsValid()) then
+					s.from.context.prf = s.from.context.prf + 80 -- Add 80 to ops
+				end
+			end
 		QueueIndex = QueueIndex + 1 
 	end
 
-	QueueBusy = false
-	QueueIndex = 0
+	data = nil
+	datatype = nil
+	sender = 0
+	signalname = ""
+	
+	runbydatasignal = 0
+	QueueIndex = 1
 	queue = {}
 end
 
@@ -73,32 +87,15 @@ end)
 ------------
 -- Sending from one E2 to another
 
-function E2toE2( name, from, to, var, vartype, skipthischeck ) -- For sending from an E2 to another E2
+function E2toE2( signalname, from, to, var, vartype ) -- For sending from an E2 to another E2
 	if (!from or !from:IsValid() or from:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!to or !to:IsValid() or to:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!from.context or !to.context) then return 0 end -- OSHI-
 	if (!IsAllowed( from.context.datasignal.scope, from, to.context.datasignal.scope, to )) then return 0 end -- Not allowed.
 	if (!var or !vartype) then return 0 end -- Failed
 	
-	if (!skipthischeck) then -- if skipthischeck is not nil, then this function has been called from the queue check function
-		queue[#queue] = { name = name, from = from, to = to, var = var, vartype = vartype } -- Add to queue
-	end
-	
-	
-	from.context.prf = from.context.prf + 80 -- Add 80 to ops
-	
-	signalname = name
-	runbydatasignal = 1
-	data = var
-	datatype = vartype
-	sender = from
-	to:Execute()
-	data = nil
-	datatype = nil
-	sender = nil
-	runbydatasignal = 0
-	signalname = ""
-	
+	queue[#queue+1] = { name = signalname, from = from, to = to, var = var, vartype = vartype } -- Add to queue
+
 	return 1 -- Transfer successful
 end
 
@@ -111,13 +108,11 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 	local ret = 1
 	if (groups[groupname]) then
 		for k,v in pairs( groups[groupname] ) do
-			if (v.groupname == groupname) then -- Same group?
-				local toent = Entity(k) -- Get the entity
-				if (toent != from) then
-					local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
-					if (tempret == 0) then -- Did the send fail?
-						ret = 0
-					end
+			local toent = Entity(k) -- Get the entity
+			if (toent != from) then
+				local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
+				if (tempret == 0) then -- Did the send fail?
+					ret = 0
 				end
 			end
 		end
@@ -127,6 +122,46 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 	return ret
 end
 
+local function ChangeGroup( self, groupname )
+	if (self.datasignal.group == groupname) then return end -- Nothing changed!
+
+	-- Remove the E2 from the previous group
+	groups[self.datasignal.group][self.entity:EntIndex()] = nil
+	
+	if (self.datasignal.group != "default") then -- Do not remove the default group
+		-- If there are no more E2s in this group, remove it
+		if (table.Count(groups[self.datasignal.group]) == 0) then
+			groups[self.datasignal.group] = nil
+		end
+	end
+	
+	-- Set the group
+	self.datasignal.group = groupname
+	
+	-- If that group does not exist, create it
+	if (!groups[groupname]) then
+		groups[groupname] = {}
+	end
+	
+	-- Add the E2 to that group
+	groups[groupname][self.entity:EntIndex()] = true
+end
+
+-- Get a table of E2s which the signal would have been sent to if it was sent
+local function GetE2s( froment, groupname, scope )
+	local ret = {}
+	
+	if (groups[groupname]) then
+		for k,v in pairs( groups[groupname] ) do
+			local ent = Entity(k)
+			if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
+				table.insert( ret, ent )
+			end
+		end
+	end
+	
+	return ret
+end
 
 -- Upperfirst, used by the E2 functions below
 local function upperfirst( word )
@@ -194,17 +229,7 @@ __e2setcost(5)
 
 -- Set group
 e2function void dsSetGroup( string groupname )
-	groups[self.datasignal.group][self.entity:EntIndex()] = nil
-	
-	if (table.Count(groups[self.datasignal.group]) == 0) then
-		groups[self.datasignal.group] = nil
-	end
-	
-	self.datasignal.group = groupname
-	if (!groups[groupname]) then
-		groups[groupname] = {}
-	end
-	groups[groupname][self.entity:EntIndex()] = true
+	ChangeGroup( self, groupname )
 end
 
 -- Get group
@@ -222,20 +247,9 @@ e2function number dsGetScope()
 	return self.datasignal.scope
 end
 
-e2function void dsSetGroupScope( string groupname, number scope )
+e2function void dsSetGroup( string groupname, number scope )
 	-- group:
-	groups[self.datasignal.group][self.entity:EntIndex()] = nil
-	
-	if (table.Count(groups[self.datasignal.group]) == 0) then
-		groups[self.datasignal.group] = nil
-	end
-	
-	self.datasignal.group = groupname
-	if (!groups[groupname]) then
-		groups[groupname] = {}
-	end
-	groups[groupname][self.entity:EntIndex()] = true
-	
+	ChangeGroup( self, groupname )
 	-- scope:
 	self.datasignal.scope = math.Clamp(math.Round(scope),0,2)
 end
@@ -271,12 +285,34 @@ e2function entity dsGetSender()
 	return sender
 end
 
+-- Get all E2s which would have recieved a signal if you had sent it to the E2s group and scope
+e2function array dsGroupMembers()
+	return GetE2s( self.entity, self.datasignal.group, self.datasignal.scope )
+end
+
+-- Get all E2s which would have recieved a signal if you had sent it to this group and the E2s scope
+e2function array dsGroupMembers( string groupname )
+	return GetE2s( self.entity, groupname, self.datasignal.scope )
+end
+
+-- Get all E2s which would have recieved a signal if you had sent it to this group
+e2function array dsGroupMembers( string groupname, number scope )
+	return GetE2s( self.entity, groupname, math.Clamp(math.Round(scope),0,2) )
+end
+
 __e2setcost(nil)
 
 ---------------------------------------------
 -- When an E2 is removed, clear it from the groups table
 registerCallback("destruct",function(self)
-	groups[self.datasignal.group][self.entity:EntIndex()] = nil
+	if (groups[self.datasignal.group]) then
+		groups[self.datasignal.group][self.entity:EntIndex()] = nil
+		if (self.datasignal.group != "default") then
+			if (table.Count(groups[self.datasignal.group]) == 0) then
+				groups[self.datasignal.group] = nil
+			end
+		end
+	end
 end)
 
 -- When an E2 is spawned, set its group and scope to the defaults
