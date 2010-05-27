@@ -111,10 +111,14 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 	if (groups[groupname]) then
 		for k,v in pairs( groups[groupname] ) do
 			local toent = Entity(k) -- Get the entity
-			if (toent != from) then
-				local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
-				if (tempret == 0) then -- Did the send fail?
-					ret = 0
+			if (!toent or !toent:IsValid() or toent:GetClass() != "gmod_wire_expression2") then
+				groups[groupname][k] = nil
+			else
+				if (toent != from) then
+					local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
+					if (tempret == 0) then -- Did the send fail?
+						ret = 0
+					end
 				end
 			end
 		end
@@ -156,6 +160,9 @@ local function GetE2s( froment, groupname, scope )
 	if (groups[groupname]) then
 		for k,v in pairs( groups[groupname] ) do
 			local ent = Entity(k)
+			if (!toent or !toent:IsValid() or toent:GetClass() != "gmod_wire_expression2") then
+				groups[groupname][k] = nil
+			else
 			if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
 				table.insert( ret, ent )
 			end
