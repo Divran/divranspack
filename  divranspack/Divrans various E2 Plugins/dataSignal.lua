@@ -273,7 +273,7 @@ end
 ----------------
 -- Get functions
 
-__e2setcost(2)
+__e2setcost(1)
 
 -- Check if the current execution was caused by ANY datasignal
 e2function number dsClk()
@@ -290,6 +290,8 @@ e2function string dsClkName()
 	return signalname
 end
 
+__e2setcost(4)
+
 -- Get the type of the current data
 e2function string dsGetType()
 	return datatype or ""
@@ -301,7 +303,7 @@ e2function entity dsGetSender()
 	return sender
 end
 
-__e2setcost(10)
+__e2setcost(20)
 
 -- Get all E2s which would have recieved a signal if you had sent it to the E2s group and scope
 e2function array dsProbe()
