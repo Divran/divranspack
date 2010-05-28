@@ -31,19 +31,21 @@ local queue = {}
 local function IsAllowed( fromscope, froment, toscope, toent )
 	if (fromscope == 0) then -- If scope is 0, only send to E2s you own
 		return E2Lib.isOwner( froment, toent )
-	elseif (fromscope == 1) then -- If scope is 1, send to friends and E2s you own
-		return (E2Lib.isOwner( froment, toent ) or E2Lib.isFriend( froment.player, toent.player ))
+	elseif (fromscope == 1) then -- If scope is 1, send to people who have you in their PP friends list, and E2s you own
+		return (E2Lib.isFriend( toent.player, froment.player ) and toscope > 0)
 	elseif (fromscope == 2) then -- If scope is 2, send to everyone
 		if (E2Lib.isOwner( froment, toent )) then -- If you are the owner, go ahead
 			return true
-		else
-			return toscope == 2 -- Check if the recieving E2 allows you to send signals to it
+		else -- else check if the recieving E2 allows your signal
+			if (toscope == 1) then -- if recieving scope is 1, return true if they have you in their pp friends list
+				return E2Lib.isFriend( toent.player, froment.player )
+			elseif (toscope == 2) then -- if recieving scope is 2, return true
+				return true
+			end
 		end
 	end
 	return false
 end
-
-local E2toE2
 
 --------------
 -- Queue
@@ -89,11 +91,13 @@ end)
 ------------
 -- Sending from one E2 to another
 
-function E2toE2( signalname, from, to, var, vartype ) -- For sending from an E2 to another E2
+local function E2toE2( signalname, fromscope, from, toscope, to, var, vartype ) -- For sending from an E2 to another E2
 	if (!from or !from:IsValid() or from:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!to or !to:IsValid() or to:GetClass() != "gmod_wire_expression2") then return 0 end -- Failed
 	if (!from.context or !to.context) then return 0 end -- OSHI-
-	if (!IsAllowed( from.context.datasignal.scope, from, to.context.datasignal.scope, to )) then return 0 end -- Not allowed.
+	if (!fromscope) then fromscope = from.context.datasignal.scope end
+	if (!toscope) then toscope = to.context.datasignal.scope end
+	if (!IsAllowed( fromscope, from, toscope, to )) then return 0 end -- Not allowed.
 	if (!var or !vartype) then return 0 end -- Failed
 	
 	queue[#queue+1] = { name = signalname, from = from, to = to, var = var, vartype = vartype } -- Add to queue
@@ -110,12 +114,12 @@ local function E2toGroup( signalname, from, groupname, scope, var, vartype ) -- 
 	local ret = 1
 	if (groups[groupname]) then
 		for k,v in pairs( groups[groupname] ) do
-			local toent = Entity(k) -- Get the entity
-			if (!toent or !toent:IsValid() or toent:GetClass() != "gmod_wire_expression2") then
+			local toent = k -- Get the entity
+			if (!toent or !toent:IsValid()) then -- If the E2 was removed without calling destruct, clear it now.
 				groups[groupname][k] = nil
 			else
 				if (toent != from) then
-					local tempret = E2toE2( signalname, from, toent, var, vartype ) -- Send the signal
+					local tempret = E2toE2( signalname, scope, from, toent.context.datasignal.scope, toent, var, vartype ) -- Send the signal
 					if (tempret == 0) then -- Did the send fail?
 						ret = 0
 					end
@@ -132,7 +136,7 @@ local function ChangeGroup( self, groupname )
 	if (self.datasignal.group == groupname) then return end -- Nothing changed!
 
 	-- Remove the E2 from the previous group
-	groups[self.datasignal.group][self.entity:EntIndex()] = nil
+	groups[self.datasignal.group][self.entity] = nil
 	
 	if (self.datasignal.group != "default") then -- Do not remove the default group
 		-- If there are no more E2s in this group, remove it
@@ -150,7 +154,7 @@ local function ChangeGroup( self, groupname )
 	end
 	
 	-- Add the E2 to that group
-	groups[groupname][self.entity:EntIndex()] = true
+	groups[groupname][self.entity] = true
 end
 
 -- Get a table of E2s which the signal would have been sent to if it was sent
@@ -159,12 +163,14 @@ local function GetE2s( froment, groupname, scope )
 	
 	if (groups[groupname]) then
 		for k,v in pairs( groups[groupname] ) do
-			local ent = Entity(k)
-			if (!ent or !ent:IsValid() or ent:GetClass() != "gmod_wire_expression2") then
+			local ent = k
+			if (!ent or !ent:IsValid()) then -- If the E2 was removed without calling destruct, clear it now.
 				groups[groupname][k] = nil
 			else
-				if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
-					table.insert( ret, ent )
+				if (froment != ent) then
+					if (IsAllowed( scope, froment, ent.context.datasignal.scope, ent )) then
+						table.insert( ret, ent )
+					end
 				end
 			end
 		end
@@ -192,7 +198,7 @@ for k,v in pairs( wire_expression_types ) do
 	registerFunction("dsSendDirect","se"..v[1],"n",function(self,args)
 		local op1, op2, op3 = args[2], args[3], args[4]
 		local rv1, rv2, rv3 = op1[1](self, op1),op2[1](self, op2),op3[1](self,op3)
-		return E2toE2( rv1, self.entity, rv2, rv3, k )
+		return E2toE2( rv1, 2, self.entity, nil, rv2, rv3, k )
 	end)
 	
 	__e2setcost(20)
@@ -295,6 +301,8 @@ e2function entity dsGetSender()
 	return sender
 end
 
+__e2setcost(10)
+
 -- Get all E2s which would have recieved a signal if you had sent it to the E2s group and scope
 e2function array dsProbe()
 	return GetE2s( self.entity, self.datasignal.group, self.datasignal.scope )
@@ -321,7 +329,7 @@ __e2setcost(nil)
 -- When an E2 is removed, clear it from the groups table
 registerCallback("destruct",function(self)
 	if (groups[self.datasignal.group]) then
-		groups[self.datasignal.group][self.entity:EntIndex()] = nil
+		groups[self.datasignal.group][self.entity] = nil
 		if (self.datasignal.group != "default") then
 			if (table.Count(groups[self.datasignal.group]) == 0) then
 				groups[self.datasignal.group] = nil
@@ -335,5 +343,5 @@ registerCallback("construct",function(self)
 	self.datasignal = {}
 	self.datasignal.group = "default"
 	self.datasignal.scope = 0
-	groups.default[self.entity:EntIndex()] = true
+	groups.default[self.entity] = true
 end)
