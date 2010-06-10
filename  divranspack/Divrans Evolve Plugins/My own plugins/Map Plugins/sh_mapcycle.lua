@@ -230,8 +230,8 @@ if (SERVER) then
 	
 	-- Does the cycle file exist? if not, create it
 	function PLUGIN:MapCycleFileExists()
-		if (!file.Exists("ev_mapcycle.txt")) then
-			file.Write("ev_mapcycle.txt","")
+		if (!file.Exists("evolve/ev_mapcycle.txt")) then
+			file.Write("evolve/ev_mapcycle.txt","")
 			return false
 		end
 		return true
@@ -248,7 +248,7 @@ if (SERVER) then
 	-- Load the cycle from the file
 	function PLUGIN:GetCycle()
 		if (self:MapCycleFileExists()) then
-			local str = file.Read( "ev_mapcycle.txt" )
+			local str = file.Read( "evolve/ev_mapcycle.txt" )
 			if (str and str != "") then
 				local tbl = glon.decode( str )
 				self.Enabled = tbl[1]
