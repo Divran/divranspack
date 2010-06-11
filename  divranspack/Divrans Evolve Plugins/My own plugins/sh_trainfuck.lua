@@ -37,7 +37,10 @@ function PLUGIN:SpawnTrain( Pos, Direction )
 	train:Spawn()
 	train:Activate()
 	train:EmitSound( "ambient/alarms/train_horn2.wav", 100, 100 )
-	train:GetPhysicsObject():SetVelocity( Direction * 50000 )
+	local phys = train:GetPhysicsObject()
+	if (phys) then
+		phys:SetVelocity( Direction * 50000 )
+	end
 	
 	timer.Create( "TrainRemove_"..CurTime(), 5, 1, function( train ) train:Remove() end, train )
 end

@@ -62,7 +62,8 @@ function PLUGIN:GetCurrentFile(NewDay)
 	local monthyear = os.date( "%m-%Y", os.time() )
 	local daymonth = os.date( "%d-%m", os.time() )
 	if (!file.Exists("evolve/logs/"..monthyear.."/"..daymonth..".txt")) then
-		file.Write("evolve/logs/"..monthyear.."/"..daymonth..".txt","\n=====[ LOG FILE CREATED ]=====\n")
+		file.Write("evolve/logs/"..monthyear.."/"..daymonth..".txt","\n=====[ LOG FILE CREATED ]====="..
+																	"\nDate: " .. os.date( "[%X] - (%d/%m/%Y) - (%A, %B)", os.time() ) .. "\n")
 	end
 	local OldFile = self.CurrentFile
 	self.CurrentFile = "evolve/logs/"..monthyear.."/"..daymonth..".txt"
