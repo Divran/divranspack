@@ -22,3 +22,7 @@ function ENT:Draw()
 	Wire_Render(self.Entity)
 	self.GPU:Render()
 end
+
+function ENT:OnRemove()
+	self.GPU:Finalize()
+end
