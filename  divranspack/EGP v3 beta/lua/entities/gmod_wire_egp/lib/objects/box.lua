@@ -9,13 +9,11 @@ Obj.Draw = function( self )
 end
 Obj.Transmit = function( self )
 	EGP.umsg.Short(self.angle)
-	EGP.umsg.String(self.material)
 	self.BaseClass.Transmit( self )
 end
 Obj.Receive = function( self, um )
 	local tbl = {}
 	tbl.angle = um:ReadShort()
-	tbl.material = um:ReadString()
 	table.Merge( tbl, self.BaseClass.Receive( self, um ) )
 	return tbl
 end

@@ -32,6 +32,7 @@ Obj.Transmit = function( self )
 	EGP.umsg.Float(self.x2)
 	EGP.umsg.Float(self.y2)
 	EGP.umsg.Short(self.size)
+	EGP:SendMaterial( self )
 	EGP:SendColor( self )
 end
 Obj.Receive = function( self, um )
@@ -41,6 +42,7 @@ Obj.Receive = function( self, um )
 	tbl.x2 = um:ReadFloat()
 	tbl.y2 = um:ReadFloat()
 	tbl.size = um:ReadShort()
+	EGP:ReceiveMaterial( tbl, um )
 	EGP:ReceiveColor( tbl, self, um )
 	return tbl
 end

@@ -4,7 +4,6 @@ Obj.h = nil
 Obj.x = nil
 Obj.y = nil
 Obj.vertices = {}
-Obj.material = ""
 Obj.Draw = function( self )
 	if (self.a>0 and #self.vertices>2) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
@@ -21,7 +20,7 @@ Obj.Transmit = function( self )
 		EGP.umsg.Float( self.vertices[i].u )
 		EGP.umsg.Float( self.vertices[i].v )
 	end
-	EGP.umsg.String(self.material)
+	EGP:SendMaterial( self )
 	EGP:SendColor( self )
 end
 Obj.Receive = function( self, um )
@@ -31,7 +30,7 @@ Obj.Receive = function( self, um )
 	for i=1,nr do
 		table.insert( tbl.vertices, { x = um:ReadFloat(), y = um:ReadFloat(), u = um:ReadFloat(), v = um:ReadFloat() } )
 	end
-	tbl.material = um:ReadString()
+	EGP:ReceiveMaterial( tbl, um )
 	EGP:ReceiveColor( tbl, self, um )
 	return tbl
 end

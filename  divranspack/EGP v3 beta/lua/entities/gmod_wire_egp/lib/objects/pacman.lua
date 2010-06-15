@@ -1,5 +1,4 @@
 local Obj = EGP:NewObject( "PacMan" )
-Obj.material = ""
 Obj.angle = 0
 Obj.size = 45
 Obj.Draw = function( self )
@@ -29,14 +28,12 @@ Obj.Draw = function( self )
 	end
 end
 Obj.Transmit = function( self )
-	EGP.umsg.String( self.material )
 	EGP.umsg.Short( math.Round(self.angle) )
 	EGP.umsg.Short( math.Round(self.size) )
 	self.BaseClass.Transmit( self )
 end
 Obj.Receive = function( self, um )
 	local tbl = {}
-	tbl.material = um:ReadString()
 	tbl.angle = um:ReadShort()
 	tbl.size = um:ReadShort()
 	table.Merge( tbl, self.BaseClass.Receive( self, um ) )

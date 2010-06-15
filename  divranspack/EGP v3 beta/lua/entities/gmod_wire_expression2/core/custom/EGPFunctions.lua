@@ -238,6 +238,13 @@ e2function void wirelink:egpMaterial( number index, string material )
 	end
 end
 
+e2function void wirelink:egpMaterialFromScreen( number index, entity gpu )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool and gpu:IsValid()) then
+		if (EGP:EditObject( v, { material = ("<gpu%d>"):format(gpu:EntIndex()) } )) then Update(self,this) end
+	end
+end
+
 ----------------------------
 -- Angle
 ----------------------------

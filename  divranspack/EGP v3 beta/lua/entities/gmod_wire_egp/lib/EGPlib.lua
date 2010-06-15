@@ -18,14 +18,17 @@ EGP.Objects.Base.r = 255
 EGP.Objects.Base.g = 255
 EGP.Objects.Base.b = 255
 EGP.Objects.Base.a = 255
+EGP.Objects.Base.material = ""
 EGP.Objects.Base.Transmit = function( self )
 	EGP:SendPosSize( self )
 	EGP:SendColor( self )
+	EGP:SendMaterial( self )
 end
 EGP.Objects.Base.Receive = function( self, um )
 	local tbl = {}
 	EGP:ReceivePosSize( tbl, um )
 	EGP:ReceiveColor( tbl, self, um )
+	EGP:ReceiveMaterial( tbl, um )
 	return tbl
 end
 EGP.Objects.Base.DataStreamInfo = function( self )
@@ -123,6 +126,10 @@ function EGP:SendColor( obj )
 	if (obj.a) then EGP.umsg.Char( obj.a - 128 ) end
 end
 
+function EGP:SendMaterial( obj ) -- ALWAYS use this when sending material
+	EGP.umsg.String( obj.material )
+end
+
 function EGP:ReceivePosSize( tbl, um ) -- Used with SendPosSize
 	tbl.w = um:ReadFloat()
 	tbl.h = um:ReadFloat()
@@ -135,6 +142,15 @@ function EGP:ReceiveColor( tbl, obj, um ) -- Used with SendColor
 	tbl.g = um:ReadChar() + 128
 	tbl.b = um:ReadChar() + 128
 	if (obj.a) then tbl.a = um:ReadChar() + 128 end
+end
+
+function EGP:ReceiveMaterial( tbl, um ) -- ALWAYS use this when receiving material
+	local mat = um:ReadString()
+	local gpuid = tonumber(mat:match("^<gpu(%d+)>$"))
+	if gpuid then
+		mat = Entity(gpuid)
+	end
+	tbl.material = mat
 end
 
 --------------------------------------------------------
@@ -338,8 +354,9 @@ function EGP:Receive( um )
 			surface.DrawRect(0,0,512,512)
 			if (#Ent.RenderTable > 0) then
 				for k,v in ipairs( Ent.RenderTable ) do 
-					if (v.material and #v.material>0) then EGP:SetMaterial( v.material ) else EGP:SetMaterial() end
-					v.Draw(v) 
+					local OldTex = EGP:SetMaterial( v.material )
+					v:Draw()
+					EGP:FixMaterial( OldTex )
 				end
 			end
 		end)
@@ -349,8 +366,9 @@ function EGP:Receive( um )
 			surface.SetDrawColor(0,0,0,255)
 			surface.DrawRect(0,0,512,512)
 			for k,v in ipairs( EGP.HomeScreen ) do 
-				if (v.material and #v.material>0) then EGP:SetMaterial( v.material ) else EGP:SetMaterial() end
-				v.Draw(v) 
+				local OldTex = EGP:SetMaterial( v.material )
+				v:Draw()
+				EGP:FixMaterial( OldTex )
 			end
 		end, 250 )
 	end
@@ -361,7 +379,6 @@ require("datastream")
 
 if (SERVER) then
 
-	-- TODO: Optimize this function
 	function EGP:SpawnFunc( ply )
 		timer.Simple(2,function(ply)
 			if (ply and ply:IsValid()) then -- In case the player crashed
@@ -402,8 +419,9 @@ else
 					surface.DrawRect(0,0,512,512)
 					if (#Ent.RenderTable > 0) then
 						for k,v in ipairs( Ent.RenderTable ) do 
-							if (v.material and #v.material>0) then EGP:SetMaterial( v.material ) else EGP:SetMaterial() end
-							v.Draw(v) 
+							local OldTex = EGP:SetMaterial( v.material )
+							v:Draw()
+							EGP:FixMaterial( OldTex )
 						end
 					end
 				end)
@@ -431,7 +449,7 @@ EGP.ValidFonts[7] = "ChatFont"
 EGP.ValidFonts[8] = "Marlett"
 
 function EGP:ValidEGP( Ent )
-	return (Ent and Ent:IsValid() and (Ent:GetClass() == "gmod_wire_egp" or Ent:GetClass() == "gmod_wire_egp_emitter"))
+	return (Ent and Ent:IsValid() and Ent:GetClass() == "gmod_wire_egp")
 end
 
 EGP.Materials = {}
@@ -451,9 +469,20 @@ end
 function EGP:SetMaterial( Mat )
 	if (!Mat) then
 		surface.SetTexture()
-	else
+	elseif (type(Mat) == "string") then
 		surface.SetTexture( self:CacheMaterial( Mat ) )
-	end
+ 	else
+		if (!Mat:IsValid() or !Mat.GPU or !Mat.GPU.RT) then return end
+		local OldTex = WireGPU_matScreen:GetMaterialTexture("$basetexture")
+		WireGPU_matScreen:SetMaterialTexture("$basetexture", Mat.GPU.RT)
+		surface.SetTexture(WireGPU_texScreen)
+		return OldTex
+ 	end
+ end
+ 
+function EGP:FixMaterial( OldTex )
+	if (!OldTex) then return end
+	WireGPU_matScreen:SetMaterialTexture("$basetexture", OldTex)
 end
 
 --------------------------------------------------------
