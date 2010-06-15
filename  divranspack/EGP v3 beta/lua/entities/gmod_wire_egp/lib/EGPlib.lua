@@ -18,7 +18,19 @@ EGP.Objects.Base.r = 255
 EGP.Objects.Base.g = 255
 EGP.Objects.Base.b = 255
 EGP.Objects.Base.a = 255
-
+EGP.Objects.Base.Transmit = function( self )
+	EGP:SendPosSize( self )
+	EGP:SendColor( self )
+end
+EGP.Objects.Base.Receive = function( self, um )
+	local tbl = {}
+	EGP:ReceivePosSize( tbl, um )
+	EGP:ReceiveColor( tbl, self, um )
+	return tbl
+end
+EGP.Objects.Base.DataStreamInfo = function( self )
+	return { x = self.x, y = self.y, w = self.w, h = self.h, r = self.r, g = self.g, b = self.b, a = self.a }
+end
 
 function EGP:NewObject( Name )
 	self.Objects[Name] = {}
@@ -98,20 +110,20 @@ end
 -- Transmitting / Receiving helper functions
 --------------------------------------------------------
 function EGP:SendPosSize( obj )
-	umsg.Float( obj.w )
-	umsg.Float( obj.h )
-	umsg.Float( obj.x )
-	umsg.Float( obj.y )
+	EGP.umsg.Float( obj.w )
+	EGP.umsg.Float( obj.h )
+	EGP.umsg.Float( obj.x )
+	EGP.umsg.Float( obj.y )
 end
 
 function EGP:SendColor( obj )
-	umsg.Char( obj.r - 128 )
-	umsg.Char( obj.g - 128 )
-	umsg.Char( obj.b - 128 )
-	if (obj.a) then umsg.Char( obj.a - 128 ) end
+	EGP.umsg.Char( obj.r - 128 )
+	EGP.umsg.Char( obj.g - 128 )
+	EGP.umsg.Char( obj.b - 128 )
+	if (obj.a) then EGP.umsg.Char( obj.a - 128 ) end
 end
 
-function EGP:ReceivePosSize( tbl, um ) -- Used with SendPosSize (But can also be used in other cases)
+function EGP:ReceivePosSize( tbl, um ) -- Used with SendPosSize
 	tbl.w = um:ReadFloat()
 	tbl.h = um:ReadFloat()
 	tbl.x = um:ReadFloat()
@@ -128,14 +140,131 @@ end
 --------------------------------------------------------
 -- Transmitting / Receiving
 --------------------------------------------------------
+----------------------------
+-- Custom umsg system
+----------------------------
+local CurrentCost = 0
+--[[ Transmit Sizes:
+	Angle = 12
+	Bool = 1
+	Char = 1
+	Entity = 2
+	Float = 4
+	Long = 4
+	Short = 2
+	String = string length
+	Vector = 12
+	VectorNormal = 12
+]]
+	
+EGP.umsg = {}
+-- Start
+function EGP.umsg.Start( name, repicient )
+	CurrentCost = 0
+	umsg.Start( name, repicient )
+end
+-- End
+function EGP.umsg.End()
+	CurrentCost = 0
+	umsg.End()
+end
+-- Angle
+function EGP.umsg.Angle( data )
+	CurrentCost = CurrentCost + 12
+	umsg.Angle( data )
+end
+-- Boolean
+function EGP.umsg.Bool( data )
+	CurrentCost = CurrentCost + 1
+	umsg.Bool( data )
+end
+-- Char
+function EGP.umsg.Char( data )
+	CurrentCost = CurrentCost + 1
+	umsg.Char( data )
+end
+-- Entity
+function EGP.umsg.Entity( data )
+	CurrentCost = CurrentCost + 2
+	umsg.Entity( data )
+end
+-- Float
+function EGP.umsg.Float( data )
+	CurrentCost = CurrentCost + 4
+	umsg.Float( data )
+end
+-- Long
+function EGP.umsg.Long( data )
+	CurrentCost = CurrentCost + 4
+	umsg.Long( data )
+end
+-- Short
+function EGP.umsg.Short( data )
+	CurrentCost = CurrentCost + 2
+	umsg.Short( data )
+end
+-- String
+function EGP.umsg.String( data )
+	CurrentCost = CurrentCost + #data
+	umsg.String( data )
+end
+-- Vector
+function EGP.umsg.Vector( data )
+	CurrentCost = CurrentCost + 12
+	umsg.Vector( data )
+end
+-- VectorNormal
+function EGP.umsg.VectorNormal( data )
+	CurrentCost = CurrentCost + 12
+	umsg.VectorNormal( data )
+end
+
+----------------------------
+-- Transmit functions
+----------------------------
+
+function EGP:SendQueue( Ent, Queue )
+	if (CurrentCost != 0) then 
+		ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
+		return
+	end
+	local Done = 0
+	EGP.umsg.Start( "EGP_Transmit_Data" )
+		EGP.umsg.Entity( Ent )
+		EGP.umsg.Short( #Queue )
+		for k,v in ipairs( Queue ) do
+			EGP.umsg.Short( v.index )
+			if (v.remove == true) then -- Remove object
+				EGP.umsg.Char( -128 )
+			else
+				EGP.umsg.Char( v.ID - 128 )
+				v:Transmit()
+			end
+			
+			Done = Done + 1
+			if (CurrentCost > 200) then -- Getting close to the max size! Start over!
+				if (table.Count( Queue ) == 1 and CurrentCost > 255) then -- The object was too big
+					ErrorNoHalt("[EGP] Umsg error. An object was too big to send!")
+					EGP.umsg.End()
+					return
+				end
+				EGP.umsg.End()
+				for i=1,Done do table.remove( Queue, 1 ) end
+				self:SendQueue( Ent, Queue )
+				return
+			end
+		end
+	EGP.umsg.End()
+end
+
 function EGP:Transmit( Ent )
 	if (#Ent.RenderTable == 0) then -- Remove all objects
 		Ent.OldRenderTable = {}
 		
-		umsg.Start("EGP_Transmit_Data")
-			umsg.Entity( Ent )
-			umsg.Short( -1 )
-		umsg.End()
+		EGP.umsg.Start("EGP_Transmit_Data")
+			EGP.umsg.Entity( Ent )
+			EGP.umsg.Short( -1 )
+		EGP.umsg.End()
 	
 	else
 	
@@ -158,29 +287,13 @@ function EGP:Transmit( Ent )
 	
 		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
 		
-		print("DataToSend:")
-		PrintTable(DataToSend)
-	
-		umsg.Start( "EGP_Transmit_Data" )
-			umsg.Entity( Ent )
-			umsg.Short( #DataToSend )
-			for k,v in ipairs( DataToSend ) do
-				umsg.Short( v.index )
-				if (v.remove == true) then -- Remove object
-					umsg.Char( -128 )
-				else
-					umsg.Char( v.ID - 128 )
-					v:Transmit()
-				end
-			end
-		umsg.End()
-	
+		self:SendQueue( Ent, DataToSend )
 	end
 end
 
 function EGP:Receive( um )
 	local Ent = um:ReadEntity()
-	local Nr = um:ReadShort()
+	local Nr = um:ReadShort() -- Estimated amount
 	if (Nr == -1) then  -- Remove all objects
 		Ent.RenderTable = {} 
 	else
@@ -195,20 +308,24 @@ function EGP:Receive( um )
 			else
 				ID = ID + 128
 				local obj = self:GetObjectByID( ID )
-				local data = obj:Receive( um )
-				
-				local bool, k, v = EGP:HasObject( Ent, index )
-				if (bool) then -- Object already exists.
-					if (v.ID != ObjID) then -- Not the same kind of object, create new
+				if (!obj) then -- In case the umsg had to abort early
+					break
+				else
+					local data = obj:Receive( um )
+					
+					local bool, k, v = EGP:HasObject( Ent, index )
+					if (bool) then -- Object already exists.
+						if (v.ID != ID) then -- Not the same kind of object, create new
+							EGP:EditObject( obj, data )
+							Ent.RenderTable[k] = obj
+						else
+							EGP:EditObject( v, data )
+						end
+					else -- Object does not exist. Create new
 						EGP:EditObject( obj, data )
-						Ent.RenderTable[k] = obj
-					else
-						EGP:EditObject( v, data )
+						obj.index = index
+						table.insert( Ent.RenderTable, obj )
 					end
-				else -- Object does not exist. Create new
-					EGP:EditObject( obj, data )
-					obj.index = index
-					table.insert( Ent.RenderTable, obj )
 				end
 			end
 		end
@@ -254,16 +371,12 @@ if (SERVER) then
 					if (v.RenderTable and #v.RenderTable>0) then
 						local DataToSend = {}
 						for k2,v2 in pairs( v.RenderTable ) do 
-							if (type(v2) != "function") then 
-								table.insert( DataToSend, v2 )
-							end 
+							table.insert( DataToSend, { ID = v2.ID, index = v2.index, Settings = v2:DataStreamInfo() } )
 						end
-						table.insert( tbl, { entid = v:EntIndex(), Settings = DataToSend } )
+						table.insert( tbl, { entid = v:EntIndex(), Objects = DataToSend } )
 					end
 				end
 				if (tbl and #tbl>0) then
-					print("DATA TO SEND:")
-					PrintTable(tbl)
 					datastream.StreamToClients( ply,"EGP_PlayerSpawn_Transmit", tbl )
 				end
 			end
@@ -277,9 +390,9 @@ else
 		for k,v in ipairs( decoded ) do
 			local Ent = Entity(v.entid)
 			if (Ent and Ent:IsValid()) then
-				for k2,v2 in pairs( v.Settings ) do
+				for k2,v2 in pairs( v.Objects ) do
 					local Obj = EGP:GetObjectByID(v2.ID)
-					EGP:EditObject( Obj, v2 )
+					EGP:EditObject( Obj, v2.Settings )
 					Obj.index = v2.index
 					table.insert( Ent.RenderTable, Obj )
 				end
@@ -351,25 +464,24 @@ EGP.HomeScreen = {}
 
 -- Create table
 local tbl = {
-	{ ID = EGP.Objects.Names["Box"], Settings = { x = 78, y = 78, h = 356, w = 356, material = "expression 2/cog", r = 255, g = 0, b = 0, a = 255 } },
+	{ ID = EGP.Objects.Names["Box"], Settings = { x = 256, y = 256, h = 356, w = 356, material = "expression 2/cog", r = 150, g = 34, b = 34, a = 255, angle = 0 } },
 	{ ID = EGP.Objects.Names["Text"], Settings = {x = 256, y = 228, text = "EGP 3", fontid = 0, align = 1, size = 50, r = 135, g = 135, b = 135, a = 255 } }
 }
 	
-	
 --[[ Old homescreen (EGP v2 home screen design contest winner)
 local tbl = {
-	{ ID = EGP.Objects.Names["BoxAngle"], Settings = {		x = 256, y = 256, w = 362, h = 362, material = "", angle = 135, 					r = 75,  g = 75, b = 200, a = 255 } },
-	{ ID = EGP.Objects.Names["BoxAngle"], Settings = {		x = 256, y = 256, w = 340, h = 340, material = "", angle = 135, 					r = 10,  g = 10, b = 10,  a = 255 } },
+	{ ID = EGP.Objects.Names["Box"], Settings = {		x = 256, y = 256, w = 362, h = 362, material = "", angle = 135, 					r = 75,  g = 75, b = 200, a = 255 } },
+	{ ID = EGP.Objects.Names["Box"], Settings = {		x = 256, y = 256, w = 340, h = 340, material = "", angle = 135, 					r = 10,  g = 10, b = 10,  a = 255 } },
 	{ ID = EGP.Objects.Names["Text"], Settings = {			x = 229, y = 28,  text =   "E", 	size = 100, fontid = 4, 						r = 200, g = 50, b = 50,  a = 255 } },
 	{ ID = EGP.Objects.Names["Text"], Settings = {	 		x = 50,  y = 200, text =   "G", 	size = 100, fontid = 4, 						r = 200, g = 50, b = 50,  a = 255 } },
 	{ ID = EGP.Objects.Names["Text"], Settings = {			x = 400, y = 200, text =   "P", 	size = 100, fontid = 4, 						r = 200, g = 50, b = 50,  a = 255 } },
 	{ ID = EGP.Objects.Names["Text"], Settings = {			x = 228, y = 375, text =   "2", 	size = 100, fontid = 4, 						r = 200, g = 50, b = 50,  a = 255 } },
-	{ ID = EGP.Objects.Names["BoxAngle"], Settings = {		x = 256, y = 256, w = 256, h = 256, material = "expression 2/cog", angle = 45, 		r = 255, g = 50, b = 50,  a = 255 } },
+	{ ID = EGP.Objects.Names["Box"], Settings = {		x = 256, y = 256, w = 256, h = 256, material = "expression 2/cog", angle = 45, 		r = 255, g = 50, b = 50,  a = 255 } },
 	{ ID = EGP.Objects.Names["Box"], Settings = {			x = 128, y = 241, w = 256, h = 30, 	material = "", 									r = 10,  g = 10, b = 10,  a = 255 } },
 	{ ID = EGP.Objects.Names["Box"], Settings = {			x = 241, y = 128, w = 30,  h = 256, material = "", 									r = 10,  g = 10, b = 10,  a = 255 } },
 	{ ID = EGP.Objects.Names["Circle"], Settings = {		x = 256, y = 256, w = 70,  h = 70, 	material = "", 									r = 255, g = 50, b = 50,  a = 255 } },
-	{ ID = EGP.Objects.Names["BoxAngle"], Settings = {	 	x = 256, y = 256, w = 362, h = 362, material = "gui/center_gradient", angle = 135, 	r = 75,  g = 75, b = 200, a = 75  } },
-	{ ID = EGP.Objects.Names["BoxAngle"], Settings = {		x = 256, y = 256, w = 362, h = 362, material = "gui/center_gradient", angle = 135, 	r = 75,  g = 75, b = 200, a = 75  } }
+	{ ID = EGP.Objects.Names["Box"], Settings = {	 	x = 256, y = 256, w = 362, h = 362, material = "gui/center_gradient", angle = 135, 	r = 75,  g = 75, b = 200, a = 75  } },
+	{ ID = EGP.Objects.Names["Box"], Settings = {		x = 256, y = 256, w = 362, h = 362, material = "gui/center_gradient", angle = 135, 	r = 75,  g = 75, b = 200, a = 75  } }
 }
 ]]
 

@@ -6,12 +6,11 @@ Obj.Draw = function( self )
 	end
 end
 Obj.Transmit = function( self )
-	EGP:SendPosSize( self )
-	EGP:SendColor( self )
+	self.BaseClass.Transmit( self )
 end
 Obj.Receive = function( self, um )
-	local tbl = {}
-	EGP:ReceivePosSize( tbl, um )
-	EGP:ReceiveColor( tbl, self, um )
-	return tbl
+	return self.BaseClass.Receive( self, um )
+end
+Obj.DataStreamInfo = function( self )
+	return self.BaseClass.DataStreamInfo( self )
 end

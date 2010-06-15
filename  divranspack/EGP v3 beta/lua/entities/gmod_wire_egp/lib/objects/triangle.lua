@@ -11,14 +11,13 @@ Obj.Draw = function( self )
 	end
 end
 Obj.Transmit = function( self )
-	umsg.Float( self.x )
-	umsg.Float( self.y )
-	umsg.Float( self.x2 )
-	umsg.Float( self.y2 )
-	umsg.Float( self.x3 )
-	umsg.Float( self.y3 )
-	umsg.String( self.material )
-	EGP:SendPosSize( self )
+	EGP.umsg.Float( self.x )
+	EGP.umsg.Float( self.y )
+	EGP.umsg.Float( self.x2 )
+	EGP.umsg.Float( self.y2 )
+	EGP.umsg.Float( self.x3 )
+	EGP.umsg.Float( self.y3 )
+	EGP.umsg.String( self.material )
 	EGP:SendColor( self )
 end
 Obj.Receive = function( self, um )
@@ -32,4 +31,7 @@ Obj.Receive = function( self, um )
 	tbl.material = um:ReadString()
 	EGP:ReceiveColor( tbl, self, um )
 	return tbl
+end
+Obj.DataStreamInfo = function( self )
+	return { material = self.material, x = self.x, y = self.y, x2 = self.x2, y2 = self.y2, x3 = self.x3, y3 = self.y3, r = self.r, g = self.g, b = self.b, a = self.a }
 end

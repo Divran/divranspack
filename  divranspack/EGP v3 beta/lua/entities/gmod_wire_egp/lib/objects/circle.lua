@@ -26,16 +26,20 @@ Obj.Draw = function( self )
 	end
 end
 Obj.Transmit = function( self )
-	umsg.String(self.material)
-	umsg.Short( self.angle )
-	EGP:SendPosSize( self )
-	EGP:SendColor( self )
+	EGP.umsg.String(self.material)
+	EGP.umsg.Short( self.angle )
+	self.BaseClass.Transmit( self )
 end
 Obj.Receive = function( self, um )
 	local tbl = {}
 	tbl.material = um:ReadString()
 	tbl.angle = um:ReadShort()
-	EGP:ReceivePosSize( tbl, um )
-	EGP:ReceiveColor( tbl, self, um )
+	table.Merge( tbl, self.BaseClass.Receive( self, um ) )
+	return tbl
+end
+Obj.DataStreamInfo = function( self )
+	local tbl = {}
+	table.Merge( tbl, self.BaseClass.DataStreamInfo( self ) )
+	table.Merge( tbl, { material = self.material, angle = self.angle } )
 	return tbl
 end

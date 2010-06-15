@@ -1,24 +1,27 @@
 local Obj = EGP:NewObject( "Box" )
 Obj.material = ""
+Obj.angle = 0
 Obj.Draw = function( self )
-	if (self.a > 0 and self.w > 0 and self.h > 0) then
+	if (self.a>0) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
-		if (self.material and #self.material>0) then
-			surface.DrawTexturedRect( self.x, self.y, self.w, self.h )
-		else
-			surface.DrawRect( self.x, self.y, self.w, self.h )
-		end
+		surface.DrawTexturedRectRotated( self.x, self.y, self.w, self.h, self.angle )
 	end
 end
 Obj.Transmit = function( self )
-	umsg.String(self.material)
-	EGP:SendPosSize( self )
-	EGP:SendColor( self )
+	EGP.umsg.Short(self.angle)
+	EGP.umsg.String(self.material)
+	self.BaseClass.Transmit( self )
 end
 Obj.Receive = function( self, um )
 	local tbl = {}
+	tbl.angle = um:ReadShort()
 	tbl.material = um:ReadString()
-	EGP:ReceivePosSize( tbl, um )
-	EGP:ReceiveColor( tbl, self, um )
+	table.Merge( tbl, self.BaseClass.Receive( self, um ) )
+	return tbl
+end
+Obj.DataStreamInfo = function( self )
+	local tbl = {}
+	table.Merge( tbl, self.BaseClass.DataStreamInfo( self ) )
+	table.Merge( tbl, { material = self.material, angle = self.angle } )
 	return tbl
 end

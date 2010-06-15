@@ -4,6 +4,8 @@ local function Update( self, this )
 	self.data.EGP[this] = true
 end
 
+__e2setcost(35)
+
 --------------------------------------------------------
 -- Box
 --------------------------------------------------------
@@ -24,6 +26,8 @@ e2function void wirelink:egpText( number index, string text, vector2 pos )
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Text"], { index = index, text = text, x = pos[1], y = pos[2] } )
 	if (bool) then Update(self,this) end
 end
+
+__e2setcost(30)
 
 ----------------------------
 -- Set Text
@@ -70,7 +74,7 @@ e2function void wirelink:egpSetFont( number index, number fontid )
 	end
 end
 
-
+__e2setcost(35)
 
 --------------------------------------------------------
 -- BoxOutline
@@ -81,16 +85,11 @@ e2function void wirelink:egpBoxOutline( number index, vector2 size, vector2 pos 
 end
 
 --------------------------------------------------------
--- BoxAngle
---------------------------------------------------------
-e2function void wirelink:egpBoxAngle( number index, vector2 size, vector2 pos, number angle )
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["BoxAngle"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2], angle = angle } )
-	if (bool) then Update(self,this) end
-end
-
---------------------------------------------------------
 -- Poly
 --------------------------------------------------------
+
+__e2setcost(45)
+
 e2function void wirelink:egpPoly( number index, ... )
 	if (!EGP:ValidEGP( this )) then return end
 	local args = {...}
@@ -138,6 +137,8 @@ e2function void wirelink:egpPoly( number index, array args )
 	if (bool) then Update(self,this) end
 end
 
+__e2setcost(35)
+
 --------------------------------------------------------
 -- Line
 --------------------------------------------------------
@@ -173,6 +174,9 @@ end
 --------------------------------------------------------
 -- Common
 --------------------------------------------------------
+
+__e2setcost(30)
+
 ----------------------------
 -- Size
 ----------------------------
@@ -265,10 +269,48 @@ e2function void wirelink:egpRemove( number index )
 	end
 end
 
+--------------------------------------------------------
+-- Additional Functions
+--------------------------------------------------------
+
+__e2setcost(20)
+
+e2function vector2 wirelink:egpCursor( entity ply )
+	if (!EGP:ValidEGP( this )) then return {-1,-1} end
+	if (!ply or !ply:IsValid() or !ply:IsPlayer()) then return {-1,-1} end
+	
+	local monitor = WireGPU_Monitors[this:GetModel()]
+	local ang = this:LocalToWorldAngles(monitor.rot)
+	local pos = this:LocalToWorld(monitor.offset)
+	local h = 512
+	local w = h/monitor.RatioX
+	local x = -w/2
+	local y = -h/2
+
+	local trace = ply:GetEyeTraceNoCursor()
+	local ent = trace.Entity
+
+	local cx = -1
+	local cy = -1
+	
+	if (!EGP:ValidEGP( ent )) then return {-1,-1} end
+	
+	if (ent == this) then
+		local dist = trace.Normal:Dot(trace.HitNormal)*trace.Fraction*-16384
+		dist = math.max(dist, trace.Fraction*16384-ent:BoundingRadius())
+		local cpos = WorldToLocal(trace.HitPos, Angle(), pos, ang)
+		cx = (0.5+cpos.x/(monitor.RS*w)) * 512
+		cy = (0.5-cpos.y/(monitor.RS*h)) * 512	
+	end
+	
+	return {cx,cy}
+end
 
 --------------------------------------------------------
 -- Callbacks
 --------------------------------------------------------
+
+__e2setcost(nil)
 
 registerCallback("postexecute",function(self)
 	for k,v in pairs( self.data.EGP ) do

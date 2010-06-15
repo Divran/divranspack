@@ -37,12 +37,12 @@ Obj.Draw = function( self )
 	end
 end
 Obj.Transmit = function( self )
-	umsg.Float( self.x )
-	umsg.Float( self.y )
-	umsg.String( self.text )
-	umsg.Char( self.fontid-128 )
-	umsg.Char( math.Clamp(self.size,0,200)-128 )
-	umsg.Char( math.Clamp(self.align,0,2) )
+	EGP.umsg.Float( self.x )
+	EGP.umsg.Float( self.y )
+	EGP.umsg.String( self.text )
+	EGP.umsg.Char( self.fontid-128 )
+	EGP.umsg.Char( math.Clamp(self.size,0,200)-128 )
+	EGP.umsg.Char( math.Clamp(self.align,0,2) )
 	EGP:SendColor( self )
 end
 Obj.Receive = function( self, um )
@@ -55,4 +55,7 @@ Obj.Receive = function( self, um )
 	tbl.align = um:ReadChar()
 	EGP:ReceiveColor( tbl, self, um )
 	return tbl
+end
+Obj.DataStreamInfo = function( self )
+	return { align = self.align, size = self.size, r = self.r, g = self.g, b = self.b, a = self.a, text = self.text, fontid = self.fontid }
 end
