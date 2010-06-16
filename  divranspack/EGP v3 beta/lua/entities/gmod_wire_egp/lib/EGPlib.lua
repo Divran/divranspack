@@ -133,7 +133,7 @@ function EGP:CreateObject( Ent, ObjID, Settings, ply )
 		end
 	end
 
-	Settings.index = math.Round(math.Clamp(Settings.index or 0, 0, self.ConVars.MaxObjects:GetInt()))
+	Settings.index = math.Round(math.Clamp(Settings.index or 1, 1, self.ConVars.MaxObjects:GetInt()))
 	
 	local bool, k, v = self:HasObject( Ent, Settings.index )
 	if (bool) then -- Already exists. Change settings:
