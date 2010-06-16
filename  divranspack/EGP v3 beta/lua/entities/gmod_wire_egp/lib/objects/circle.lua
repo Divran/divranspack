@@ -7,9 +7,9 @@ Obj.Draw = function( self )
 		for i=0,360,10 do
 			local rad = math.rad(i)
 			local x = math.cos(rad)
-			local u = x
+			local u = (x+1)/2
 			local y = math.sin(rad)
-			local v = y
+			local v = (y+1)/2
 			
 			rad = math.rad(self.angle)
 			local tempx = x * self.w * math.cos(rad) - y * self.h * math.sin(rad) + self.x

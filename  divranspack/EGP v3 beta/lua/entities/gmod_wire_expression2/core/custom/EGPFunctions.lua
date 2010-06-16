@@ -4,7 +4,7 @@ local function Update( self, this )
 	self.data.EGP[this] = true
 end
 
-__e2setcost(35)
+__e2setcost(15)
 
 --------------------------------------------------------
 -- Box
@@ -12,6 +12,15 @@ __e2setcost(35)
 e2function void wirelink:egpBox( number index, vector2 size, vector2 pos )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Box"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+--------------------------------------------------------
+-- BoxAngle
+--------------------------------------------------------
+e2function void wirelink:egpBoxAngle( number index, vector2 size, vector2 pos )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["BoxAngle"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2] }, self.player )
 	if (bool) then Update(self,this) end
 end
 
@@ -24,7 +33,7 @@ e2function void wirelink:egpText( number index, string text, vector2 pos )
 	if (bool) then Update(self,this) end
 end
 
-__e2setcost(30)
+__e2setcost(10)
 
 ----------------------------
 -- Set Text
@@ -75,7 +84,7 @@ e2function void wirelink:egpSetFont( number index, number fontid )
 	end
 end
 
-__e2setcost(35)
+__e2setcost(15)
 
 --------------------------------------------------------
 -- BoxOutline
@@ -90,7 +99,7 @@ end
 -- Poly
 --------------------------------------------------------
 
-__e2setcost(45)
+__e2setcost(20)
 
 e2function void wirelink:egpPoly( number index, ... )
 	if (!EGP:IsAllowed( self, this )) then return end
@@ -141,7 +150,7 @@ e2function void wirelink:egpPoly( number index, array args )
 	if (bool) then Update(self,this) end
 end
 
-__e2setcost(35)
+__e2setcost(15)
 
 --------------------------------------------------------
 -- Line
@@ -180,10 +189,10 @@ e2function void wirelink:egpPacManCircle( number index, vector2 size, vector2 po
 end
 
 --------------------------------------------------------
--- Common
+-- Set functions
 --------------------------------------------------------
 
-__e2setcost(30)
+__e2setcost(10)
 
 ----------------------------
 -- Size
@@ -288,12 +297,107 @@ e2function void wirelink:egpRemove( number index )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
-		this.RenderTable[k] = {}
-		this.RenderTable[k].remove = true
-		this.RenderTable[k].index = index
+		table.remove( this.RenderTable, k )
 		Update(self,this)
 	end
 end
+
+--------------------------------------------------------
+-- Get functions
+--------------------------------------------------------
+
+__e2setcost(5)
+
+e2function vector2 wirelink:egpPos( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.x and v.y) then
+			return {v.x, v.y}
+		end
+	end
+	return {-1,-1}
+end
+
+e2function vector2 wirelink:egpSize( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.w and v.h) then
+			return {v.w, v.h}
+		end
+	end
+	return {-1,-1}
+end
+
+e2function number wirelink:egpSize( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.size) then
+			return v.size
+		end
+	end
+	return -1
+end
+
+e2function vector4 wirelink:egpColor( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.r and v.g and v.b and v.a) then
+			return {v.r,v.g,v.b,v.a}
+		end
+	end
+	return {-1,-1,-1,-1}
+end
+
+e2function vector wirelink:egpColor( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.r and v.g and v.b) then
+			return {v.r, v.g, v.b}
+		end
+	end
+	return {-1,-1,-1}
+end
+
+e2function number wirelink:egpAngle( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.angle) then
+			return v.angle
+		end
+	end
+	return -1
+end
+
+e2function string wirelink:egpMaterial( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.material) then
+			return v.material
+		end
+	end
+	return ""
+end
+
+__e2setcost(10)
+
+e2function array wirelink:egpVertices( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.vertices) then
+			local ret = {}
+			for k2,v2 in ipairs( v.vertices ) do
+				table.insert( ret, {v2.x,v2.y} )
+			end
+			return ret
+		elseif (v.x and v.y and v.x2 and v.y2) then
+			return {{v.x,v.y},{v.x2,v.y2}}
+		elseif (v.x and v.y and v.x2 and v.y2 and v.x3 and v.y3) then
+			return {{v.x,v.y},{v.x2,v.y2},{v.x3,v.y3}}
+		end
+	end
+	return {}
+end
+
 
 --------------------------------------------------------
 -- Additional Functions
@@ -342,7 +446,7 @@ registerCallback("postexecute",function(self)
 	for k,v in pairs( self.data.EGP ) do
 		if (k and k:IsValid()) then
 			if (v == true) then
-				EGP:Transmit( k )
+				EGP:Transmit( k, self )
 				self.data.EGP[k] = nil
 			end
 		else

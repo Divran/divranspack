@@ -80,7 +80,7 @@ end
 
 function EGP:HasObject( Ent, index )
 	if (!EGP:ValidEGP( Ent )) then return false end
-	index = math.Round(math.Clamp(index or 1,1,255))
+	index = math.Round(math.Clamp(index or 1, 1, self.ConVars.MaxObjects:GetInt()))
 	for k,v in ipairs( Ent.RenderTable ) do
 		if (v.index == index) then
 			return true, k, v
@@ -104,18 +104,17 @@ function EGP:CheckInterval( ply )
 	local interval = self.ConVars.Interval:GetInt()
 	local maxcount = self.ConVars.MaxPerInterval:GetInt()
 	
-	if (self.IntervalCheck[ply].objects == 0 and self.IntervalCheck[ply].time + interval < CurTime()) then -- No timer started. Start a new one
-		self.IntervalCheck[ply].objects = self.IntervalCheck[ply].objects + 1
-		self.IntervalCheck[ply].time = CurTime() + interval
-	elseif (self.IntervalCheck[ply].objects > 0 and self.IntervalCheck[ply].time > CurTime()) then -- Timer started, add object count
-		self.IntervalCheck[ply].objects = self.IntervalCheck[ply].objects + 1
-		if (self.IntervalCheck[ply].objects > maxcount) then -- Hit max objects per interval limit, block creation
+	local tbl = self.IntervalCheck[ply]
+	if (tbl.time < CurTime()) then
+		tbl.objects = 1
+		tbl.time = CurTime() + interval
+	else
+		tbl.objects = tbl.objects + 1
+		if (tbl.objects >= maxcount) then
 			return false
 		end
-	elseif (self.IntervalCheck[ply].time > 0 and self.IntervalCheck[ply].time < CurTime()) then -- Timer finished running, start a new one
-		self.IntervalCheck[ply].time = CurTime() + interval
-		self.IntervalCheck[ply].objects = 0
 	end
+	
 	return true
 end
 ----------------------------
@@ -339,7 +338,7 @@ function EGP:SendQueue( Ent, Queue )
 	EGP.umsg.End()
 end
 
-function EGP:Transmit( Ent )
+function EGP:Transmit( Ent, E2 )
 	if (#Ent.RenderTable == 0) then -- Remove all objects
 		Ent.OldRenderTable = {}
 		
@@ -352,9 +351,7 @@ function EGP:Transmit( Ent )
 	
 		local DataToSend = {}
 		for k,v in ipairs( Ent.RenderTable ) do
-			if (v.remove == true) then -- Remove object
-				table.insert( DataToSend, { index = v.index, remove = true, index2 = k } )
-			elseif (!Ent.OldRenderTable[k] or Ent.OldRenderTable[k] != v or Ent.OldRenderTable[k].ID != v.ID) then -- Check for differences
+			if (!Ent.OldRenderTable[k] or Ent.OldRenderTable[k] != v or Ent.OldRenderTable[k].ID != v.ID) then -- Check for differences
 				table.insert( DataToSend, v )
 			else
 				for k2,v2 in pairs( v ) do
@@ -365,10 +362,18 @@ function EGP:Transmit( Ent )
 			end
 		end
 		
-		for k,v in ipairs( DataToSend ) do if (v.remove == true) then table.remove( Ent.RenderTable, v.index2 ) end end -- Remove object
+		-- Check if any object was removed
+		for k,v in ipairs( Ent.OldRenderTable ) do
+			if (!Ent.RenderTable[k]) then
+				table.insert( DataToSend, { index = v.index, remove = true} )
+			end
+		end
 	
 		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
 		
+		if (E2 and E2.entity and E2.entity:IsValid()) then
+			E2.prf = E2.prf + #DataToSend * 50
+		end
 		self:SendQueue( Ent, DataToSend )
 	end
 end
@@ -559,7 +564,7 @@ EGP.HomeScreen = {}
 
 -- Create table
 local tbl = {
-	{ ID = EGP.Objects.Names["Box"], Settings = { x = 256, y = 256, h = 356, w = 356, material = "expression 2/cog", r = 150, g = 34, b = 34, a = 255, angle = 0 } },
+	{ ID = EGP.Objects.Names["Box"], Settings = { x = 256-356/2, y = 256-356/2, h = 356, w = 356, material = "expression 2/cog", r = 150, g = 34, b = 34, a = 255 } },
 	{ ID = EGP.Objects.Names["Text"], Settings = {x = 256, y = 228, text = "EGP 3", fontid = 0, align = 1, size = 50, r = 135, g = 135, b = 135, a = 255 } }
 }
 	
