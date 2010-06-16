@@ -1,5 +1,10 @@
 EGP = {}
 
+EGP.ConVars = {}
+EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
+EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
+EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
+
 --------------------------------------------------------
 -- Objects
 --------------------------------------------------------
@@ -60,6 +65,18 @@ end
 --------------------------------------------------------
 -- e2function Helper functions
 --------------------------------------------------------
+----------------------------
+-- IsAllowed check
+----------------------------
+function EGP:IsAllowed( E2, Ent )
+	if (Ent and Ent:IsValid() and E2 and E2.entity and E2.entity:IsValid() and E2Lib.isOwner( E2, Ent )) then
+		return true
+	end
+	return false
+end
+----------------------------
+-- Object existance check
+----------------------------
 
 function EGP:HasObject( Ent, index )
 	if (!EGP:ValidEGP( Ent )) then return false end
@@ -72,33 +89,80 @@ function EGP:HasObject( Ent, index )
 	return false
 end
 
-function EGP:CreateObject( Ent, ObjID, Settings )
-	if (!EGP:ValidEGP( Ent )) then return false end
+----------------------------
+-- Object per second allowance checks
+----------------------------
+EGP.IntervalCheck = {}
+
+function EGP:PlayerDisconnect( ply ) EGP.IntervalCheck[ply] = nil end
+hook.Add("PlayerDisconnect","EGP_PlayerDisconnect",function( ply ) EGP:PlayerDisconnect( ply ) end)
+
+
+function EGP:CheckInterval( ply )
+	if (!self.IntervalCheck[ply]) then self.IntervalCheck[ply] = { objects = 0, time = 0 } end
 	
-	Settings.index = math.Round(math.Clamp(Settings.index or 1, 1, 255))
+	local interval = self.ConVars.Interval:GetInt()
+	local maxcount = self.ConVars.MaxPerInterval:GetInt()
+	
+	if (self.IntervalCheck[ply].objects == 0 and self.IntervalCheck[ply].time + interval < CurTime()) then -- No timer started. Start a new one
+		self.IntervalCheck[ply].objects = self.IntervalCheck[ply].objects + 1
+		self.IntervalCheck[ply].time = CurTime() + interval
+	elseif (self.IntervalCheck[ply].objects > 0 and self.IntervalCheck[ply].time > CurTime()) then -- Timer started, add object count
+		self.IntervalCheck[ply].objects = self.IntervalCheck[ply].objects + 1
+		if (count > maxcount) then -- Hit max objects per interval limit, block creation
+			ret = false
+		end
+	elseif (self.IntervalCheck[ply].time > 0 and self.IntervalCheck[ply].time < CurTime()) then -- Timer finished running, start a new one
+		self.IntervalCheck[ply].time = CurTime() + interval
+		self.IntervalCheck[ply].objects = 0
+	end
+end
+----------------------------
+-- Create / edit objects
+----------------------------
+
+function EGP:CreateObject( Ent, ObjID, Settings, ply )
+	if (!self:ValidEGP( Ent )) then return false end
+	
+	if (SERVER) then
+		if (ply and ply:IsValid() and ply:IsPlayer()) then
+			if (!self:CheckInterval( ply )) then
+				return false
+			end
+		end
+	end
+
+	Settings.index = math.Round(math.Clamp(Settings.index or 0, 0, self.ConVars.MaxObjects:GetInt()))
 	
 	local bool, k, v = self:HasObject( Ent, Settings.index )
 	if (bool) then -- Already exists. Change settings:
 		if (v.ID != ObjID) then -- Not the same kind of object, create new
 			local Obj = {}
-			Obj = EGP:GetObjectByID( ObjID )
-			EGP:EditObject( Obj, Settings )
+			Obj = self:GetObjectByID( ObjID )
+			self:EditObject( Obj, Settings )
 			Obj.index = Settings.index
 			Ent.RenderTable[k] = Obj
 			return true, Obj
 		else
-			return EGP:EditObject( v, Settings ), v
+			return self:EditObject( v, Settings ), v
 		end
 	else -- Did not exist. Create:
-		local Obj = EGP:GetObjectByID( ObjID )
-		EGP:EditObject( Obj, Settings )
+		local Obj = self:GetObjectByID( ObjID )
+		self:EditObject( Obj, Settings )
 		Obj.index = Settings.index
 		table.insert( Ent.RenderTable, Obj )
 		return true, Obj
 	end
 end
 
-function EGP:EditObject( Obj, Settings )
+function EGP:EditObject( Obj, Settings, ply )
+	if (SERVER) then
+		if (ply and ply:IsValid() and ply:IsPlayer()) then
+			if (!self:CheckInterval( ply )) then
+				return false
+			end
+		end
+	end
 	local ret = false
 	for k,v in pairs( Settings ) do
 		if (Obj[k] and Obj[k] != v) then
@@ -259,8 +323,9 @@ function EGP:SendQueue( Ent, Queue )
 			
 			Done = Done + 1
 			if (CurrentCost > 200) then -- Getting close to the max size! Start over!
-				if (table.Count( Queue ) == 1 and CurrentCost > 255) then -- The object was too big
+				if (Done == 1 and CurrentCost > 255) then -- The object was too big
 					ErrorNoHalt("[EGP] Umsg error. An object was too big to send!")
+					table.remove( Queue, 1 )
 					EGP.umsg.End()
 					return
 				end
