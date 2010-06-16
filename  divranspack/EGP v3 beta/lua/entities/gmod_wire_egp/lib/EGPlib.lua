@@ -110,12 +110,13 @@ function EGP:CheckInterval( ply )
 	elseif (self.IntervalCheck[ply].objects > 0 and self.IntervalCheck[ply].time > CurTime()) then -- Timer started, add object count
 		self.IntervalCheck[ply].objects = self.IntervalCheck[ply].objects + 1
 		if (self.IntervalCheck[ply].objects > maxcount) then -- Hit max objects per interval limit, block creation
-			ret = false
+			return false
 		end
 	elseif (self.IntervalCheck[ply].time > 0 and self.IntervalCheck[ply].time < CurTime()) then -- Timer finished running, start a new one
 		self.IntervalCheck[ply].time = CurTime() + interval
 		self.IntervalCheck[ply].objects = 0
 	end
+	return true
 end
 ----------------------------
 -- Create / edit objects
