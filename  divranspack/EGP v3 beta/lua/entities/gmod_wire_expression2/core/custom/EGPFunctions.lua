@@ -9,7 +9,7 @@ __e2setcost(15)
 --------------------------------------------------------
 -- Box
 --------------------------------------------------------
-e2function void wirelink:egpBox( number index, vector2 size, vector2 pos )
+e2function void wirelink:egpBox( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Box"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2] }, self.player )
 	if (bool) then Update(self,this) end
@@ -18,7 +18,7 @@ end
 --------------------------------------------------------
 -- BoxAngle
 --------------------------------------------------------
-e2function void wirelink:egpBoxAngle( number index, vector2 size, vector2 pos )
+e2function void wirelink:egpBoxAngle( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["BoxAngle"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2] }, self.player )
 	if (bool) then Update(self,this) end
@@ -89,7 +89,7 @@ __e2setcost(15)
 --------------------------------------------------------
 -- BoxOutline
 --------------------------------------------------------
-e2function void wirelink:egpBoxOutline( number index, vector2 size, vector2 pos )
+e2function void wirelink:egpBoxOutline( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["BoxOutline"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2] }, self.player )
 	if (bool) then Update(self,this) end
@@ -164,7 +164,7 @@ end
 --------------------------------------------------------
 -- Circle
 --------------------------------------------------------
-e2function void wirelink:egpCircle( number index, vector2 size, vector2 pos )
+e2function void wirelink:egpCircle( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Circle"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
 	if (bool) then Update(self,this) end
@@ -182,7 +182,13 @@ end
 --------------------------------------------------------
 -- PacMan Circle
 --------------------------------------------------------
-e2function void wirelink:egpPacManCircle( number index, vector2 size, vector2 pos, number angle, number mouthsize )
+e2function void wirelink:egpPacManCircle( number index, vector2 pos, vector2 size )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacMan"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+e2function void wirelink:egpPacManCircle( number index, vector2 pos, vector2 size, number angle, number mouthsize )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacMan"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
 	if (bool) then Update(self,this) end
