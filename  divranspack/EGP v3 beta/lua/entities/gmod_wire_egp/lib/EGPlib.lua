@@ -372,7 +372,7 @@ function EGP:Transmit( Ent, E2 )
 		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
 		
 		if (E2 and E2.entity and E2.entity:IsValid()) then
-			E2.prf = E2.prf + #DataToSend * 50
+			E2.prf = E2.prf + #DataToSend * 150
 		end
 		self:SendQueue( Ent, DataToSend )
 	end
