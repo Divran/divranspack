@@ -304,7 +304,7 @@ end
 -- Transmit functions
 ----------------------------
 
-function EGP:SendQueue( Ent, Queue )
+function EGP:SendQueue( Ent, Queue, ply )
 	if (CurrentCost != 0) then 
 		ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
 		return
@@ -343,10 +343,10 @@ function EGP:Transmit( Ent, E2 )
 	if (#Ent.RenderTable == 0) then -- Remove all objects
 		Ent.OldRenderTable = {}
 		
-		EGP.umsg.Start("EGP_Transmit_Data")
-			EGP.umsg.Entity( Ent )
-			EGP.umsg.Short( -1 )
-		EGP.umsg.End()
+		umsg.Start("EGP_Transmit_Data")
+			umsg.Entity( Ent )
+			umsg.Short( -1 )
+		umsg.End()
 	
 	else
 	
@@ -375,6 +375,7 @@ function EGP:Transmit( Ent, E2 )
 		if (E2 and E2.entity and E2.entity:IsValid()) then
 			E2.prf = E2.prf + #DataToSend * 150
 		end
+		
 		self:SendQueue( Ent, DataToSend )
 	end
 end
@@ -432,6 +433,7 @@ if (SERVER) then
 			if (ply and ply:IsValid()) then -- In case the player crashed
 				local tbl = {}
 				local en = ents.FindByClass("gmod_wire_egp")
+				table.Merge( en, ents.FindByClass("gmod_wire_egp_hud") )
 				for k,v in pairs( en ) do
 					if (v.RenderTable and #v.RenderTable>0) then
 						local DataToSend = {}
@@ -486,7 +488,7 @@ EGP.ValidFonts[7] = "ChatFont"
 EGP.ValidFonts[8] = "Marlett"
 
 function EGP:ValidEGP( Ent )
-	return (Ent and Ent:IsValid() and Ent:GetClass() == "gmod_wire_egp")
+	return (Ent and Ent:IsValid() and (Ent:GetClass() == "gmod_wire_egp" or Ent:GetClass() == "gmod_wire_egp_hud"))
 end
 
 EGP.Materials = {}

@@ -34,6 +34,23 @@ if (SERVER) then
 		undo.Finish()
 	end
 	
+	function TOOL:RightClick( trace )
+		if (trace.Entity and trace.Entity:IsPlayer()) then return false end
+		local ply = self:GetOwner()
+		if (!ply:CheckLimit( "wire_egps" )) then return false end
+		
+		local ent = self:MakeHUDEGP( ply, trace )
+		if (!ent) then return end
+		
+		ply:AddCount( "wire_egp",ent )
+		ply:AddCleanup( "wire_egp", ent )
+
+		undo.Create( "wire_egp" )
+			undo.AddEntity( ent )
+			undo.SetPlayer( ply )
+		undo.Finish()
+	end
+	
 	function TOOL:MakeWireEGP( pl, trace )
 		if ( !pl:CheckLimit( "wire_egps" ) ) then return false end
 		local egp = ents.Create( "gmod_wire_egp" )
@@ -49,8 +66,21 @@ if (SERVER) then
 			egp:SetPos( trace.HitPos - trace.HitNormal * egp:OBBMins().x )
 		end
 		
-		egp:Spawn()
 		egp:SetPlayer(pl)
+		egp:Spawn()
+		return egp
+	end
+	
+	function TOOL:MakeHUDEGP( pl, trace )
+		if ( !pl:CheckLimit( "wire_egps" ) ) then return false end
+		local egp = ents.Create( "gmod_wire_egp_hud" )
+		if (!egp:IsValid()) then return false end
+		egp:SetModel("models/bull/dynamicbutton.mdl")
+		egp:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0) )
+		egp:SetPos( trace.HitPos - trace.HitNormal * egp:OBBMins().z )
+		
+		egp:SetPlayer(pl)
+		egp:Spawn()
 		return egp
 	end
 else
@@ -62,6 +92,7 @@ else
 	language.Add("Tool_wire_egp_createflat", "Create flat to surface")
 		
 	function TOOL:LeftClick( trace ) return (!trace.Entity or (trace.Entity and !trace.Entity:IsPlayer())) end
+	function TOOL:RightClick( trace ) return (!trace.Entity or (trace.Entity and !trace.Entity:IsPlayer())) end
 end
 
 function TOOL:UpdateGhost( ent, ply )

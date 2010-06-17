@@ -1,8 +1,9 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
+AddCSLuaFile("HUDDraw.lua")
 
-ENT.WireDebugName = "E2 Graphics Processor"
+ENT.WireDebugName = "E2 Graphics Processor HUD"
 
 function ENT:Initialize()	
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -11,4 +12,10 @@ function ENT:Initialize()
 	
 	self.RenderTable = {}
 	self.OldRenderTable = {}
+	
+	self:SetUseType(SIMPLE_USE)
+end
+
+function ENT:Use( ply )
+	umsg.Start( "EGP_HUD_Use", ply ) umsg.Entity( self ) umsg.End()
 end

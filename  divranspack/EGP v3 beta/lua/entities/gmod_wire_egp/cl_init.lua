@@ -3,7 +3,6 @@ include('shared.lua')
 function ENT:Initialize()
 	self.RenderTable = {}
 	self.GPU = GPULib.WireGPU( self )
-	--self.RT = self.GPU:Initialize()
 	
 	self.GPU:RenderToGPU( function()
 		render.Clear( 0, 0, 0, 0 )
