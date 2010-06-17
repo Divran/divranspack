@@ -3,7 +3,7 @@ Obj.material = ""
 Obj.Draw = function( self )
 	if (self.a>0) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
-		if (self.material and #self.material>0) then
+		if (self.material and (type(self.material == "string" and #self.material>0) or (type(mat) == "Entity" and mat:IsValid()))) then
 			surface.DrawTexturedRectRotated( self.x + self.w / 2, self.y + self.h / 2, self.w, self.h, 0 )
 		else
 			surface.DrawRect( self.x, self.y, self.w, self.h )

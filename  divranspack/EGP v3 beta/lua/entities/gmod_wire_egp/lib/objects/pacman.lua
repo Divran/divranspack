@@ -11,14 +11,16 @@ Obj.Draw = function( self )
 		for i=0,360-self.size,(360-self.size)/36 do
 			local rad = math.rad(i)
 			local x = math.cos(rad)
+			local u = (x+1)/2
 			local y = math.sin(rad)
+			local v = (y+1)/2
 			
 			rad = math.rad(self.angle)
 			local tempx = x * self.w * math.cos(rad) - y * self.h * math.sin(rad) + self.x
 			y = x * self.w * math.sin(rad) + y * self.h * math.cos(rad) + self.y
 			x = tempx
 			
-			table.insert( vertices, { x = x, y = y, u = 0, v = 0 } )
+			table.insert( vertices, { x = x, y = y, u = u, v = v } )
 		end
 		
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )

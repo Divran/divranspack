@@ -7,7 +7,7 @@ Obj.material = ""
 Obj.Draw = function( self )
 	if (self.a>0) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
-		surface.DrawPoly( { { x = self.x, y = self.y, u = 0, v = 0 }, { x = self.x2, y = self.y2, u = 0, v = 1 }, { x = self.x3, y = self.y2, u = 1, v = 0 } } )
+		surface.DrawPoly( { { x = self.x, y = self.y, u = 0, v = 0 }, { x = self.x2, y = self.y2, u = 0, v = 1 }, { x = self.x3, y = self.y3, u = 1, v = 0 } } )
 	end
 end
 Obj.Transmit = function( self )

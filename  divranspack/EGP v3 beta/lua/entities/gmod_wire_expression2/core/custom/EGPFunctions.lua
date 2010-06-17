@@ -230,6 +230,24 @@ e2function void wirelink:egpPos( number index, vector2 pos )
 	end
 end
 
+e2function void wirelink:egpRotate( number index, vector2 worldpos, vector2 axispos, number angle )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.x and v.y and v.angle) then
+			
+			local vec, ang = LocalToWorld(Vector(axispos[1],axispos[2],0), Angle(0,0,0), Vector(worldpos[1],worldpos[2],0), Angle(0,angle,0))
+			
+			local x = vec.x
+			local y = vec.y
+			
+			angle = -ang.yaw
+			
+			if (EGP:EditObject( v, { x = x, y = y, angle = angle }, self.player )) then Update(self,this) end
+		end
+	end
+end
+
 ----------------------------
 -- Color
 ----------------------------
@@ -271,7 +289,7 @@ end
 e2function void wirelink:egpMaterialFromScreen( number index, entity gpu )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
-	if (bool and gpu:IsValid()) then
+	if (bool and gpu and gpu:IsValid()) then
 		if (EGP:EditObject( v, { material = ("<gpu%d>"):format(gpu:EntIndex()) }, self.player )) then Update(self,this) end
 	end
 end

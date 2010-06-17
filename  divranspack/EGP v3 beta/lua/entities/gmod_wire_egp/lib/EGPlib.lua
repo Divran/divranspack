@@ -81,6 +81,7 @@ end
 function EGP:HasObject( Ent, index )
 	if (!EGP:ValidEGP( Ent )) then return false end
 	index = math.Round(math.Clamp(index or 1, 1, self.ConVars.MaxObjects:GetInt()))
+	if (!Ent.RenderTable or #Ent.RenderTable == 0) then return false end
 	for k,v in ipairs( Ent.RenderTable ) do
 		if (v.index == index) then
 			return true, k, v
@@ -537,6 +538,8 @@ function EGP:CacheMaterial( Mat )
 	return self.Materials[Mat]
 end
 
+--[[
+
 function EGP:SetMaterial( Mat )
 	if (!Mat) then
 		surface.SetTexture()
@@ -554,6 +557,34 @@ function EGP:SetMaterial( Mat )
 function EGP:FixMaterial( OldTex )
 	if (!OldTex) then return end
 	WireGPU_matScreen:SetMaterialTexture("$basetexture", OldTex)
+end
+
+]]
+
+if (CLIENT) then
+	EGP.FakeTex = surface.GetTextureID("egp_ignore_this_error")
+	EGP.FakeMat = Material("egp_ignore_this_error")
+end
+
+function EGP:SetMaterial( Mat )
+	print("Mat:",Mat)
+	if (!Mat) then
+		surface.SetTexture()
+	elseif (type(Mat) == "string") then
+		surface.SetTexture( self:CacheMaterial( Mat ) )
+ 	elseif (type(Mat) == "Entity") then
+		
+		if (!Mat:IsValid() or !Mat.GPU or !Mat.GPU.RT) then return end
+		local OldTex = EGP.FakeMat:GetMaterialTexture("$basetexture")
+		EGP.FakeMat:SetMaterialTexture("$basetexture", Mat.GPU.RT)
+		surface.SetTexture(EGP.FakeTex)
+		return OldTex
+ 	end
+ end
+ 
+function EGP:FixMaterial( OldTex )
+	if (!OldTex) then return end
+	EGP.FakeMat:SetMaterialTexture("$basetexture", OldTex)
 end
 
 --------------------------------------------------------
