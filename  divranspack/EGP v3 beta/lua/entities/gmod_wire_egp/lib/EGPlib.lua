@@ -23,7 +23,6 @@ EGP.Objects.Base.r = 255
 EGP.Objects.Base.g = 255
 EGP.Objects.Base.b = 255
 EGP.Objects.Base.a = 255
-EGP.Objects.Base.parent = -1
 EGP.Objects.Base.material = ""
 EGP.Objects.Base.Transmit = function( self )
 	EGP:SendPosSize( self )
@@ -462,18 +461,7 @@ else
 					Obj.index = v2.index
 					table.insert( Ent.RenderTable, Obj )
 				end
-				Ent.GPU:RenderToGPU( function()
-					render.Clear( 0, 0, 0, 0 )
-					surface.SetDrawColor(0,0,0,255)
-					surface.DrawRect(0,0,512,512)
-					if (#Ent.RenderTable > 0) then
-						for k,v in ipairs( Ent.RenderTable ) do 
-							local OldTex = EGP:SetMaterial( v.material )
-							v:Draw()
-							EGP:FixMaterial( OldTex )
-						end
-					end
-				end)
+				Ent:GPU_Update()
 			end
 		end
 	end
@@ -539,8 +527,8 @@ end
 ]]
 
 if (CLIENT) then
-	EGP.FakeTex = surface.GetTextureID("egp_ignore_this_error")
 	EGP.FakeMat = Material("egp_ignore_this_error")
+	EGP.FakeTex = surface.GetTextureID("egp_ignore_this_error")
 end
 
 function EGP:SetMaterial( Mat )
