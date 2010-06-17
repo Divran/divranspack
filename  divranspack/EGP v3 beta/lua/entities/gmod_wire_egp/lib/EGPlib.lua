@@ -23,6 +23,7 @@ EGP.Objects.Base.r = 255
 EGP.Objects.Base.g = 255
 EGP.Objects.Base.b = 255
 EGP.Objects.Base.a = 255
+EGP.Objects.Base.parent = -1
 EGP.Objects.Base.material = ""
 EGP.Objects.Base.Transmit = function( self )
 	EGP:SendPosSize( self )
@@ -419,31 +420,7 @@ function EGP:Receive( um )
 		end
 	end
 	
-	if (Ent:GetClass() == "gmod_wire_egp") then
-		Ent.GPU:RenderToGPU( function()
-			render.Clear( 0, 0, 0, 0 )
-			surface.SetDrawColor(0,0,0,255)
-			surface.DrawRect(0,0,512,512)
-			if (#Ent.RenderTable > 0) then
-				for k,v in ipairs( Ent.RenderTable ) do 
-					local OldTex = EGP:SetMaterial( v.material )
-					v:Draw()
-					EGP:FixMaterial( OldTex )
-				end
-			end
-		end)
-	elseif (Ent:GetClass() == "gmod_wire_egp_emitter") then
-		Ent.GPU:RenderToWorld( 200, 200, function()
-			render.Clear( 0, 0, 0, 0 )
-			surface.SetDrawColor(0,0,0,255)
-			surface.DrawRect(0,0,512,512)
-			for k,v in ipairs( EGP.HomeScreen ) do 
-				local OldTex = EGP:SetMaterial( v.material )
-				v:Draw()
-				EGP:FixMaterial( OldTex )
-			end
-		end, 250 )
-	end
+	Ent:EGP_Update()
 end
 usermessage.Hook( "EGP_Transmit_Data", function(um) EGP:Receive( um ) end )
 
@@ -567,13 +544,11 @@ if (CLIENT) then
 end
 
 function EGP:SetMaterial( Mat )
-	print("Mat:",Mat)
 	if (!Mat) then
 		surface.SetTexture()
 	elseif (type(Mat) == "string") then
 		surface.SetTexture( self:CacheMaterial( Mat ) )
  	elseif (type(Mat) == "Entity") then
-		
 		if (!Mat:IsValid() or !Mat.GPU or !Mat.GPU.RT) then return end
 		local OldTex = EGP.FakeMat:GetMaterialTexture("$basetexture")
 		EGP.FakeMat:SetMaterialTexture("$basetexture", Mat.GPU.RT)
