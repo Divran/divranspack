@@ -1,6 +1,8 @@
 local tbl = {}
 
-		
+--------------------------------------------------------
+-- Toggle
+--------------------------------------------------------		
 local function EGP_Use( um )
 	local ent = um:ReadEntity()
 	if (ent.On == true) then
@@ -11,8 +13,22 @@ local function EGP_Use( um )
 		LocalPlayer():ChatPrint("[EGP] EGP HUD Connected.")
 	end
 end
-usermessage.Hook( "EGP_HUD_Use", EGP_Use )		
+usermessage.Hook( "EGP_HUD_Use", EGP_Use )	
 
+--------------------------------------------------------
+-- Disconnect all HUDs
+--------------------------------------------------------
+concommand.Add("wire_egp_hud_disconnect",function()
+	local en = ents.FindByClass("gmod_wire_egp_hud")
+	LocalPlayer():ChatPrint("[EGP] Disconnected from all EGP HUDs.")
+	for k,v in ipairs( en ) do
+		en.On = nil
+	end
+end)
+
+--------------------------------------------------------
+-- Add / Remove HUD Entities
+--------------------------------------------------------	
 function EGP:AddHUDEGP( Ent )
 	table.insert( tbl, Ent )
 end
@@ -26,6 +42,9 @@ function EGP:RemoveHUDEGP( Ent )
 	end
 end
 
+--------------------------------------------------------
+-- Paint
+--------------------------------------------------------
 hook.Add("HUDPaint","EGP_HUDPaint",function()
 	for k,v in ipairs( tbl ) do
 		if (!v or !v:IsValid()) then

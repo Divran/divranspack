@@ -16,7 +16,7 @@ function ENT:Initialize()
 end
 
 function ENT:EGP_Update()
-	if (self.RenderTable and #self.RenderTable > 0) then
+	if (self.RenderTable) then
 		self.GPU:RenderToGPU( function()
 			render.Clear( 0, 0, 0, 0 )
 			surface.SetDrawColor(0,0,0,255)

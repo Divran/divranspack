@@ -25,7 +25,9 @@ end
 function ENT:Initialize()
 	self.RenderTable = {}
 	
-	self.On = true
+	if (LocalPlayer() == self:GetPlayer()) then
+		self.On = true
+	end
 	
 	EGP:AddHUDEGP( self )
 end

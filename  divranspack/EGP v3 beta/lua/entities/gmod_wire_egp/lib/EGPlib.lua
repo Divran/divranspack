@@ -1,4 +1,5 @@
 EGP = {}
+local EGP = EGP
 
 EGP.ConVars = {}
 EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
@@ -340,7 +341,7 @@ function EGP:SendQueue( Ent, Queue, ply )
 end
 
 function EGP:Transmit( Ent, E2 )
-	if (#Ent.RenderTable == 0) then -- Remove all objects
+	if (#Ent.RenderTable == 0 and #Ent.OldRenderTable > 0) then -- Remove all objects
 		Ent.OldRenderTable = {}
 		
 		umsg.Start("EGP_Transmit_Data")
@@ -392,29 +393,31 @@ function EGP:Receive( um )
 			if (ID == -128) then -- Remove object
 				local bool, k, v = EGP:HasObject( Ent, index )
 				if (bool) then
+					if (v.OnRemove) then v:OnRemove() end
 					table.remove( Ent.RenderTable, k )
 				end
 			else
+				if (index == 0) then break end -- In case the umsg had to abort early
 				ID = ID + 128
-				local obj = self:GetObjectByID( ID )
-				if (!obj) then -- In case the umsg had to abort early
-					break
-				else
-					local data = obj:Receive( um )
-					
-					local bool, k, v = EGP:HasObject( Ent, index )
-					if (bool) then -- Object already exists.
-						if (v.ID != ID) then -- Not the same kind of object, create new
-							EGP:EditObject( obj, data )
-							Ent.RenderTable[k] = obj
-						else
-							EGP:EditObject( v, data )
-						end
-					else -- Object does not exist. Create new
-						EGP:EditObject( obj, data )
-						obj.index = index
-						table.insert( Ent.RenderTable, obj )
+				local bool, k, v = self:HasObject( Ent, index )
+				if (bool) then -- Object already exists
+					if (v.ID != ID) then -- Not the same kind of object, create new
+						if (v.OnRemove) then v:OnRemove() end
+						local Obj = self:GetObjectByID( ID )
+						local data = Obj:Receive( um )
+						self:EditObject( Obj, data )
+						Obj.index = index
+						Ent.RenderTable[k] = Obj
+						if (Obj.OnCreate) then Obj:OnCreate() end
+					else -- Edit
+						self:EditObject( v, v:Receive( um ) )
 					end
+				else -- Object does not exist. Create new
+					local Obj = self:GetObjectByID( ID )
+					self:EditObject( Obj, Obj:Receive( um ) )
+					Obj.index = index
+					if (Obj.OnCreate) then Obj:OnCreate() end
+					table.insert( Ent.RenderTable, Obj )
 				end
 			end
 		end

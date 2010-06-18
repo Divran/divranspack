@@ -194,6 +194,33 @@ e2function void wirelink:egpPacManCircle( number index, vector2 pos, vector2 siz
 	if (bool) then Update(self,this) end
 end
 
+--[[
+--------------------------------------------------------
+-- Camera
+--------------------------------------------------------
+e2function void wirelink:egpCamera( number index, vector2 pos, vector2 size )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Camera"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+e2function void wirelink:egpAngle( number index, angle ang )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (EGP:EditObject( v, { camang = Angle(ang[1],ang[2],ang[3]) }, self.player )) then Update(self,this) end
+	end
+end
+
+e2function void wirelink:egpPos( number index, vector pos )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (EGP:EditObject( v, { campos = Vector(pos[1],pos[2],pos[3]) }, self.player )) then Update(self,this) end
+	end
+end
+]]
+	
 --------------------------------------------------------
 -- Set functions
 --------------------------------------------------------
@@ -230,7 +257,23 @@ e2function void wirelink:egpPos( number index, vector2 pos )
 	end
 end
 
-e2function void wirelink:egpRotate( number index, vector2 worldpos, vector2 axispos, number angle )
+----------------------------
+-- Angle
+----------------------------
+
+e2function void wirelink:egpAngle( number index, number angle )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (EGP:EditObject( v, { angle = angle }, self.player )) then Update(self,this) end
+	end
+end
+
+-------------
+-- Position & Angle
+-------------
+
+e2function void wirelink:egpAngle( number index, vector2 worldpos, vector2 axispos, number angle )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
@@ -291,18 +334,6 @@ e2function void wirelink:egpMaterialFromScreen( number index, entity gpu )
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool and gpu and gpu:IsValid()) then
 		if (EGP:EditObject( v, { material = ("<gpu%d>"):format(gpu:EntIndex()) }, self.player )) then Update(self,this) end
-	end
-end
-
-----------------------------
--- Angle
-----------------------------
-
-e2function void wirelink:egpAngle( number index, number angle )
-	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, k, v = EGP:HasObject( this, index )
-	if (bool) then
-		if (EGP:EditObject( v, { angle = angle }, self.player )) then Update(self,this) end
 	end
 end
 

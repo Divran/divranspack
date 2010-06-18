@@ -1,5 +1,4 @@
 local Obj = EGP:NewObject( "Box" )
-Obj.material = ""
 Obj.Draw = function( self )
 	if (self.a>0) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
