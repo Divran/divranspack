@@ -43,6 +43,7 @@ Obj.Transmit = function( self )
 	EGP.umsg.Char( self.fontid-128 )
 	EGP.umsg.Char( math.Clamp(self.size,0,200)-128 )
 	EGP.umsg.Char( math.Clamp(self.align,0,2) )
+	EGP.umsg.Short( self.parent )
 	EGP:SendColor( self )
 end
 Obj.Receive = function( self, um )
@@ -53,6 +54,7 @@ Obj.Receive = function( self, um )
 	tbl.fontid = um:ReadChar()+128
 	tbl.size = um:ReadChar()+128
 	tbl.align = um:ReadChar()
+	tbl.parent = um:ReadShort()
 	EGP:ReceiveColor( tbl, self, um )
 	return tbl
 end

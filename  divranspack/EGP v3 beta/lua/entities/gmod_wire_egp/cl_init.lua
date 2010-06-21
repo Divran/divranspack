@@ -22,6 +22,10 @@ function ENT:EGP_Update()
 			surface.SetDrawColor(0,0,0,255)
 			surface.DrawRect(0,0,512,512)
 			for k,v in ipairs( self.RenderTable ) do 
+				if (v.parent and v.parent != 0) then
+					local x, y = EGP:GetGlobalPos( self, v.index )
+					EGP:EditObject( v, { x = x, y = y }, self:GetPlayer() )
+				end
 				EGP:SetMaterial( v.material )
 				v:Draw() 
 			end

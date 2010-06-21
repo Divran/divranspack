@@ -4,6 +4,7 @@ Obj.y2 = 0
 Obj.x3 = 0
 Obj.y3 = 0
 Obj.material = ""
+Obj.parent = nil
 Obj.Draw = function( self )
 	if (self.a>0) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )

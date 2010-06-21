@@ -31,7 +31,7 @@ Obj.Draw = function( self )
 end
 Obj.Transmit = function( self )
 	EGP.umsg.Short( math.Round(self.angle) )
-	EGP.umsg.Short( math.Round(self.size) )
+	EGP.umsg.Short( math.Round(self.size) )	
 	self.BaseClass.Transmit( self )
 end
 Obj.Receive = function( self, um )

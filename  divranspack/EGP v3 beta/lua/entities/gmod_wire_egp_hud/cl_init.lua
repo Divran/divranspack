@@ -32,7 +32,14 @@ function ENT:Initialize()
 	EGP:AddHUDEGP( self )
 end
 
-function ENT:EGP_Update() end
+function ENT:EGP_Update() 
+	for k,v in ipairs( self.RenderTable ) do
+		if (v.parent and v.parent != 0) then
+			local x, y = EGP:GetGlobalPos( self, v.index )
+			EGP:EditObject( v, { x = x, y = y }, self:GetPlayer() )
+		end
+	end
+end
 
 function ENT:OnRemove()
 	EGP:RemoveHUDEGP( self )

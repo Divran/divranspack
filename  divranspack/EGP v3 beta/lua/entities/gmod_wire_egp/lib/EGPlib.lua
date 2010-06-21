@@ -25,16 +25,19 @@ EGP.Objects.Base.g = 255
 EGP.Objects.Base.b = 255
 EGP.Objects.Base.a = 255
 EGP.Objects.Base.material = ""
+EGP.Objects.Base.parent = 0
 EGP.Objects.Base.Transmit = function( self )
 	EGP:SendPosSize( self )
 	EGP:SendColor( self )
 	EGP:SendMaterial( self )
+	EGP.umsg.Short( self.parent )
 end
 EGP.Objects.Base.Receive = function( self, um )
 	local tbl = {}
 	EGP:ReceivePosSize( tbl, um )
 	EGP:ReceiveColor( tbl, self, um )
 	EGP:ReceiveMaterial( tbl, um )
+	tbl.parent = um:ReadShort()
 	return tbl
 end
 EGP.Objects.Base.DataStreamInfo = function( self )
@@ -173,6 +176,51 @@ function EGP:EditObject( Obj, Settings, ply )
 		end
 	end
 	return ret
+end
+
+----------------------------
+-- Parenting functions
+----------------------------
+function EGP:GetGlobalPos( Ent, index )
+	local bool, k, v = self:HasObject( Ent, index )
+	if (bool) then
+		if (v.parent != 0) then
+			local x, y = self:GetGlobalPos( Ent, v.parent )
+			return v.x + x, v.y + y
+		end
+		return v.x, v.y
+	end
+end
+
+--[[ Have not yet found a use for this.
+function EGP:GetLocalPos( Ent, index )
+	local bool, k, v = self:HasObject( Ent, index )
+	if (bool) then
+		if (v.parent != 0) then
+			local x, y = self:GetLocalPos( Ent, v.parent )
+			return v.x - x, v.y - y
+		end
+		return v.x, v.y
+	end
+end
+]]
+
+function EGP:SetParent( Ent, index, parentindex )
+	local bool, k, v = self:HasObject( Ent, index )
+	if (bool) then
+		local bool2, k2, v2 = self:HasObject( Ent, parentindex )
+		if (bool2) then
+			if (self:EditObject( v, { parent = parentindex }, Ent:GetPlayer() )) then return true end
+		end
+	end
+end
+
+function EGP:UnParent( Ent, index )
+	local bool, k, v = self:HasObject( Ent, index )
+	if (bool) then
+		local x, y = self:GetGlobalPos( Ent, index )
+		if (self:EditObject( v, { x = x, y = y, parent = 0 }, Ent:GetPlayer() )) then return true end
+	end
 end
 
 --------------------------------------------------------

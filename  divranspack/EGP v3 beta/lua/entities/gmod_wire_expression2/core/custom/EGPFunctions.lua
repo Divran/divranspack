@@ -49,7 +49,7 @@ end
 ----------------------------
 -- Alignment
 ----------------------------
-e2function void wirelink:egpSetAlign( number index, number align )
+e2function void wirelink:egpAlign( number index, number align )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
@@ -60,7 +60,7 @@ end
 ----------------------------
 -- Font
 ----------------------------
-e2function void wirelink:egpSetFont( number index, string font )
+e2function void wirelink:egpFont( number index, string font )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
@@ -74,15 +74,20 @@ e2function void wirelink:egpSetFont( number index, string font )
 	end
 end
 
-e2function void wirelink:egpSetFont( number index, number fontid )
+e2function void wirelink:egpFont( number index, string font, number size )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
-		if (EGP.ValidFont[fontid]) then
-			if (EGP:EditObject( v, { fontid = fontid }, self.player )) then Update(self,this) end
+		local fontid = 0
+		for k,v in ipairs( EGP.ValidFonts ) do
+			if (v:lower() == font:lower()) then
+				fontid = k
+			end
 		end
+		if (EGP:EditObject( v, { fontid = fontid, size = size }, self.player )) then Update(self,this) end
 	end
 end
+
 
 __e2setcost(15)
 
@@ -220,6 +225,16 @@ e2function void wirelink:egpPos( number index, vector pos )
 	end
 end
 ]]
+
+--------------------------------------------------------
+-- Avatar Image
+--------------------------------------------------------
+e2function void wirelink:egpAvatar( number index, vector2 pos, vector2 size, entity ply )
+	if (!EGP:IsAllowed( self, this )) then return end
+	if (!ply or !ply:IsValid() or !ply:IsPlayer()) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Avatar"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], ply = ply }, self.player )
+	if (bool) then Update(self,this) end
+end
 	
 --------------------------------------------------------
 -- Set functions
@@ -337,6 +352,29 @@ e2function void wirelink:egpMaterialFromScreen( number index, entity gpu )
 	end
 end
 
+----------------------------
+-- Parenting
+----------------------------
+e2function void wirelink:egpParent( number index, number parentindex )
+	if (!EGP:IsAllowed( self, this )) then return end
+	if (EGP:SetParent( this, index, parentindex )) then Update( self, this ) end
+end
+
+e2function void wirelink:egpUnParent( number index )
+	if (!EGP:IsAllowed( self, this )) then return end
+	if (EGP:UnParent( this, index )) then Update( self, this ) end
+end
+
+e2function number wirelink:egpParent( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.parent) then
+			return v.parent
+		end
+	end
+	return 0
+end
+	
 --------------------------------------------------------
 -- Clear & Remove
 --------------------------------------------------------

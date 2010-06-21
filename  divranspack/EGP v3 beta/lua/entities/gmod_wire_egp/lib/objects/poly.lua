@@ -4,6 +4,7 @@ Obj.h = nil
 Obj.x = nil
 Obj.y = nil
 Obj.vertices = {}
+Obj.parent = nil
 Obj.Draw = function( self )
 	if (self.a>0 and #self.vertices>2) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
