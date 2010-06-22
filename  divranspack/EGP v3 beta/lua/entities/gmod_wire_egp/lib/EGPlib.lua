@@ -5,6 +5,7 @@ EGP.ConVars = {}
 EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
 EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
 EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
+EGP.ConVars.UmsgPerSec = CreateConVar("wire_egp_umsg_per_sec", 25, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
 
 --------------------------------------------------------
 -- Objects
@@ -184,23 +185,25 @@ end
 function EGP:GetGlobalPos( Ent, index )
 	local bool, k, v = self:HasObject( Ent, index )
 	if (bool) then
-		if (v.parent != 0) then
-			local x, y = self:GetGlobalPos( Ent, v.parent )
-			return v.x + x, v.y + y
+		if (v.parent and v.parent != 0) then
+			local x, y, ang = self:GetGlobalPos( Ent, v.parent )
+			local vec, ang = LocalToWorld( Vector( v.x or 0, v.y or 0, 0 ), Angle( 0, v.angle or 0, 0 ), Vector( x or 0, y or 0, 0 ), Angle( 0, -ang or 0, 0 ) )
+			return vec.x, vec.y, ang.y
 		end
-		return v.x, v.y
+		return v.x, v.y, v.angle
 	end
 end
 
---[[ Have not yet found a use for this.
+--[[ I have not yet found a use for this, but I'll keep it just in case
 function EGP:GetLocalPos( Ent, index )
 	local bool, k, v = self:HasObject( Ent, index )
 	if (bool) then
-		if (v.parent != 0) then
-			local x, y = self:GetLocalPos( Ent, v.parent )
-			return v.x - x, v.y - y
+		if (v.parent and v.parent != 0) then
+			local x, y, ang = self:GetLocalPos( Ent, v.parent )
+			local vec, ang = WorldToLocal( Vector( v.x or 0, v.y or 0, 0 ), Angle( 0, v.angle or 0, 0 ), Vector( x or 0, y or 0, 0 ), Angle( 0, -ang or 0, 0 ) )
+			return vec.x, vec.y, ang.y
 		end
-		return v.x, v.y
+		return v.x, v.y, v.angle
 	end
 end
 ]]

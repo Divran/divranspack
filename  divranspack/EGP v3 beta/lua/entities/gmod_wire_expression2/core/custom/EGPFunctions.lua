@@ -16,15 +16,6 @@ e2function void wirelink:egpBox( number index, vector2 pos, vector2 size )
 end
 
 --------------------------------------------------------
--- BoxAngle
---------------------------------------------------------
-e2function void wirelink:egpBoxAngle( number index, vector2 pos, vector2 size )
-	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["BoxAngle"], { index = index, w = size[1], h = size[2], x = pos[1], y = pos[2] }, self.player )
-	if (bool) then Update(self,this) end
-end
-
---------------------------------------------------------
 -- Text
 --------------------------------------------------------
 e2function void wirelink:egpText( number index, string text, vector2 pos )
@@ -535,11 +526,34 @@ end
 
 __e2setcost(nil)
 
+local umsgcount = {}
+
+local function CheckUmsgTimer( ply )
+	if (!umsgcount[ply]) then umsgcount[ply] = { count = 0, time = 0 } end
+	
+	local maxcount = EGP.ConVars.UmsgPerSec:GetInt()
+	
+	local tbl = umsgcount[ply]
+	if (tbl.time < CurTime()) then
+		tbl.count = 1
+		tbl.time = CurTime() + 1
+	else
+		tbl.count = tbl.count + 1
+		if (tbl.count > maxcount) then
+			return false
+		end
+	end
+	
+	return true
+end
+
 registerCallback("postexecute",function(self)
 	for k,v in pairs( self.data.EGP ) do
 		if (k and k:IsValid()) then
 			if (v == true) then
-				EGP:Transmit( k, self )
+				if (CheckUmsgTimer( self.player )) then
+					EGP:Transmit( k, self )
+				end
 				self.data.EGP[k] = nil
 			end
 		else
