@@ -9,7 +9,7 @@ Obj.Draw = function( self )
 	if (self.a>0 and #self.vertices>2) then
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
 		if (self.vertices and #self.vertices>0) then
-			surface.DrawPoly( vertices )
+			surface.DrawPoly( self.vertices )
 		end
 	end
 end
@@ -18,8 +18,8 @@ Obj.Transmit = function( self )
 	for i=1,math.min(#self.vertices,128) do
 		EGP.umsg.Float( self.vertices[i].x )
 		EGP.umsg.Float( self.vertices[i].y )
-		EGP.umsg.Float( self.vertices[i].u )
-		EGP.umsg.Float( self.vertices[i].v )
+		EGP.umsg.Float( self.vertices[i].u or 0 )
+		EGP.umsg.Float( self.vertices[i].v or 0 )
 	end
 	EGP:SendMaterial( self )
 	EGP:SendColor( self )

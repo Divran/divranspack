@@ -4,7 +4,8 @@ Obj.w = nil
 Obj.text = ""
 Obj.fontid = 0
 Obj.size = 1
-Obj.align = 0
+Obj.valign = 0
+Obj.halign = 0
 Obj.Draw = function( self )
 	if (self.text and #self.text>0) then
 		surface.SetTextColor( self.r, self.g, self.b, self.a )
@@ -21,17 +22,18 @@ Obj.Draw = function( self )
 			surface.SetFont( font )
 		end
 		
-		if (align != 0) then
-			local textwidth, textheight = surface.GetTextSize(self.text)
-			local falign = self.align
-			local halign, valign = falign%10, math.floor(falign/10)
-					
-			local x = self.x - (textwidth * (halign/2))
-			local y = self.y - (textheight * (valign/2))
-			surface.SetTextPos( x, y )
-		else
-			surface.SetTextPos( self.x, self.y )
+		local w,h
+		local x, y = self.x, self.y
+		if (self.halign != 0) then
+			w,h = surface.GetTextSize( self.text )
+			x = x - (w * ((self.halign%10)/2))
 		end
+		if (self.valign) then
+			if (!h) then _,h = surface.GetTextSize( self.text ) end
+			y = y - (h * ((self.valign%10)/2))
+		end
+		
+		surface.SetTextPos( x, y )
 		
 		surface.DrawText( self.text )
 	end
@@ -42,7 +44,8 @@ Obj.Transmit = function( self )
 	EGP.umsg.String( self.text )
 	EGP.umsg.Char( self.fontid-128 )
 	EGP.umsg.Char( math.Clamp(self.size,0,200)-128 )
-	EGP.umsg.Char( math.Clamp(self.align,0,2) )
+	EGP.umsg.Char( math.Clamp(self.valign,0,2) )
+	EGP.umsg.Char( math.Clamp(self.halign,0,2) )
 	EGP.umsg.Short( self.parent )
 	EGP:SendColor( self )
 end
@@ -53,7 +56,8 @@ Obj.Receive = function( self, um )
 	tbl.text = um:ReadString()
 	tbl.fontid = um:ReadChar()+128
 	tbl.size = um:ReadChar()+128
-	tbl.align = um:ReadChar()
+	tbl.valign = um:ReadChar()
+	tbl.halign = um:ReadChar()
 	tbl.parent = um:ReadShort()
 	EGP:ReceiveColor( tbl, self, um )
 	return tbl

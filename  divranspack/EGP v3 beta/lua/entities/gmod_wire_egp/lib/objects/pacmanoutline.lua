@@ -1,4 +1,4 @@
-local Obj = EGP:NewObject( "PacMan" )
+local Obj = EGP:NewObject( "PacManOutline" )
 Obj.angle = 0
 Obj.size = 45
 Obj.Draw = function( self )
@@ -7,26 +7,30 @@ Obj.Draw = function( self )
 		
 		self.size = math.Clamp(self.size,0,359)
 		
-		table.insert( vertices, { x = self.x, y = self.y, u = 0, v = 0 } )
+		table.insert( vertices, { x = self.x, y = self.y } )
 		for i=0,359-self.size,math.floor(360-self.size)/36 do
 			local rad = math.rad(i)
 			local x = math.cos(rad)
-			local u = (x+1)/2
 			local y = math.sin(rad)
-			local v = (y+1)/2
 			
 			rad = math.rad(self.angle)
 			local tempx = x * self.w * math.cos(rad) - y * self.h * math.sin(rad) + self.x
 			y = x * self.w * math.sin(rad) + y * self.h * math.cos(rad) + self.y
 			x = tempx
 			
-			table.insert( vertices, { x = x, y = y, u = u, v = v } )
+			table.insert( vertices, { x = x, y = y } )
 		end
 		
 		surface.SetDrawColor( self.r, self.g, self.b, self.a )
-		if (vertices and #vertices>0) then
-			surface.DrawPoly( vertices )
+		
+		for k,v in ipairs( vertices ) do
+			if (k+1<=#vertices) then
+				local x, y = v.x, v.y
+				local x2, y2 = vertices[k+1].x, vertices[k+1].y
+				surface.DrawLine( x, y, x2, y2 )
+			end
 		end
+		surface.DrawLine( vertices[#vertices].x, vertices[#vertices].y, vertices[1].x, vertices[1].y )
 	end
 end
 Obj.Transmit = function( self )

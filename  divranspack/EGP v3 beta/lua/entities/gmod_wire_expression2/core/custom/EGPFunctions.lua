@@ -40,11 +40,19 @@ end
 ----------------------------
 -- Alignment
 ----------------------------
-e2function void wirelink:egpAlign( number index, number align )
+e2function void wirelink:egpAlign( number index, number halign )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
-		if (EGP:EditObject( v, { align = math.Clamp(align,0,2) }, self.player )) then Update(self,this) end
+		if (EGP:EditObject( v, { halign = math.Clamp(halign,0,2) }, self.player )) then Update(self,this) end
+	end
+end
+
+e2function void wirelink:egpAlign( number index, number halign, number valign )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (EGP:EditObject( v, { valign = math.Clamp(valign,0,2), halign = math.Clamp(halign,0,2) }, self.player )) then Update(self,this) end
 	end
 end
 
@@ -167,11 +175,29 @@ e2function void wirelink:egpCircle( number index, vector2 pos, vector2 size )
 end
 
 --------------------------------------------------------
+-- Circle Outline
+--------------------------------------------------------
+e2function void wirelink:egpCircleOutline( number index, vector2 pos, vector2 size )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["CircleOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+--------------------------------------------------------
 -- Triangle
 --------------------------------------------------------
 e2function void wirelink:egpTriangle( number index, vector2 vert1, vector2 vert2, vector2 vert3 )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Triangle"], { index = index, x = vert1[1], y = vert1[2], x2 = vert2[1], y2 = vert2[2], x3 = vert3[1], y3 = vert3[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+--------------------------------------------------------
+-- Triangle Outline
+--------------------------------------------------------
+e2function void wirelink:egpTriangleOutline( number index, vector2 vert1, vector2 vert2, vector2 vert3 )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["TriangleOutline"], { index = index, x = vert1[1], y = vert1[2], x2 = vert2[1], y2 = vert2[2], x3 = vert3[1], y3 = vert3[2] }, self.player )
 	if (bool) then Update(self,this) end
 end
 
@@ -187,6 +213,21 @@ end
 e2function void wirelink:egpPacManCircle( number index, vector2 pos, vector2 size, number angle, number mouthsize )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacMan"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+--------------------------------------------------------
+-- PacMan Circle Outline
+--------------------------------------------------------
+e2function void wirelink:egpPacManCircleOutline( number index, vector2 pos, vector2 size )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacManOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
+e2function void wirelink:egpPacManCircleOutline( number index, vector2 pos, vector2 size, number angle, number mouthsize )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacManOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
 	if (bool) then Update(self,this) end
 end
 
