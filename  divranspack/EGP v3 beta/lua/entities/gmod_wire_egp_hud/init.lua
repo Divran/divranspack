@@ -14,6 +14,8 @@ function ENT:Initialize()
 	self.OldRenderTable = {}
 	
 	self:SetUseType(SIMPLE_USE)
+	
+	self:SetModel("models/bull/dynamicbutton.mdl")
 end
 
 function ENT:Use( ply )
