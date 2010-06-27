@@ -36,7 +36,7 @@ function ENT:EGP_Update()
 	for k,v in ipairs( self.RenderTable ) do
 		if (v.parent and v.parent != 0) then
 			local x, y, angle = EGP:GetGlobalPos( self, v.index )
-			EGP:EditObject( v, { x = x, y = y, angle = angle }, self:GetPlayer() )
+			EGP:EditObject( v, { x = x, y = y, angle = angle } )
 		end
 	end
 end

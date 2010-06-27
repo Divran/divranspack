@@ -473,7 +473,16 @@ function EGP:Receive( um )
 		end
 	end
 	
-	Ent:EGP_Update()
+	if (Ent.EGP_Update) then -- this..
+		Ent:EGP_Update()
+	else
+		 -- ..and this is because it bugs on dupe (EGP_Update does not exist at first)
+		timer.Simple(1,function(Ent) 
+			if (Ent and Ent:IsValid() and Ent.EGP_Update) then 
+				Ent:EGP_Update() 
+			end 
+		end,Ent)
+	end
 end
 usermessage.Hook( "EGP_Transmit_Data", function(um) EGP:Receive( um ) end )
 

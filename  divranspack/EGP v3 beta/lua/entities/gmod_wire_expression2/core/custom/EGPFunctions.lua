@@ -473,7 +473,8 @@ e2function vector4 wirelink:egpColor( number index )
 	return {-1,-1,-1,-1}
 end
 
-e2function vector wirelink:egpColor( number index )
+--[[
+e2 function vector wirelink:egpColor( number index )
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
 		if (v.r and v.g and v.b) then
@@ -482,6 +483,7 @@ e2function vector wirelink:egpColor( number index )
 	end
 	return {-1,-1,-1}
 end
+]]
 
 e2function number wirelink:egpAngle( number index )
 	local bool, k, v = EGP:HasObject( this, index )
