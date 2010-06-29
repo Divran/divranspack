@@ -204,30 +204,30 @@ end
 --------------------------------------------------------
 -- PacMan Circle
 --------------------------------------------------------
-e2function void wirelink:egpPacManCircle( number index, vector2 pos, vector2 size )
+e2function void wirelink:egpWedge( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacMan"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["WEdge"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
 	if (bool) then Update(self,this) end
 end
 
-e2function void wirelink:egpPacManCircle( number index, vector2 pos, vector2 size, number angle, number mouthsize )
+e2function void wirelink:egpWedge( number index, vector2 pos, vector2 size, number angle, number mouthsize )
 	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacMan"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Wedge"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
 	if (bool) then Update(self,this) end
 end
 
 --------------------------------------------------------
 -- PacMan Circle Outline
 --------------------------------------------------------
-e2function void wirelink:egpPacManCircleOutline( number index, vector2 pos, vector2 size )
+e2function void wirelink:egpWedgeOutline( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacManOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["WedgeOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
 	if (bool) then Update(self,this) end
 end
 
-e2function void wirelink:egpPacManCircleOutline( number index, vector2 pos, vector2 size, number angle, number mouthsize )
+e2function void wirelink:egpWedgeOutline( number index, vector2 pos, vector2 size, number angle, number mouthsize )
 	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["PacManOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["WedgeOutline"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], size = mouthsize, angle = angle }, self.player )
 	if (bool) then Update(self,this) end
 end
 
@@ -365,6 +365,15 @@ e2function void wirelink:egpColor( number index, r,g,b,a )
 	end
 end
 
+e2function wirelink:egpAlpha( number index, number a )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (EGP:EditObject( v, { a = a }, self.player )) then Update(self,this) end
+	end
+end
+
+
 ----------------------------
 -- Material
 ----------------------------
@@ -463,7 +472,7 @@ e2function number wirelink:egpSize( number index )
 	return -1
 end
 
-e2function vector4 wirelink:egpColor( number index )
+e2function vector4 wirelink:egpColor4( number index )
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
 		if (v.r and v.g and v.b and v.a) then
@@ -473,17 +482,25 @@ e2function vector4 wirelink:egpColor( number index )
 	return {-1,-1,-1,-1}
 end
 
---[[
-e2 function vector wirelink:egpColor( number index )
+e2function vector wirelink:egpColor( number index )
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
 		if (v.r and v.g and v.b) then
-			return {v.r, v.g, v.b}
+			return {v.r,v.g,v.b}
 		end
 	end
 	return {-1,-1,-1}
 end
-]]
+
+e2function number wirelink:egpAlpha( number index )
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		if (v.a) then
+			return v.a
+		end
+	end
+	return -1
+end
 
 e2function number wirelink:egpAngle( number index )
 	local bool, k, v = EGP:HasObject( this, index )

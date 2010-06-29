@@ -1,4 +1,4 @@
-local Obj = EGP:NewObject( "PacMan" )
+local Obj = EGP:NewObject( "Wedge" )
 Obj.angle = 0
 Obj.size = 45
 Obj.Draw = function( self )
