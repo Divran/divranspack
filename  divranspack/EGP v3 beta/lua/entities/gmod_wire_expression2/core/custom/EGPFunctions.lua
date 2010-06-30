@@ -4,6 +4,44 @@ local function Update( self, this )
 	self.data.EGP[this] = true
 end
 
+-------------
+-- Save
+-------------
+
+__e2setcost(20)
+
+e2function void wirelink:egpSaveFrame( string index )
+	if (!EGP:ValidEGP( this )) then return end
+	if (!index or index == "") then return end
+	if (!this.RenderTable or #this.RenderTable == 0) then return end
+	EGP:SaveFrame( self.player, this, index )
+end
+
+e2function void wirelink:egpSaveFrame( index )
+	if (!EGP:ValidEGP( this )) then return end
+	if (!index) then return end
+	if (!this.RenderTable or #this.RenderTable == 0) then return end
+	EGP:SaveFrame( self.player, this, tostring(index) )
+end
+
+-------------
+-- Load
+-------------
+
+__e2setcost(30)
+
+e2function void wirelink:egpLoadFrame( string index )
+	if (!EGP:IsAllowed( self, this )) then return end
+	if (!index or index == "") then return end
+	EGP:LoadFrame( self.player, this, index )
+end
+
+e2function void wirelink:egpLoadFrame( number index )
+	if (!EGP:IsAllowed( self, this )) then return end
+	if (!index) then return end
+	EGP:LoadFrame( self.player, this, tostring(index) )
+end
+
 __e2setcost(15)
 
 --------------------------------------------------------
@@ -256,7 +294,7 @@ e2function void wirelink:egpPos( number index, vector pos )
 		if (EGP:EditObject( v, { campos = Vector(pos[1],pos[2],pos[3]) }, self.player )) then Update(self,this) end
 	end
 end
-]]
+
 
 --------------------------------------------------------
 -- Avatar Image
@@ -267,6 +305,7 @@ e2function void wirelink:egpAvatar( number index, vector2 pos, vector2 size, ent
 	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Avatar"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], ply = ply }, self.player )
 	if (bool) then Update(self,this) end
 end
+]]
 	
 --------------------------------------------------------
 -- Set functions
@@ -365,7 +404,7 @@ e2function void wirelink:egpColor( number index, r,g,b,a )
 	end
 end
 
-e2function wirelink:egpAlpha( number index, number a )
+e2function void wirelink:egpAlpha( number index, number a )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
@@ -389,7 +428,7 @@ e2function void wirelink:egpMaterialFromScreen( number index, entity gpu )
 	if (!EGP:IsAllowed( self, this )) then return end
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool and gpu and gpu:IsValid()) then
-		if (EGP:EditObject( v, { material = ("<gpu%d>"):format(gpu:EntIndex()) }, self.player )) then Update(self,this) end
+		if (EGP:EditObject( v, { material = gpu }, self.player )) then Update(self,this) end
 	end
 end
 
@@ -581,6 +620,31 @@ e2function vector2 wirelink:egpCursor( entity ply )
 end
 
 --------------------------------------------------------
+-- Useful functions
+--------------------------------------------------------
+
+e2function number wirelink:egpNumObjects()
+	if (!EGP:ValidEGP( this )) then return -1 end
+	return #this.RenderTable
+end
+
+e2function number egpMaxObjects()
+	return EGP.ConVars.MaxObjects:GetInt()
+end
+
+e2function number egpMaxEdits()
+	return EGP.ConVars.MaxPerInterval:GetInt()
+end
+
+e2function number egpInterval()
+	return EGP.ConVars.Interval:GetInt() * 1000
+end
+
+e2function number egpCanEdit()
+	return (EGP:CheckInterval( self.player, true ) and 1 or 0)
+end
+
+--------------------------------------------------------
 -- Callbacks
 --------------------------------------------------------
 
@@ -594,9 +658,9 @@ registerCallback("postexecute",function(self)
 				self.data.EGP[k] = nil
 			end
 		else
-			v = nil
+			self.data.EGP[k] = nil
 		end
-	end
+	end	
 end)
 
 registerCallback("construct",function(self)

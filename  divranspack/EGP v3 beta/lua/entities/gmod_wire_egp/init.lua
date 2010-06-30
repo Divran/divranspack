@@ -11,4 +11,7 @@ function ENT:Initialize()
 	
 	self.RenderTable = {}
 	self.OldRenderTable = {}
+	
+	self.Outputs = WireLib.CreateOutputs( self, { "link [WIRELINK]" } )
+	WireLib.TriggerOutput( self, "link", self )
 end

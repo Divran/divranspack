@@ -16,6 +16,9 @@ function ENT:Initialize()
 	self:SetUseType(SIMPLE_USE)
 	
 	self:SetModel("models/bull/dynamicbutton.mdl")
+	
+	self.Outputs = WireLib.CreateOutputs( self, { "link [WIRELINK]" } )
+	WireLib.TriggerOutput( self, "link", self )
 end
 
 function ENT:Use( ply )

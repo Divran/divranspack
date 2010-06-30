@@ -73,8 +73,13 @@ end
 -- IsAllowed check
 ----------------------------
 function EGP:IsAllowed( E2, Ent )
-	if (Ent and Ent:IsValid() and E2 and E2.entity and E2.entity:IsValid() and E2Lib.isOwner( E2, Ent )) then
-		return true
+	if (!EGP:ValidEGP( Ent )) then return end
+	if (E2 and E2.entity and E2.entity:IsValid()) then
+		if (!E2Lib.isOwner(E2,Ent)) then
+			return E2Lib.isFriend(E2.player,E2Lib.getOwner(Ent))
+		else
+			return true
+		end
 	end
 	return false
 end
@@ -103,21 +108,28 @@ function EGP:PlayerDisconnect( ply ) EGP.IntervalCheck[ply] = nil end
 hook.Add("PlayerDisconnect","EGP_PlayerDisconnect",function( ply ) EGP:PlayerDisconnect( ply ) end)
 
 
-function EGP:CheckInterval( ply )
+function EGP:CheckInterval( ply, bool )
 	if (!self.IntervalCheck[ply]) then self.IntervalCheck[ply] = { objects = 0, time = 0 } end
 	
 	local interval = self.ConVars.Interval:GetInt()
 	local maxcount = self.ConVars.MaxPerInterval:GetInt()
 	
 	local tbl = self.IntervalCheck[ply]
-	if (tbl.time < CurTime()) then
-		tbl.objects = 1
-		tbl.time = CurTime() + interval
+	
+	if (bool) then
+		return (tbl.objects < maxcount)
 	else
-		tbl.objects = tbl.objects + 1
-		if (tbl.objects >= maxcount) then
-			return false
+	
+		if (tbl.time < CurTime()) then
+			tbl.objects = 1
+			tbl.time = CurTime() + interval
+		else
+			tbl.objects = tbl.objects + 1
+			if (tbl.objects >= maxcount) then
+				return false
+			end
 		end
+		
 	end
 	
 	return true
@@ -228,6 +240,86 @@ end
 --------------------------------------------------------
 -- Transmitting / Receiving helper functions
 --------------------------------------------------------
+-----------------------
+-- Material
+-----------------------
+EGP.SavedMaterials = {}
+function EGP:GetSavedMaterial( Mat )
+	if (!table.HasValue( self.SavedMaterials, Mat )) then
+		self:SaveMaterial( Mat )
+		return "?" .. Mat
+	else
+		local str
+		for k,v in ipairs( self.SavedMaterials ) do
+			if (v == Mat) then
+				str = k
+				break
+			end
+		end
+		return "." .. str
+	end
+end
+
+function EGP:SaveMaterial( Mat )
+	if (!Mat or #Mat == 0) then return end
+	if (!table.HasValue( self.SavedMaterials, Mat )) then
+		table.insert( self.SavedMaterials, Mat )
+	end
+end
+
+function EGP:SendMaterial( obj ) -- ALWAYS use this when sending material
+	local str
+	
+	-- "!" = entity
+	-- "?" = string
+	-- "." = number
+	
+	if (type(obj.material) == "Entity") then
+		if (!obj.material:IsValid()) then 
+			str = ""
+		else
+			str = "!" .. obj.material:EntIndex()
+		end
+	elseif (type(obj.material) == "string") then
+		if (obj.material == "") then
+			str = ""
+		else
+			str = self:GetSavedMaterial( obj.material )
+		end
+	end
+	print("SENDING:",str)
+	EGP.umsg.String( str )
+end
+
+function EGP:ReceiveMaterial( tbl, um ) -- ALWAYS use this when receiving material
+	local mat = um:ReadString()
+	local first = mat:Left(1)
+	if (first == "!" or first == "?" or first == ".") then
+		print("HAS FIRST")
+		mat = mat:Right(-2)
+		if (first == "!") then
+			print("ENTITY")
+			mat = Entity(tonumber(mat))
+		elseif (first == ".") then
+			print("NUMBER")
+			for k,v in pairs( self.SavedMaterials ) do
+				if (mat == tostring(k)) then
+					mat = v
+					break
+				end
+			end
+		elseif (first == "?") then
+			print("STRING")
+			self:SaveMaterial( mat )
+		end
+	end
+	print("RECEIVING:",mat)
+	tbl.material = mat
+end
+
+-----------------------
+-- Other
+-----------------------
 function EGP:SendPosSize( obj )
 	EGP.umsg.Float( obj.w )
 	EGP.umsg.Float( obj.h )
@@ -242,10 +334,6 @@ function EGP:SendColor( obj )
 	if (obj.a) then EGP.umsg.Char( obj.a - 128 ) end
 end
 
-function EGP:SendMaterial( obj ) -- ALWAYS use this when sending material
-	EGP.umsg.String( obj.material )
-end
-
 function EGP:ReceivePosSize( tbl, um ) -- Used with SendPosSize
 	tbl.w = um:ReadFloat()
 	tbl.h = um:ReadFloat()
@@ -258,15 +346,6 @@ function EGP:ReceiveColor( tbl, obj, um ) -- Used with SendColor
 	tbl.g = um:ReadChar() + 128
 	tbl.b = um:ReadChar() + 128
 	if (obj.a) then tbl.a = um:ReadChar() + 128 end
-end
-
-function EGP:ReceiveMaterial( tbl, um ) -- ALWAYS use this when receiving material
-	local mat = um:ReadString()
-	local gpuid = tonumber(mat:match("^<gpu(%d+)>$"))
-	if gpuid then
-		mat = Entity(gpuid)
-	end
-	tbl.material = mat
 end
 
 --------------------------------------------------------
@@ -420,7 +499,7 @@ function EGP:Transmit( Ent, E2 )
 				table.insert( DataToSend, { index = v.index, remove = true} )
 			end
 		end
-	
+		
 		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
 		
 		if (E2 and E2.entity and E2.entity:IsValid()) then
@@ -611,6 +690,80 @@ function EGP:FixMaterial( OldTex )
 	EGP.FakeMat:SetMaterialTexture("$basetexture", OldTex)
 end
 ]]
+--------------------------------------------------------
+--  Frame Saving & Loading
+--------------------------------------------------------
+EGP.Frames = {}
+
+function EGP:SaveFrame( ply, Ent, index, skip )
+	if (SERVER) then
+		if (!self:CheckInterval( ply )) then return end
+	end
+	
+	-- Try again later?
+	if (CLIENT) then
+		if (!Ent.RenderTable or #Ent.RenderTable == 0) then 
+			if (skip) then return end
+			timer.Simple( 2, function() self:SaveFrame( ply, Ent, index, true ) end )
+		end
+	end
+	
+	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
+	EGP.Frames[ply][index] = Ent.RenderTable
+	
+	if (SERVER) then
+		umsg.Start("EGP_SaveFrame")
+			umsg.Entity( ply )
+			umsg.Entity( Ent )
+			umsg.String( index )
+		umsg.End()
+	end
+end
+
+function EGP:LoadFrame( ply, Ent, index )
+	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} return end
+	if (SERVER) then
+		if (!self:CheckInterval( ply )) then return end
+		local frame = EGP.Frames[ply][index]
+		if (!frame) then return end
+		umsg.Start("EGP_LoadFrame")
+			umsg.Entity( ply )
+			umsg.Entity( Ent )
+			umsg.String( index )
+		umsg.End()
+		Ent.RenderTable = frame
+		Ent.OldRenderTable = frame
+	else
+		local frame = EGP.Frames[ply][index]
+		if (!frame) then return end
+		if (!Ent.EGP_Update) then return end
+		Ent.RenderTable = frame
+		Ent:EGP_Update()
+	end
+		
+end
+
+if (CLIENT) then
+	usermessage.Hook( "EGP_SaveFrame",function( um )
+		local ply = um:ReadEntity()
+		local ent = um:ReadEntity()
+		local index = um:ReadString()
+		if (!ply or !ply:IsValid()) then return end
+		if (!ent or !ent:IsValid()) then return end
+		if (!index or index == "") then return end
+		EGP:SaveFrame( ply, ent, index )
+	end)
+	
+	usermessage.Hook( "EGP_LoadFrame",function( um ) 
+		local ply = um:ReadEntity()
+		local ent = um:ReadEntity()
+		local index = um:ReadString()
+		if (!ply or !ply:IsValid()) then return end
+		if (!ent or !ent:IsValid()) then return end
+		if (!index or index == "") then return end
+		EGP:LoadFrame( ply, ent, index )
+	end)
+end
 --------------------------------------------------------
 --  Homescreen
 --------------------------------------------------------
