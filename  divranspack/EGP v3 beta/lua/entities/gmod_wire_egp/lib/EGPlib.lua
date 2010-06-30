@@ -287,7 +287,6 @@ function EGP:SendMaterial( obj ) -- ALWAYS use this when sending material
 			str = self:GetSavedMaterial( obj.material )
 		end
 	end
-	print("SENDING:",str)
 	EGP.umsg.String( str )
 end
 
@@ -295,13 +294,10 @@ function EGP:ReceiveMaterial( tbl, um ) -- ALWAYS use this when receiving materi
 	local mat = um:ReadString()
 	local first = mat:Left(1)
 	if (first == "!" or first == "?" or first == ".") then
-		print("HAS FIRST")
 		mat = mat:Right(-2)
 		if (first == "!") then
-			print("ENTITY")
 			mat = Entity(tonumber(mat))
 		elseif (first == ".") then
-			print("NUMBER")
 			for k,v in pairs( self.SavedMaterials ) do
 				if (mat == tostring(k)) then
 					mat = v
@@ -309,11 +305,9 @@ function EGP:ReceiveMaterial( tbl, um ) -- ALWAYS use this when receiving materi
 				end
 			end
 		elseif (first == "?") then
-			print("STRING")
 			self:SaveMaterial( mat )
 		end
 	end
-	print("RECEIVING:",mat)
 	tbl.material = mat
 end
 
