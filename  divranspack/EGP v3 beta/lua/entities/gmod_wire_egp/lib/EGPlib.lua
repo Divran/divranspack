@@ -621,6 +621,11 @@ EGP.ValidFonts[5] = "Courier New"
 EGP.ValidFonts[6] = "Times New Roman"
 EGP.ValidFonts[7] = "ChatFont"
 EGP.ValidFonts[8] = "Marlett"
+if (CLIENT) then
+	for k,v in ipairs( EGP.ValidFonts ) do
+		surface.CreateFont(v,18,800,true,false,"WireEGP_"..v)
+	end
+end
 
 function EGP:ValidEGP( Ent )
 	return (Ent and Ent:IsValid() and (Ent:GetClass() == "gmod_wire_egp" or Ent:GetClass() == "gmod_wire_egp_hud"))

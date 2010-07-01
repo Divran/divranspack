@@ -19,7 +19,7 @@ Obj.Draw = function( self )
 			end
 			surface.SetFont( fontname )
 		else
-			surface.SetFont( font )
+			surface.SetFont( "WireEGP_" .. font )
 		end
 		
 		local w,h
