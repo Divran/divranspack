@@ -517,7 +517,8 @@ function EGP:Transmit( Ent, E2 )
 			end
 			
 			Ent.EGP_FrameSave = nil
-		elseif (Ent.EGP_FrameLoad != nil) then
+		end
+		if (Ent.EGP_FrameLoad != nil) then
 			local ply = Ent.EGP_FrameLoad.ply
 			local index = Ent.EGP_FrameLoad.index
 			if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
