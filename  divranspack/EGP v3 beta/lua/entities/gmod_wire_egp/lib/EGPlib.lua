@@ -111,7 +111,7 @@ hook.Add("PlayerDisconnect","EGP_PlayerDisconnect",function( ply ) EGP:PlayerDis
 function EGP:CheckInterval( ply, bool )
 	if (!self.IntervalCheck[ply]) then self.IntervalCheck[ply] = { objects = 0, time = 0 } end
 	
-	local interval = self.ConVars.Interval:GetInt()
+	local interval = self.ConVars.Interval:GetFloat()
 	local maxcount = self.ConVars.MaxPerInterval:GetInt()
 	
 	local tbl = self.IntervalCheck[ply]
@@ -428,7 +428,7 @@ end
 -- Transmit functions
 ----------------------------
 
-function EGP:SendQueue( Ent, Queue, ply )
+function EGP:SendQueue( Ent, Queue )
 	if (CurrentCost != 0) then 
 		ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
 		return
@@ -501,6 +501,39 @@ function EGP:Transmit( Ent, E2 )
 		end
 		
 		self:SendQueue( Ent, DataToSend )
+		
+		if (Ent.EGP_FrameSave != nil) then
+			if (Ent.RenderTable and #Ent.RenderTable > 0) then
+				local ply = Ent.EGP_FrameSave.ply
+				local index = Ent.EGP_FrameSave.index
+				umsg.Start("EGP_SaveFrame")
+					umsg.Entity( ply )
+					umsg.Entity( Ent )
+					umsg.String( index )
+				umsg.End()
+
+				if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
+				EGP.Frames[ply][index] = Ent.RenderTable
+			end
+			
+			Ent.EGP_FrameSave = nil
+		elseif (Ent.EGP_FrameLoad != nil) then
+			local ply = Ent.EGP_FrameLoad.ply
+			local index = Ent.EGP_FrameLoad.index
+			if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
+			local frame = EGP.Frames[ply][index]
+			if (frame) then
+				umsg.Start("EGP_LoadFrame")
+					umsg.Entity( ply )
+					umsg.Entity( Ent )
+					umsg.String( index )
+				umsg.End()
+				Ent.RenderTable = frame
+				Ent.OldRenderTable = frame
+			end
+			
+			Ent.EGP_FrameLoad = nil
+		end
 	end
 end
 
@@ -569,6 +602,7 @@ if (SERVER) then
 				local tbl = {}
 				local en = ents.FindByClass("gmod_wire_egp")
 				table.Merge( en, ents.FindByClass("gmod_wire_egp_hud") )
+				table.Merge( en, ents.FindByClass("gmod_wire_egp_emitter") )
 				for k,v in pairs( en ) do
 					if (v.RenderTable and #v.RenderTable>0) then
 						local DataToSend = {}
@@ -628,7 +662,7 @@ if (CLIENT) then
 end
 
 function EGP:ValidEGP( Ent )
-	return (Ent and Ent:IsValid() and (Ent:GetClass() == "gmod_wire_egp" or Ent:GetClass() == "gmod_wire_egp_hud"))
+	return (Ent and Ent:IsValid() and (Ent:GetClass() == "gmod_wire_egp" or Ent:GetClass() == "gmod_wire_egp_hud" or Ent:GetClass() == "gmod_wire_egp_emitter"))
 end
 
 EGP.Materials = {}
@@ -694,28 +728,14 @@ end
 --------------------------------------------------------
 EGP.Frames = {}
 
-function EGP:SaveFrame( ply, Ent, index, skip )
+function EGP:SaveFrame( ply, Ent, index )
+	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
 	if (SERVER) then
 		if (!self:CheckInterval( ply )) then return end
-	end
-	
-	-- Try again later?
-	if (CLIENT) then
-		if (!Ent.RenderTable or #Ent.RenderTable == 0) then 
-			if (skip) then return end
-			timer.Simple( 2, function() self:SaveFrame( ply, Ent, index, true ) end )
-		end
-	end
-	
-	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
-	EGP.Frames[ply][index] = Ent.RenderTable
-	
-	if (SERVER) then
-		umsg.Start("EGP_SaveFrame")
-			umsg.Entity( ply )
-			umsg.Entity( Ent )
-			umsg.String( index )
-		umsg.End()
+		Ent.EGP_FrameSave = { ply = ply, index = index }
+		PrintTable(Ent.EGP_FrameSave)
+	else	
+		EGP.Frames[ply][index] = Ent.RenderTable
 	end
 end
 
@@ -723,23 +743,13 @@ function EGP:LoadFrame( ply, Ent, index )
 	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} return end
 	if (SERVER) then
 		if (!self:CheckInterval( ply )) then return end
-		local frame = EGP.Frames[ply][index]
-		if (!frame) then return end
-		umsg.Start("EGP_LoadFrame")
-			umsg.Entity( ply )
-			umsg.Entity( Ent )
-			umsg.String( index )
-		umsg.End()
-		Ent.RenderTable = frame
-		Ent.OldRenderTable = frame
+		Ent.EGP_FrameLoad = { ply = ply, index = index }
 	else
 		local frame = EGP.Frames[ply][index]
 		if (!frame) then return end
-		if (!Ent.EGP_Update) then return end
 		Ent.RenderTable = frame
 		Ent:EGP_Update()
 	end
-		
 end
 
 if (CLIENT) then

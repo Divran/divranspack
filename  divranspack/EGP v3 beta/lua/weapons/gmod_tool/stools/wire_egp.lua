@@ -104,6 +104,7 @@ else
 	function TOOL:Reload( trace )
 		if (!EGP:ValidEGP( trace.Entity )) then return false end
 		if (trace.Entity:GetClass() == "gmod_wire_egp_hud") then return false end
+		if (trace.Entity:GetClass() == "gmod_wire_egp_emitter") then return false end
 		trace.Entity.GPU:Finalize()
 		trace.Entity.GPU = GPULib.WireGPU( trace.Entity )
 		trace.Entity:EGP_Update()

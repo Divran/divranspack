@@ -13,15 +13,15 @@ __e2setcost(20)
 e2function void wirelink:egpSaveFrame( string index )
 	if (!EGP:ValidEGP( this )) then return end
 	if (!index or index == "") then return end
-	if (!this.RenderTable or #this.RenderTable == 0) then return end
 	EGP:SaveFrame( self.player, this, index )
+	Update(self,this)
 end
 
 e2function void wirelink:egpSaveFrame( index )
 	if (!EGP:ValidEGP( this )) then return end
 	if (!index) then return end
-	if (!this.RenderTable or #this.RenderTable == 0) then return end
 	EGP:SaveFrame( self.player, this, tostring(index) )
+	Update(self,this)
 end
 
 -------------
@@ -34,12 +34,14 @@ e2function void wirelink:egpLoadFrame( string index )
 	if (!EGP:IsAllowed( self, this )) then return end
 	if (!index or index == "") then return end
 	EGP:LoadFrame( self.player, this, index )
+	Update(self,this)
 end
 
 e2function void wirelink:egpLoadFrame( number index )
 	if (!EGP:IsAllowed( self, this )) then return end
 	if (!index) then return end
 	EGP:LoadFrame( self.player, this, tostring(index) )
+	Update(self,this)
 end
 
 __e2setcost(15)
@@ -637,7 +639,7 @@ e2function number egpMaxEdits()
 end
 
 e2function number egpInterval()
-	return EGP.ConVars.Interval:GetInt() * 1000
+	return EGP.ConVars.Interval:GetFloat() * 1000
 end
 
 e2function number egpCanEdit()

@@ -54,8 +54,9 @@ hook.Add("HUDPaint","EGP_HUDPaint",function()
 			if (v.On == true) then
 				if (v.RenderTable and #v.RenderTable > 0) then
 					for k2,v2 in ipairs( v.RenderTable ) do 
-						EGP:SetMaterial( v2.material )
+						local oldtex = EGP:SetMaterial( v2.material )
 						v2:Draw() 
+						EGP:FixMaterial( oldtex )
 					end
 				end
 			end
