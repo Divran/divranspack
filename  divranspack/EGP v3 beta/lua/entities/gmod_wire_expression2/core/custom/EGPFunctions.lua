@@ -4,6 +4,9 @@ local function Update( self, this )
 	self.data.EGP[this] = true
 end
 
+--------------------------------------------------------
+-- Frames
+--------------------------------------------------------
 -------------
 -- Save
 -------------
@@ -42,6 +45,30 @@ e2function void wirelink:egpLoadFrame( number index )
 	if (!index) then return end
 	EGP:LoadFrame( self.player, this, tostring(index) )
 	Update(self,this)
+end
+
+--------------------------------------------------------
+-- Order
+--------------------------------------------------------
+
+e2function void wirelink:egpOrder( number index, number order )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		local bool2 = EGP:SetOrder( this, k, order )
+		if (bool2) then
+			Update(self,this)
+		end
+	end
+end
+
+e2function number wirelink:egpOrder( number index )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, k, v = EGP:HasObject( this, index )
+	if (bool) then
+		return k
+	end
+	return 0
 end
 
 __e2setcost(15)

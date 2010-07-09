@@ -83,10 +83,10 @@ function EGP:IsAllowed( E2, Ent )
 	end
 	return false
 end
+
 ----------------------------
 -- Object existance check
 ----------------------------
-
 function EGP:HasObject( Ent, index )
 	if (!EGP:ValidEGP( Ent )) then return false end
 	index = math.Round(math.Clamp(index or 1, 1, self.ConVars.MaxObjects:GetInt()))
@@ -95,6 +95,22 @@ function EGP:HasObject( Ent, index )
 		if (v.index == index) then
 			return true, k, v
 		end
+	end
+	return false
+end
+
+----------------------------
+-- Object order changing
+----------------------------
+function EGP:SetOrder( Ent, from, to )
+	if (!Ent.RenderTable or #Ent.RenderTable == 0) then return false end
+	if (Ent.RenderTable[from]) then
+		to = math.Clamp(to,1,#Ent.RenderTable)
+		local temp = Ent.RenderTable[from]
+		table.remove( Ent.RenderTable, from )
+		table.insert( Ent.RenderTable, to, temp )
+		if (SERVER) then Ent.RenderTable[to].ChangeOrder = {from,to} end
+		return true
 	end
 	return false
 end
@@ -439,10 +455,20 @@ function EGP:SendQueue( Ent, Queue )
 		EGP.umsg.Short( #Queue )
 		for k,v in ipairs( Queue ) do
 			EGP.umsg.Short( v.index )
+			
 			if (v.remove == true) then -- Remove object
 				EGP.umsg.Char( -128 )
 			else
 				EGP.umsg.Char( v.ID - 128 )
+				
+				if (v.ChangeOrder) then
+					-- Change order
+					EGP.umsg.Short( v.ChangeOrder[1] )
+					EGP.umsg.Short( v.ChangeOrder[2] )
+				else
+					EGP.umsg.Short( -1 )
+				end
+				
 				v:Transmit()
 			end
 			
@@ -494,13 +520,17 @@ function EGP:Transmit( Ent, E2 )
 			end
 		end
 		
-		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
-		
 		if (E2 and E2.entity and E2.entity:IsValid()) then
 			E2.prf = E2.prf + #DataToSend * 150
 		end
 		
 		self:SendQueue( Ent, DataToSend )
+		
+		for k,v in ipairs( Ent.RenderTable ) do
+			if (v.ChangeOrder) then v.ChangeOrder = nil end
+		end
+		
+		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
 		
 		if (Ent.EGP_FrameSave != nil) then
 			if (Ent.RenderTable and #Ent.RenderTable > 0) then
@@ -539,8 +569,11 @@ function EGP:Transmit( Ent, E2 )
 end
 
 function EGP:Receive( um )
+
+	
 	local Ent = um:ReadEntity()
 	local Nr = um:ReadShort() -- Estimated amount
+	
 	if (Nr == -1) then  -- Remove all objects
 		Ent.RenderTable = {} 
 	else
@@ -554,6 +587,14 @@ function EGP:Receive( um )
 					table.remove( Ent.RenderTable, k )
 				end
 			else
+			
+				-- Change Order
+				local ChangeOrder_From = um:ReadShort()
+				local ChangeOrder_To
+				if (ChangeOrder_From != -1) then
+					ChangeOrder_To = um:ReadShort()
+				end
+				
 				if (index == 0) then break end -- In case the umsg had to abort early
 				ID = ID + 128
 				local bool, k, v = self:HasObject( Ent, index )
@@ -575,6 +616,11 @@ function EGP:Receive( um )
 					Obj.index = index
 					if (Obj.OnCreate) then Obj:OnCreate() end
 					table.insert( Ent.RenderTable, Obj )
+				end
+				
+				-- Change Order
+				if (ChangeOrder_From and ChangeOrder_To) then
+					local b = self:SetOrder( Ent, ChangeOrder_From, ChangeOrder_To )
 				end
 			end
 		end
@@ -734,7 +780,6 @@ function EGP:SaveFrame( ply, Ent, index )
 	if (SERVER) then
 		if (!self:CheckInterval( ply )) then return end
 		Ent.EGP_FrameSave = { ply = ply, index = index }
-		PrintTable(Ent.EGP_FrameSave)
 	else	
 		EGP.Frames[ply][index] = Ent.RenderTable
 	end
