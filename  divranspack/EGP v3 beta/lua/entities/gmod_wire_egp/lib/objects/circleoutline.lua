@@ -26,6 +26,7 @@ Obj.Draw = function( self )
 				surface.DrawLine( x, y, x2, y2 )
 			end
 		end
+		
 		surface.DrawLine( vertices[#vertices].x, vertices[#vertices].y, vertices[1].x, vertices[1].y )
 	end
 end

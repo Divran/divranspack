@@ -1,9 +1,8 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
-AddCSLuaFile("HUDDraw.lua")
 
-ENT.WireDebugName = "E2 Graphics Processor HUD"
+ENT.WireDebugName = "E2 Graphics Processor Emitter"
 
 function ENT:Initialize()	
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
@@ -17,8 +16,4 @@ function ENT:Initialize()
 	
 	self.Outputs = WireLib.CreateOutputs( self, { "link [WIRELINK]" } )
 	WireLib.TriggerOutput( self, "link", self )
-end
-
-function ENT:Use( ply )
-	umsg.Start( "EGP_HUD_Use", ply ) umsg.Entity( self ) umsg.End()
 end

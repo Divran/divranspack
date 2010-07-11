@@ -2,9 +2,13 @@ EGP = {}
 local EGP = EGP
 
 EGP.ConVars = {}
-EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
-EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
-EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
+EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING } )
+EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
+EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
+
+EGP.ConVars.AllowEmitter = CreateConVar( "wire_egp_allow_emitter", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
+EGP.ConVars.AllowHUD = CreateConVar( "wire_egp_allow_hud", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
+EGP.ConVars.AllowScreen = CreateConVar( "wire_egp_allow_screen", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
 
 --------------------------------------------------------
 -- Objects
