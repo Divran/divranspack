@@ -1,7 +1,7 @@
 include('shared.lua')
 
 function ENT:Initialize()
-	self.RenderTable = EGP.HomeScreen
+	self.RenderTable = table.Copy(EGP.HomeScreen)
 end
 
 --[[ THIS FUNCTION DOESN'T WORK AS INTENDED. Which is why I added the convar to block EGP screens/HUDs/emitters.

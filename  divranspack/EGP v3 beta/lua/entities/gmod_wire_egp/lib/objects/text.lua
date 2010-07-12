@@ -3,24 +3,20 @@ Obj.h = nil
 Obj.w = nil
 Obj.text = ""
 Obj.fontid = 0
-Obj.size = 1
+Obj.size = 18
 Obj.valign = 0
 Obj.halign = 0
 Obj.Draw = function( self )
 	if (self.text and #self.text>0) then
 		surface.SetTextColor( self.r, self.g, self.b, self.a )
 		
-		local font = EGP.ValidFonts[self.fontid] or "WireGPU_ConsoleFont"
-		if (self.size != 1) then
-			local fontname = "WireEGP_"..self.size.."_"..self.fontid
-			if (!table.HasValue( EGP.ValidFonts, fontname )) then 
-				surface.CreateFont(font,self.size,800,true,false,fontname)
-				table.insert( EGP.ValidFonts, fontname )
-			end
-			surface.SetFont( fontname )
-		else
-			surface.SetFont( "WireEGP_" .. font )
+		local font = "WireEGP_" .. self.size .. "_" .. self.fontid
+		if (!EGP.ValidFonts_Lookup[font]) then
+			surface.CreateFont( EGP.ValidFonts[self.fontid], self.size, 800, true, false, font )
+			table.insert( EGP.ValidFonts, font )
+			EGP.ValidFonts_Lookup[font] = true
 		end
+		surface.SetFont( font )
 		
 		local w,h
 		local x, y = self.x, self.y
@@ -43,7 +39,7 @@ Obj.Transmit = function( self )
 	EGP.umsg.Float( self.y )
 	EGP.umsg.String( self.text )
 	EGP.umsg.Char( self.fontid-128 )
-	EGP.umsg.Char( math.Clamp(self.size,0,200)-128 )
+	EGP.umsg.Char( math.Clamp(self.size,0,128)-128 )
 	EGP.umsg.Char( math.Clamp(self.valign,0,2) )
 	EGP.umsg.Char( math.Clamp(self.halign,0,2) )
 	EGP.umsg.Short( self.parent )

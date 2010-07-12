@@ -134,6 +134,7 @@ e2function void wirelink:egpFont( number index, string font )
 		for k,v in ipairs( EGP.ValidFonts ) do
 			if (v:lower() == font:lower()) then
 				fontid = k
+				break
 			end
 		end
 		if (EGP:EditObject( v, { fontid = fontid }, self.player )) then Update(self,this) end
@@ -148,6 +149,7 @@ e2function void wirelink:egpFont( number index, string font, number size )
 		for k,v in ipairs( EGP.ValidFonts ) do
 			if (v:lower() == font:lower()) then
 				fontid = k
+				break
 			end
 		end
 		if (EGP:EditObject( v, { fontid = fontid, size = size }, self.player )) then Update(self,this) end

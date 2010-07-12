@@ -2,13 +2,13 @@ EGP = {}
 local EGP = EGP
 
 EGP.ConVars = {}
-EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING } )
-EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
-EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
+EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
+EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
+EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
 
-EGP.ConVars.AllowEmitter = CreateConVar( "wire_egp_allow_emitter", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
-EGP.ConVars.AllowHUD = CreateConVar( "wire_egp_allow_hud", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
-EGP.ConVars.AllowScreen = CreateConVar( "wire_egp_allow_screen", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NEVER_AS_STRING }  )
+EGP.ConVars.AllowEmitter = CreateConVar( "wire_egp_allow_emitter", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE  }  )
+EGP.ConVars.AllowHUD = CreateConVar( "wire_egp_allow_hud", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE  }  )
+EGP.ConVars.AllowScreen = CreateConVar( "wire_egp_allow_screen", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE  }  )
 
 --------------------------------------------------------
 -- Objects
@@ -470,7 +470,7 @@ function EGP:SendQueue( Ent, Queue )
 					EGP.umsg.Short( v.ChangeOrder[1] )
 					EGP.umsg.Short( v.ChangeOrder[2] )
 				else
-					EGP.umsg.Short( -1 )
+					EGP.umsg.Short( 0 )
 				end
 				
 				v:Transmit()
@@ -595,7 +595,7 @@ function EGP:Receive( um )
 				-- Change Order
 				local ChangeOrder_From = um:ReadShort()
 				local ChangeOrder_To
-				if (ChangeOrder_From != -1) then
+				if (ChangeOrder_From != 0) then
 					ChangeOrder_To = um:ReadShort()
 				end
 				
@@ -696,6 +696,7 @@ end
 --------------------------------------------------------
 
 -- Valid fonts table
+EGP.ValidFonts_Lookup = {}
 EGP.ValidFonts = {}
 EGP.ValidFonts[0] = "WireGPU_ConsoleFont"
 EGP.ValidFonts[1] = "Coolvetica"
@@ -707,8 +708,15 @@ EGP.ValidFonts[6] = "Times New Roman"
 EGP.ValidFonts[7] = "ChatFont"
 EGP.ValidFonts[8] = "Marlett"
 if (CLIENT) then
+	local new = {}
 	for k,v in ipairs( EGP.ValidFonts ) do
-		surface.CreateFont(v,18,800,true,false,"WireEGP_"..v)
+		local font = "WireEGP_18_"..k
+		surface.CreateFont(v,18,800,true,false,font)
+		EGP.ValidFonts_Lookup[font] = true
+		table.insert( new, font )
+	end
+	for k,v in ipairs( new ) do
+		table.insert( EGP.ValidFonts, v )
 	end
 end
 
