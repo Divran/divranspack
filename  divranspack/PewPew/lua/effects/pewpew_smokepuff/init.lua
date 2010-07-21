@@ -1,7 +1,7 @@
 -- Smokepuff, made by Divran
 
 function EFFECT:Init( data )
-	local Pos = data:GetOrigin()
+	local Pos = data:GetOrigin()	
 	local NumParticles = 32
 	
 	local emitter = ParticleEmitter( Pos )

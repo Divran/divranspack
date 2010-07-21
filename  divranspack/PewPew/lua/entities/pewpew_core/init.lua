@@ -109,6 +109,7 @@ end
 
 function ENT:BuildDupeInfo()
 	local info = self.BaseClass.BuildDupeInfo(self) or {}
+	info.pewpewInfo = {}
 	info.pewpewInfo.Owner = self.Owner
 	return info
 end
