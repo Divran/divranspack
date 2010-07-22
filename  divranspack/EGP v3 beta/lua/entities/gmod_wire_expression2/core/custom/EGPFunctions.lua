@@ -91,6 +91,12 @@ e2function void wirelink:egpText( number index, string text, vector2 pos )
 	if (bool) then Update(self,this) end
 end
 
+e2function void wirelink:egpTextLayout( number index, string text, vector2 pos, vector2 size )
+	if (!EGP:IsAllowed( self, this )) then return end
+	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["TextLayout"], { index = index, text = text, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
+	if (bool) then Update(self,this) end
+end
+
 __e2setcost(10)
 
 ----------------------------
