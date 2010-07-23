@@ -105,7 +105,7 @@ if (SERVER) then
 		if (self:GetStage() == 0) then
 			if (!trace.Entity:GetClass() == "gmod_wire_egp_hud") then return false end
 			self:SetStage(1)
-			ply:ChatPrint("[EGP] Now left click a vehicle, or click the same EGP HUD again to unlink it.")
+			ply:ChatPrint("[EGP] Now right click a vehicle, or right click the same EGP HUD again to unlink it.")
 			self.Selected = trace.Entity
 		else
 			if (!self.Selected or !self.Selected:IsValid()) then
@@ -133,7 +133,7 @@ else
 	language.Add( "Tool_wire_egp_name", "E2 Graphics Processor" )
     language.Add( "Tool_wire_egp_desc", "EGP Tool" )
     language.Add( "Tool_wire_egp_0", "Primary: Create EGP Screen/HUD/Emitter, Secondary: Link EGP HUD to vehicle, Reload: Respawn and reload the GPU RenderTarget (Client side) - use if the screen is gone due to lag." )
-	language.Add( "Tool_wire_egp_1", "Now left click a vehicle, or click the same EGP HUD again to unlink it." )
+	language.Add( "Tool_wire_egp_1", "Now right click a vehicle, or right click the same EGP HUD again to unlink it." )
 	language.Add( "sboxlimit_wire_egps", "You've hit the EGP limit!" )
 	language.Add( "Undone_wire_egp", "Undone EGP" )
 	language.Add( "Tool_wire_egp_createflat", "Create flat to surface" )
