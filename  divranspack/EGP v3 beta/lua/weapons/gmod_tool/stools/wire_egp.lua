@@ -96,10 +96,44 @@ if (SERVER) then
 		
 		return true
 	end
+	
+	function TOOL:RightClick( trace )
+		if (!trace.Entity or !trace.Entity:IsValid()) then return false end
+		if (trace.Entity:IsPlayer()) then return false end
+		
+		local ply = self:GetOwner()
+		if (self:GetStage() == 0) then
+			if (!trace.Entity:GetClass() == "gmod_wire_egp_hud") then return false end
+			self:SetStage(1)
+			ply:ChatPrint("[EGP] Now left click a vehicle, or click the same EGP HUD again to unlink it.")
+			self.Selected = trace.Entity
+		else
+			if (!self.Selected or !self.Selected:IsValid()) then
+				self:SetStage(0)
+				ply:ChatPrint("[EGP] Error! Selected EGP HUD is nil or no longer exists!")
+				return false
+			end
+			if (trace.Entity == self.Selected) then
+				EGP:UnlinkHUDFromVehicle( self.Selected )
+				self.Selected = nil
+				self:SetStage(0)
+				ply:ChatPrint("[EGP] Unlinked EGP HUD.")
+				return true
+			end
+			if (!trace.Entity:IsVehicle()) then return false end
+			self:SetStage(0)
+			ply:ChatPrint("[EGP] EGP HUD linked.")
+			EGP:LinkHUDToVehicle( self.Selected, trace.Entity )
+			self.Selected = nil
+		end
+		
+		return true
+	end
 else
 	language.Add( "Tool_wire_egp_name", "E2 Graphics Processor" )
     language.Add( "Tool_wire_egp_desc", "EGP Tool" )
-    language.Add( "Tool_wire_egp_0", "Primary: Create EGP Screen/HUD/Emitter, Reload: Respawn and reload the GPU RenderTarget (Client side) - use if the screen is gone due to lag." )
+    language.Add( "Tool_wire_egp_0", "Primary: Create EGP Screen/HUD/Emitter, Secondary: Link EGP HUD to vehicle, Reload: Respawn and reload the GPU RenderTarget (Client side) - use if the screen is gone due to lag." )
+	language.Add( "Tool_wire_egp_1", "Now left click a vehicle, or click the same EGP HUD again to unlink it." )
 	language.Add( "sboxlimit_wire_egps", "You've hit the EGP limit!" )
 	language.Add( "Undone_wire_egp", "Undone EGP" )
 	language.Add( "Tool_wire_egp_createflat", "Create flat to surface" )

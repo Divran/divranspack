@@ -2,6 +2,7 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
 AddCSLuaFile("HUDDraw.lua")
+include("HUDDraw.lua")
 
 ENT.WireDebugName = "E2 Graphics Processor HUD"
 
