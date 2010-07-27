@@ -277,7 +277,7 @@ e2function void wirelink:egpTriangleOutline( number index, vector2 vert1, vector
 end
 
 --------------------------------------------------------
--- PacMan Circle
+-- Wedge
 --------------------------------------------------------
 e2function void wirelink:egpWedge( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
@@ -292,7 +292,7 @@ e2function void wirelink:egpWedge( number index, vector2 pos, vector2 size, numb
 end
 
 --------------------------------------------------------
--- PacMan Circle Outline
+-- Wedge Outline
 --------------------------------------------------------
 e2function void wirelink:egpWedgeOutline( number index, vector2 pos, vector2 size )
 	if (!EGP:IsAllowed( self, this )) then return end
@@ -306,44 +306,6 @@ e2function void wirelink:egpWedgeOutline( number index, vector2 pos, vector2 siz
 	if (bool) then Update(self,this) end
 end
 
---[[
---------------------------------------------------------
--- Camera
---------------------------------------------------------
-e2function void wirelink:egpCamera( number index, vector2 pos, vector2 size )
-	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Camera"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2] }, self.player )
-	if (bool) then Update(self,this) end
-end
-
-e2function void wirelink:egpAngle( number index, angle ang )
-	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, k, v = EGP:HasObject( this, index )
-	if (bool) then
-		if (EGP:EditObject( v, { camang = Angle(ang[1],ang[2],ang[3]) }, self.player )) then Update(self,this) end
-	end
-end
-
-e2function void wirelink:egpPos( number index, vector pos )
-	if (!EGP:IsAllowed( self, this )) then return end
-	local bool, k, v = EGP:HasObject( this, index )
-	if (bool) then
-		if (EGP:EditObject( v, { campos = Vector(pos[1],pos[2],pos[3]) }, self.player )) then Update(self,this) end
-	end
-end
-
-
---------------------------------------------------------
--- Avatar Image
---------------------------------------------------------
-e2function void wirelink:egpAvatar( number index, vector2 pos, vector2 size, entity ply )
-	if (!EGP:IsAllowed( self, this )) then return end
-	if (!ply or !ply:IsValid() or !ply:IsPlayer()) then return end
-	local bool, obj = EGP:CreateObject( this, EGP.Objects.Names["Avatar"], { index = index, x = pos[1], y = pos[2], w = size[1], h = size[2], ply = ply }, self.player )
-	if (bool) then Update(self,this) end
-end
-]]
-	
 --------------------------------------------------------
 -- Set functions
 --------------------------------------------------------
@@ -669,16 +631,54 @@ e2function number egpMaxObjects()
 	return EGP.ConVars.MaxObjects:GetInt()
 end
 
-e2function number egpMaxEdits()
-	return EGP.ConVars.MaxPerInterval:GetInt()
+e2function number egpMaxUmsgPerSecond()
+	return EGP.ConVars.MaxPerSec:GetInt()
 end
 
-e2function number egpInterval()
-	return EGP.ConVars.Interval:GetFloat() * 1000
-end
-
-e2function number egpCanEdit()
+e2function number egpCanSendUmsg()
 	return (EGP:CheckInterval( self.player, true ) and 1 or 0)
+end
+
+e2function number egpClearQueue()
+	if (EGP.Queue[self.player]) then
+		EGP.Queue[self.player] = {}
+		EGP:StopTimer( "EGP_QueueCheck_"..self.player:UniqueID() )
+		return 1
+	end
+	return 0
+end
+
+e2function number wirelink:egpClearQueue()
+	if (!EGP:ValidEGP( this )) then return end
+	if (EGP.Queue[self.player] and EGP.Queue[self.player]) then
+		for k,v in pairs( EGP.Queue[self.player] ) do
+			if (v.screen == this) then
+				EGP.Queue[self.player][k] = nil
+				return 1
+			end
+		end
+	end
+	return 0
+end
+
+e2function number egpQueue()
+	if (EGP.Queue[self.player]) then
+		return #EGP.Queue[self.player]
+	end
+	return 0
+end
+
+e2function number egpQueueClk()
+	if (EGP.RunByEGPQueue) then
+		return 1
+	end
+	return 0
+end
+
+e2function entity egpQueueScreen()
+	if (EGP.RunByEGPQueue) then
+		return EGP.RunByEGPQueue_Ent
+	end
 end
 
 --------------------------------------------------------
@@ -687,9 +687,11 @@ end
 
 __e2setcost(nil)
 
+registerCallback("preexecute",function(self) self.data.EGP.TRIGGERING = true end)
+
 registerCallback("postexecute",function(self)
 	for k,v in pairs( self.data.EGP ) do
-		if (k and k:IsValid()) then
+		if (k and k != "TRIGGERING" and k:IsValid()) then
 			if (v == true) then
 				EGP:Transmit( k, self )
 				self.data.EGP[k] = nil
@@ -698,6 +700,7 @@ registerCallback("postexecute",function(self)
 			self.data.EGP[k] = nil
 		end
 	end	
+	self.data.EGP.TRIGGERING = false
 end)
 
 registerCallback("construct",function(self)

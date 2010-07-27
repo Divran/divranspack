@@ -3,8 +3,7 @@ local EGP = EGP
 
 EGP.ConVars = {}
 EGP.ConVars.MaxObjects = CreateConVar( "wire_egp_max_objects", 300, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE } )
-EGP.ConVars.MaxPerInterval = CreateConVar( "wire_egp_max_objects_per_interval", 30, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
-EGP.ConVars.Interval = CreateConVar( "wire_egp_interval", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
+EGP.ConVars.MaxPerSec = CreateConVar( "wire_egp_max_umsg_per_sec", 5, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE }  )
 
 EGP.ConVars.AllowEmitter = CreateConVar( "wire_egp_allow_emitter", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE  }  )
 EGP.ConVars.AllowHUD = CreateConVar( "wire_egp_allow_hud", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE  }  )
@@ -118,56 +117,12 @@ function EGP:SetOrder( Ent, from, to )
 	end
 	return false
 end
-
-----------------------------
--- Object per second allowance checks
-----------------------------
-EGP.IntervalCheck = {}
-
-function EGP:PlayerDisconnect( ply ) EGP.IntervalCheck[ply] = nil end
-hook.Add("PlayerDisconnect","EGP_PlayerDisconnect",function( ply ) EGP:PlayerDisconnect( ply ) end)
-
-
-function EGP:CheckInterval( ply, bool )
-	if (!self.IntervalCheck[ply]) then self.IntervalCheck[ply] = { objects = 0, time = 0 } end
-	
-	local interval = self.ConVars.Interval:GetFloat()
-	local maxcount = self.ConVars.MaxPerInterval:GetInt()
-	
-	local tbl = self.IntervalCheck[ply]
-	
-	if (bool) then
-		return (tbl.objects < maxcount)
-	else
-	
-		if (tbl.time < CurTime()) then
-			tbl.objects = 1
-			tbl.time = CurTime() + interval
-		else
-			tbl.objects = tbl.objects + 1
-			if (tbl.objects >= maxcount) then
-				return false
-			end
-		end
-		
-	end
-	
-	return true
-end
 ----------------------------
 -- Create / edit objects
 ----------------------------
 
 function EGP:CreateObject( Ent, ObjID, Settings, ply )
 	if (!self:ValidEGP( Ent )) then return false end
-	
-	if (SERVER) then
-		if (ply and ply:IsValid() and ply:IsPlayer()) then
-			if (!self:CheckInterval( ply )) then
-				return false
-			end
-		end
-	end
 
 	Settings.index = math.Round(math.Clamp(Settings.index or 1, 1, self.ConVars.MaxObjects:GetInt()))
 	
@@ -193,13 +148,6 @@ function EGP:CreateObject( Ent, ObjID, Settings, ply )
 end
 
 function EGP:EditObject( Obj, Settings, ply )
-	if (SERVER) then
-		if (ply and ply:IsValid() and ply:IsPlayer()) then
-			if (!self:CheckInterval( ply )) then
-				return false
-			end
-		end
-	end
 	local ret = false
 	for k,v in pairs( Settings ) do
 		if (Obj[k] and Obj[k] != v) then
@@ -366,6 +314,86 @@ end
 -- Transmitting / Receiving
 --------------------------------------------------------
 ----------------------------
+-- Umsgs per second check
+----------------------------
+EGP.IntervalCheck = {}
+
+function EGP:PlayerDisconnect( ply ) EGP.IntervalCheck[ply] = nil EGP.Queue[ply] = nil end
+hook.Add("PlayerDisconnect","EGP_PlayerDisconnect",function( ply ) EGP:PlayerDisconnect( ply ) end)
+
+
+function EGP:CheckInterval( ply, bool )
+	if (!self.IntervalCheck[ply]) then self.IntervalCheck[ply] = { umsgs = 0, time = 0 } end
+	
+	local maxcount = self.ConVars.MaxPerSec:GetInt()
+	
+	local tbl = self.IntervalCheck[ply]
+	
+	if (bool) then
+		return (tbl.umsgs < maxcount)
+	else
+	
+		if (tbl.time < CurTime()) then
+			tbl.umsgs = 1
+			tbl.time = CurTime() + 1
+		else
+			tbl.umsgs = tbl.umsgs + 1
+			if (tbl.umsgs > maxcount) then
+				return false
+			end
+		end
+		
+	end
+	
+	return true
+end
+----------------------------
+-- Automatic Queue System
+----------------------------
+EGP.Queue = {}
+
+function EGP:StopTimer( Timer, Ent, E2 )
+	if (timer.IsTimer( Timer )) then
+		timer.Destroy( Timer )
+	end
+	timer.Simple( 0, function( Ent, E2 ) -- Run next tick
+		if (E2 and E2.entity and E2.entity:IsValid()) then
+			EGP.RunByEGPQueue = 1
+			EGP.RunByEGPQueue_Ent = Ent
+			E2.entity:Execute()
+			EGP.RunByEGPQueue_Ent = nil
+			EGP.RunByEGPQueue = nil
+		end
+	end, Ent, E2)
+end
+
+function EGP:AddToQueue( Queue, Ent, E2 )
+	if (!Queue or #Queue == 0) then return end
+	local ply = E2.player
+	if (!Ent or !Ent:IsValid() or !E2 or !E2.entity or !E2.entity:IsValid() or !ply or !ply:IsValid()) then return end
+	if (!EGP.Queue[ply]) then EGP.Queue[ply] = {} end
+	Queue.screen = Ent
+	Queue.expression = E2
+	table.insert( EGP.Queue[ply], Queue )
+	
+	if (!timer.IsTimer( "EGP_QueueCheck_"..ply:UniqueID() )) then
+		timer.Create( "EGP_QueueCheck_"..ply:UniqueID(), 1, 0, function( ply )
+			local str = "EGP_QueueCheck_"..ply:UniqueID()
+			if (!EGP.Queue[ply]) then EGP:StopTimer( str ) return end
+			local Queue = EGP.Queue[ply]
+			if (!Queue or #Queue == 0) then EGP:StopTimer( str ) return end
+			Queue = Queue[1]
+			local Ent = Queue.screen
+			local E2 = Queue.expression
+			if (!Ent or !Ent:IsValid() or !E2 or !E2.entity or !E2.entity:IsValid()) then EGP:StopTimer( str ) return end
+			table.remove( EGP.Queue[ply], 1 )
+			EGP:Transmit( Ent, E2, Queue )
+		end, ply)
+	end
+	
+end
+
+----------------------------
 -- Custom umsg system
 ----------------------------
 local CurrentCost = 0
@@ -447,13 +475,21 @@ end
 ----------------------------
 -- Transmit functions
 ----------------------------
-
-function EGP:SendQueue( Ent, Queue )
+function EGP:SendQueue( Ent, Queue, ply )
 	if (CurrentCost != 0) then 
 		ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
-		return
+		return {}
 	end
 	local Done = 0
+	
+	-- Check interval
+	if (ply and ply:IsValid() and ply:IsPlayer()) then 
+		local b = self:CheckInterval( ply )
+		if (b == false) then 
+			return Queue -- Return the remaining queue
+		end
+	end
+			
 	EGP.umsg.Start( "EGP_Transmit_Data" )
 		EGP.umsg.Entity( Ent )
 		EGP.umsg.Short( #Queue )
@@ -478,97 +514,131 @@ function EGP:SendQueue( Ent, Queue )
 			
 			Done = Done + 1
 			if (CurrentCost > 200) then -- Getting close to the max size! Start over!
-				if (Done == 1 and CurrentCost > 255) then -- The object was too big
+				if (Done == 1 and CurrentCost > 256) then -- The object was too big
 					ErrorNoHalt("[EGP] Umsg error. An object was too big to send!")
 					table.remove( Queue, 1 )
-					EGP.umsg.End()
-					return
 				end
 				EGP.umsg.End()
 				for i=1,Done do table.remove( Queue, 1 ) end
-				self:SendQueue( Ent, Queue )
-				return
+				return self:SendQueue( Ent, Queue, ply )
 			end
 		end
 	EGP.umsg.End()
+	return {}
 end
 
-function EGP:Transmit( Ent, E2 )
-	if (#Ent.RenderTable == 0 and #Ent.OldRenderTable > 0) then -- Remove all objects
-		Ent.OldRenderTable = {}
-		
-		umsg.Start("EGP_Transmit_Data")
-			umsg.Entity( Ent )
-			umsg.Short( -1 )
-		umsg.End()
-	
+function EGP:Transmit( Ent, E2, CustomQueue )
+	local DataToSend = {}
+	if (CustomQueue != nil) then
+		DataToSend = CustomQueue
 	else
-	
-		local DataToSend = {}
-		for k,v in ipairs( Ent.RenderTable ) do
-			if (!Ent.OldRenderTable[k] or Ent.OldRenderTable[k] != v or Ent.OldRenderTable[k].ID != v.ID) then -- Check for differences
-				table.insert( DataToSend, v )
-			else
-				for k2,v2 in pairs( v ) do
-					if (!Ent.OldRenderTable[k][k2] or Ent.OldRenderTable[k][k2] != v2) then -- Check for differences
-						table.insert( DataToSend, v )
+		
+		if (#Ent.RenderTable == 0 and #Ent.OldRenderTable > 0) then -- Remove all objects
+			Ent.OldRenderTable = {}
+			
+			umsg.Start("EGP_Transmit_Data")
+				umsg.Entity( Ent )
+				umsg.Short( -1 )
+			umsg.End()
+			
+			if (E2 and E2.entity and E2.entity:IsValid()) then
+				E2.prf = E2.prf + 100
+			end
+			
+			return
+		else
+		
+			for k,v in ipairs( Ent.RenderTable ) do
+				if (!Ent.OldRenderTable[k] or Ent.OldRenderTable[k].ID != v.ID) then -- Check for differences
+					table.insert( DataToSend, v )
+				else
+					for k2,v2 in pairs( v ) do
+						if (k2 != "BaseClass") then
+							if (!Ent.OldRenderTable[k][k2] or Ent.OldRenderTable[k][k2] != v2) then -- Check for differences
+								table.insert( DataToSend, v )
+							end
+						end
 					end
 				end
 			end
-		end
-		
-		-- Check if any object was removed
-		for k,v in ipairs( Ent.OldRenderTable ) do
-			if (!Ent.RenderTable[k]) then
-				table.insert( DataToSend, { index = v.index, remove = true} )
+			
+			-- Check if any object was removed
+			for k,v in ipairs( Ent.OldRenderTable ) do
+				if (!Ent.RenderTable[k]) then
+					table.insert( DataToSend, { index = v.index, remove = true} )
+				end
 			end
 		end
+	end
 		
-		if (E2 and E2.entity and E2.entity:IsValid()) then
-			E2.prf = E2.prf + #DataToSend * 150
-		end
-		
-		self:SendQueue( Ent, DataToSend )
-		
-		for k,v in ipairs( Ent.RenderTable ) do
-			if (v.ChangeOrder) then v.ChangeOrder = nil end
-		end
-		
-		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
-		
-		if (Ent.EGP_FrameSave != nil) then
-			if (Ent.RenderTable and #Ent.RenderTable > 0) then
-				local ply = Ent.EGP_FrameSave.ply
-				local index = Ent.EGP_FrameSave.index
-				umsg.Start("EGP_SaveFrame")
-					umsg.Entity( ply )
-					umsg.Entity( Ent )
-					umsg.String( index )
-				umsg.End()
+	if (E2 and E2.entity and E2.entity:IsValid()) then
+		E2.prf = E2.prf + #DataToSend * 150
+	end
+	
+	local Remainder = self:SendQueue( Ent, DataToSend, E2.player )
 
-				if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
-				EGP.Frames[ply][index] = Ent.RenderTable
-			end
+	for k,v in ipairs( Ent.RenderTable ) do
+		if (v.ChangeOrder) then v.ChangeOrder = nil end
+	end
+
+	if (Remainder and #Remainder > 0) then -- Not everything was sent - save to queue
 			
-			Ent.EGP_FrameSave = nil
+		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
+		for k,v in pairs( Remainder ) do
+			local idx = v.index
+			for k2,v2 in pairs( Ent.OldRenderTable ) do
+				if (v2.index == idx) then
+					Ent.OldRenderTable[k2] = nil
+				end
+			end
 		end
-		if (Ent.EGP_FrameLoad != nil) then
-			local ply = Ent.EGP_FrameLoad.ply
-			local index = Ent.EGP_FrameLoad.index
+		EGP:AddToQueue( Remainder, Ent, E2 )
+		
+	else -- Everything was sent - proceed as usual
+	
+		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
+		if (E2.data.EGP.TRIGGERING == false) then -- Only trigger if the E2 is not already running
+			EGP:StopTimer( "EGP_QueueCheck_"..E2.player:UniqueID(), Ent, E2 ) 
+		end
+		
+	end
+	
+	if (Ent.EGP_FrameSave != nil) then			
+		if (Ent.RenderTable and #Ent.RenderTable > 0) then
+			if (!self:CheckInterval( ply )) then return end
+			
+			local ply = Ent.EGP_FrameSave.ply
+			local index = Ent.EGP_FrameSave.index
+			umsg.Start("EGP_SaveFrame")
+				umsg.Entity( ply )
+				umsg.Entity( Ent )
+				umsg.String( index )
+			umsg.End()
+
 			if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
-			local frame = EGP.Frames[ply][index]
-			if (frame) then
-				umsg.Start("EGP_LoadFrame")
-					umsg.Entity( ply )
-					umsg.Entity( Ent )
-					umsg.String( index )
-				umsg.End()
-				Ent.RenderTable = frame
-				Ent.OldRenderTable = frame
-			end
-			
-			Ent.EGP_FrameLoad = nil
+			EGP.Frames[ply][index] = Ent.RenderTable
 		end
+		
+		Ent.EGP_FrameSave = nil
+	end
+	if (Ent.EGP_FrameLoad != nil) then
+		if (!self:CheckInterval( ply )) then return end
+		
+		local ply = Ent.EGP_FrameLoad.ply
+		local index = Ent.EGP_FrameLoad.index
+		if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
+		local frame = EGP.Frames[ply][index]
+		if (frame) then
+			umsg.Start("EGP_LoadFrame")
+				umsg.Entity( ply )
+				umsg.Entity( Ent )
+				umsg.String( index )
+			umsg.End()
+			Ent.RenderTable = frame
+			Ent.OldRenderTable = frame
+		end
+		
+		Ent.EGP_FrameLoad = nil
 	end
 end
 
@@ -790,7 +860,6 @@ EGP.Frames = {}
 function EGP:SaveFrame( ply, Ent, index )
 	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
 	if (SERVER) then
-		if (!self:CheckInterval( ply )) then return end
 		Ent.EGP_FrameSave = { ply = ply, index = index }
 	else	
 		EGP.Frames[ply][index] = Ent.RenderTable
@@ -800,7 +869,6 @@ end
 function EGP:LoadFrame( ply, Ent, index )
 	if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} return end
 	if (SERVER) then
-		if (!self:CheckInterval( ply )) then return end
 		Ent.EGP_FrameLoad = { ply = ply, index = index }
 	else
 		local frame = EGP.Frames[ply][index]
@@ -831,6 +899,7 @@ if (CLIENT) then
 		EGP:LoadFrame( ply, ent, index )
 	end)
 end
+
 --------------------------------------------------------
 --  Homescreen
 --------------------------------------------------------
