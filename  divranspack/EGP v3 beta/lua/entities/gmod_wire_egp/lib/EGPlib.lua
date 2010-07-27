@@ -541,8 +541,10 @@ function EGP:Transmit( Ent, E2, CustomQueue )
 				umsg.Short( -1 )
 			umsg.End()
 			
+			
 			if (E2 and E2.entity and E2.entity:IsValid()) then
-				E2.prf = E2.prf + 100
+				self:StopTimer( "EGP_QueueCheck_"..E2.player:UniqueID() )
+				E2.prf = E2.prf + 150
 			end
 			
 			return
@@ -597,8 +599,10 @@ function EGP:Transmit( Ent, E2, CustomQueue )
 	else -- Everything was sent - proceed as usual
 	
 		Ent.OldRenderTable = table.Copy( Ent.RenderTable )
-		if (E2.data.EGP.TRIGGERING == false) then -- Only trigger if the E2 is not already running
-			EGP:StopTimer( "EGP_QueueCheck_"..E2.player:UniqueID(), Ent, E2 ) 
+		if (E2 and E2.entity and E2.entity:IsValid()) then
+			if (E2.data.EGP.TRIGGERING == false) then -- Only trigger if the E2 is not already running
+				EGP:StopTimer( "EGP_QueueCheck_"..E2.player:UniqueID(), Ent, E2 ) 
+			end
 		end
 		
 	end
