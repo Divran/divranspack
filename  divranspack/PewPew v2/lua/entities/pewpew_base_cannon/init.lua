@@ -177,6 +177,7 @@ end
 	
 function ENT:FireBullet()
 	if (!pewpew:GetConVar( "Firing" )) then return end
+	if (!pewpew:CallHookBool( "PewPew_ShouldCannonFire", self )) then return end
 	
 	-- Is energy usage enabled?
 	if (pewpew:GetConVar( "EnergyUsage" )) then

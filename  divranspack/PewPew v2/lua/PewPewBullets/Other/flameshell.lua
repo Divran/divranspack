@@ -51,7 +51,7 @@ function BULLET:Explode(self, trace)
 	local Pos = self.Entity:GetPos()
 	local Norm = self.Entity:GetUp()
 
-	util.BlastDamage(self.Entity, self.Entity, Pos+Norm*10, self.Bullet.Damage, self.Bullet.Radius)
+	pewpew:PlayerBlastDamage(self.Entity, self.Entity, Pos+Norm*10, self.Bullet.Damage, self.Bullet.Radius)
 	pewpew:BlastDamage(Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self )
 	
 	local vOffset = Pos+Vector(0,0,2)

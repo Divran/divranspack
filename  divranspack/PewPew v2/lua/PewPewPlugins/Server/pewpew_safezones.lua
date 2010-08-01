@@ -2,6 +2,8 @@
 -- These functions add safe zones
 ------------------------------------------------------------------------------------------------------------
 
+pewpew:CreateConVar( "ShootingInSafeZones", "bool", true )
+
 -- Damage Blocked Table
 pewpew.SafeZones = {}
 
@@ -100,47 +102,54 @@ end
 -- Used below...
 local function check( ... )
 	for k,v in pairs( {...} ) do
-		if (type(v) == "Entity" and v and v:IsValid()) then
+		if (type(v) == "Entity" and pewpew:CheckValid(v)) then
 			if (pewpew:FindSafeZone(v:GetPos())) then return false end
 		end
 	end
 end
 
+local function ShouldCannonFire( pewpew, ent )
+	if (ent and ent:IsValid() and pewpew:FindSafeZone( ent:GetPos() ) and !pewpew:GetConVar( "ShootingInSafeZones" )) then
+		return false
+	end
+end
+hook.Add("PewPew_ShouldCannonFire", "PewPew_SafeZone_ShouldCannonFire",ShouldCannonFire)
+
 -- Block damage from being dealt if the damage dealer is inside a safe zone
-function pewpew:BlockInitBlastDamage(a,b,c,d,e,DamageDealer)
+local function BlockInitBlastDamage(pewpew,a,b,c,d,e,DamageDealer)
 	return check(DamageDealer)
 end
-hook.Add("PewPew_InitBlastDamage","PewPew_SafeZone_InitBlastDamage",pewpew.BlockInitBlastDamage)
+hook.Add("PewPew_InitBlastDamage","PewPew_SafeZone_InitBlastDamage",BlockInitBlastDamage)
 
 -- Block damage from being dealt if the damaged prop is inside a safe zone
-function pewpew:BlockBlastDamage( ent )
+local function BlockBlastDamage( pewpew, ent )
 	return check(ent)
 end
-hook.Add("PewPew_ShouldDoBlastDamage","PewPew_SafeZone_BlastDamage",pewpew.BlockBlastDamage)
+hook.Add("PewPew_ShouldDoBlastDamage","PewPew_SafeZone_BlastDamage",BlockBlastDamage)
 
 -- Block slice damage from being dealt if the damage dealer is inside a safe zone
-function pewpew:BlockInitSliceDamage( a,b,c,d,e,f,DamageDealer )
+local function BlockInitSliceDamage( pewpew, a,b,c,d,e,f,DamageDealer )
 	return check(DamageDealer)
 end
-hook.Add("PewPew_InitSliceDamage","PewPew_SafeZone_SliceDamage",pewpew.BlockInitSliceDamage)
+hook.Add("PewPew_InitSliceDamage","PewPew_SafeZone_SliceDamage",BlockInitSliceDamage)
 
 -- Block emp damage from being dealt if the damaged prop is inside a safe zone
-function pewpew:BlockEMPDamage( ent,a,b,DamageDealer )
+local function BlockEMPDamage( pewpew, ent,a,b,DamageDealer )
 	return check(ent,DamageDealer)
 end
-hook.Add("PewPew_ShouldDoEMPDamage","PewPew_SafeZone_EMPDamage",pewpew.BlockEMPDamage)
+hook.Add("PewPew_ShouldDoEMPDamage","PewPew_SafeZone_EMPDamage",BlockEMPDamage)
 
-function pewpew:BlockPointDamage( TargetEntity,Damage,DamageDealer )
+local function BlockPointDamage( pewpew, TargetEntity,Damage,DamageDealer )
 	return check(TargetEntity,DamageDealer)
 end
-hook.Add("PewPew_ShouldDoPointDamage","PewPew_SafeZone_PointDamage",pewpew.BlockPointDamage)
+hook.Add("PewPew_ShouldDoPointDamage","PewPew_SafeZone_PointDamage",BlockPointDamage)
 
-function pewpew:BlockFireDamage( TargetEntity,a,b,DamageDealer )
+local function BlockFireDamage( pewpew, TargetEntity,a,b,DamageDealer )
 	return check(TargetEntity,DamageDealer)
 end
-hook.Add( "PewPew_ShouldDoFireDamage","PewPew_SafeZone_FireDamage",pewpew.BlockFireDamage)
+hook.Add( "PewPew_ShouldDoFireDamage","PewPew_SafeZone_FireDamage",BlockFireDamage)
 
-function pewpew:BlockDamage( TargetEntity, Damage, DamageDealer )
+local function BlockDamage( pewpew, TargetEntity, Damage, DamageDealer )
 	return check(TargetEntity,DamageDealer)
 end
-hook.Add("PewPew_ShouldDamage","PewPew_SafeZone_BaseDamage",pewpew.BlockDamage)
+hook.Add("PewPew_ShouldDamage","PewPew_SafeZone_BaseDamage",BlockDamage)

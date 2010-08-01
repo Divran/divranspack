@@ -1,3 +1,5 @@
+pewpew:CreateConVar("StargateShield_DamageMul","float",0.25)
+
 local function check( ent, dlr )
 	local shields = ents.FindByClass("shield")
 	for k,v in pairs( shields ) do
@@ -19,7 +21,7 @@ local function checkblast( pos, size, damage )
 			if (size + size2 < dir:Length()) then
 				dir:Normalize()
 				local pos2 = v:GetPos() + dir * size
-				v:Hit(nil,pos2,damage,dir)
+				v:Hit(nil,pos2,damage*pewpew:GetConVar("StargateShield_DamageMul"),dir)
 			end
 		end
 	end

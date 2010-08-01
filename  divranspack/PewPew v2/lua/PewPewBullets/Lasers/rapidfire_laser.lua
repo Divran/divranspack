@@ -46,7 +46,7 @@ function BULLET:Fire( self )
 	if (trace.Entity and trace.Entity:IsValid()) then
 		-- Stargate shield damage
 		if (trace.Entity:GetClass() == "shield") then
-			trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage,trace.HitNormal)
+			trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
 		else
 			pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
 		end

@@ -123,7 +123,7 @@ function BULLET:ThinkFunc( self )
 	if (self.Lifetime) then
 		if (CurTime() > self.Lifetime) then
 			if (self.Bullet.ExplodeAfterDeath) then
-				local trace = self:DefaultTrace()
+				local trace = pewpew:Trace(self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self)
 				self:Explode( trace )
 			else
 				self.Entity:Remove()
@@ -133,7 +133,7 @@ function BULLET:ThinkFunc( self )
 	
 	if (CurTime() > self.TraceDelay) then
 		-- Check if it hit something
-		local trace = self:DefaultTrace()
+		local trace = pewpew:Trace(self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self)
 		
 		if (trace.Hit and !self.Exploded) then	
 			self.Exploded = true

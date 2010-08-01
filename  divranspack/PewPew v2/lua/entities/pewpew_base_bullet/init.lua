@@ -98,7 +98,7 @@ function ENT:DefaultExplode( trace )
 			if (trace.Entity and trace.Entity:IsValid()) then
 				-- Stargate shield damage
 				if (trace.Entity:GetClass() == "shield") then
-					trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage,trace.HitNormal)
+					trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
 					damaged = true
 				else
 					pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
@@ -110,7 +110,7 @@ function ENT:DefaultExplode( trace )
 			
 			-- Player Damage
 			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew:GetConVar( "Damage" )) then
-				util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+				pewpew:PlayerBlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 			end
 		elseif (damagetype == "PointDamage") then
 			pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
@@ -127,7 +127,7 @@ function ENT:DefaultExplode( trace )
 	
 	-- Stargate shield damage
 	if (trace.Entity and trace.Entity:IsValid() and trace.Entity:GetClass() == "shield" and !damaged) then
-		trace.Entity:Hit(self,trace.HitPos,self.Bullet.Damage,trace.HitNormal)
+		trace.Entity:Hit(self,trace.HitPos,self.Bullet.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
 	end
 	
 	-- Remove the bullet
@@ -136,7 +136,7 @@ end
 
 function ENT:Explode(trace)
 	if (!trace) then
-		trace = self:DefaultTrace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.Direction * self.Bullet.Speed)
+		trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed)
 	end
 	if (self.Bullet.ExplodeOverride) then
 		-- Allows you to override the Explode function
@@ -179,7 +179,7 @@ function ENT:DefaultThink()
 	end
 	
 	if (CurTime() > self.TraceDelay) then
-		local trace = self:DefaultTrace()
+		local trace = pewpew:Trace( self:GetPos(), self.FlightDirection, self )
 
 		if (!trace) then error("[PewPew] Invalid trace") return end
 			

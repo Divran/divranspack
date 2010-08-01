@@ -72,7 +72,7 @@ end
 BULLET.FireOverride = true
 function BULLET:Fire( self )
 	self.Bullet.Speed = self.CustomSpeed or 100
-	self:DefaultFireBullet()
+	self:OldSystem_FireBullet()
 end
 
 pewpew:AddWeapon( BULLET )

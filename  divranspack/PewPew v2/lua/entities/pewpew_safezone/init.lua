@@ -50,6 +50,18 @@ function ENT:TriggerInput( name, value )
 			self.ChangeDelay = CurTime() + 5
 		end
 	end
+	
+	if (self.ChangeDelay > CurTime()) then -- If ChangeDelay was set to something higher, color the safe zone red to show that you cannot change its inputs at the moment, then after 5 seconds color it back.
+		local _,_,_,a = self:GetColor()
+		self:SetColor( 255,0,0,a )
+		
+		timer.Simple( 5, function( ent ) 
+			if (ent and ent:IsValid()) then
+				local _,_,_,a = ent:GetColor()
+				ent:SetColor( 255,255,255,a )
+			end
+		end,self)
+	end
 		
 end
 

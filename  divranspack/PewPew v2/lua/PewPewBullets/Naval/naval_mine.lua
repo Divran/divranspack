@@ -94,7 +94,7 @@ function BULLET:CannonPhysicsCollideFunc( Data, PhysObj )
 	
 	-- Damage
 	if (pewpew:GetConVar( "Damage" )) then
-		util.BlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+		pewpew:PlayerBlastDamage( self.Entity, self.Entity, Pos + Norm * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 	end
 	pewpew:BlastDamage( Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 	

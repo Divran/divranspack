@@ -44,6 +44,8 @@ BULLET.AmmoReloadtime = 6
 
 BULLET.EnergyPerShot = 400
 
+BULLET.UseOldSystem = true
+
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
@@ -65,7 +67,7 @@ function BULLET:InitializeFunc(self)
 	self.Entity:NextThink(CurTime())
 end
 
--- Think (Is called a lot of times :p)
+-- Think
 BULLET.ThinkOverride = true
 function BULLET:ThinkFunc( self )
 	if (self.Burning and CurTime() > self.Fuse) then
@@ -76,7 +78,7 @@ function BULLET:ThinkFunc( self )
 	
 	if (not self.Burning and self.Entity:GetVelocity():Length() < 1) then
 		if (pewpew:GetConVar( "Damage" )) then
-			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
+			pewpew:PlayerBlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
 		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 		
@@ -109,7 +111,7 @@ BULLET.PhysicsCollideOverride = true
 function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
 	if (not (self.Cannon:IsValid() and PhysObj == self.Cannon:GetPhysicsObject()) and not self.Burning) then
 		if (pewpew:GetConVar( "Damage" )) then
-			util.BlastDamage(self.Entity, self.Entity, CollisionData.HitPos, self.Bullet.Damage, self.Bullet.Radius)
+			pewpew:PlayerBlastDamage(self.Entity, self.Entity, CollisionData.HitPos, self.Bullet.Damage, self.Bullet.Radius)
 		end
 		if (pewpew:CheckValid(CollisionData.HitEntity)) then
 			pewpew:PointDamage(CollisionData.HitEntity,self.Bullet.Damage,self)

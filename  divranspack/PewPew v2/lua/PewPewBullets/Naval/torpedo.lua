@@ -108,11 +108,11 @@ function BULLET:ThinkFunc( self )
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 	
 	-- Check if it hit something
-	local trace = self:DefaultTrace()
+	local trace = pewpew:Trace(self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self)
 	
 	if (trace.Hit) then
 		if (pewpew:GetConVar( "Damage" )) then
-			util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
+			pewpew:PlayerBlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
 		end
 		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 		

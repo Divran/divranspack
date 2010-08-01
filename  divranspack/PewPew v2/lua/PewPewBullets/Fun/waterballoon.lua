@@ -67,7 +67,7 @@ function BULLET:Explode(self, trace)
 	local Norm = self.Entity:GetUp()
 
 	if (pewpew:GetConVar( "Damage" )) then
-		util.BlastDamage(self.Entity, self.Entity, Pos+Norm*10, self.Bullet.Damage, self.Bullet.Radius)
+		pewpew:PlayerBlastDamage(self.Entity, self.Entity, Pos+Norm*10, self.Bullet.Damage, self.Bullet.Radius)
 		pewpew:BlastDamage(Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
 	end
 	

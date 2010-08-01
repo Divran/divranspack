@@ -6,9 +6,14 @@ pewpew:CreateConVar( "CoreDamageOnly", "bool", false )
 pewpew:CreateConVar( "RepairToolHealCores", "float", 200 )
 
 function pewpew:CheckForCore( TargetEntity, Damage, DamageDealer )
-	if (TargetEntity and TargetEntity:IsValid() and TargetEntity:GetClass() == "pewpew_core") then
-		self:DamageCore( TargetEntity, Damage ) -- Deal damage to core
-		return false -- Prevent damage to the original target entity
+	if (self:CheckValid( TargetEntity )) then
+		if (TargetEntity:GetClass() == "pewpew_core") then -- If the entity is a core
+			self:DamageCore( TargetEntity, Damage ) -- Deal damage to core
+			return false -- Prevent damage to the core
+		elseif (TargetEntity.pewpew and self:CheckValid( TargetEntity.pewpew.Core )) then -- If the entity is connected to a core
+			self:DamageCore( TargetEntity.pewpew.Core, Damage ) -- Deal damage to core
+			return false -- Prevent damage to the original target
+		end
 	end
 	if (self:GetConVar("CoreDamageOnly")) then return false end
 end
@@ -19,7 +24,7 @@ function pewpew:DamageCore( ent, Damage )
 	if (!self:CheckValid( ent )) then return end
 	if (!ent.pewpew) then ent.pewpew = {} end
 	if (ent:GetClass() != "pewpew_core") then return end
-	ent.pewpew.CoreHealth = ent.pewpew.CoreHealth - math.abs(Damage) * self.CoreDamageMul
+	ent.pewpew.CoreHealth = ent.pewpew.CoreHealth - math.abs(Damage) * self:GetConVar("CoreDamageMul")
 	ent:SetNWInt("pewpewHealth",ent.pewpew.CoreHealth)
 	-- Wire Output
 	WireLib.TriggerOutput( ent, "Health", ent.pewpew.CoreHealth or 0 )

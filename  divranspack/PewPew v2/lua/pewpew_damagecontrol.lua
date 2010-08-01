@@ -35,8 +35,8 @@ pewpew.DamageWhitelist = { "gmod_wire_turret", "gmod_wire_forcer", "gmod_wire_gr
 -- Hook calling:
 function pewpew:CallHookBool( HookName, ... )
 	local ret = {hook.Call(HookName,nil,self,...)}
-	if (#ret>0) then
-		for k,v in ipairs( ret ) do
+	if (ret and table.Count(ret) >0) then
+		for k,v in pairs( ret ) do
 			if (v == false) then
 				return false
 			end
@@ -47,8 +47,8 @@ end
 
 function pewpew:CallHookNum( HookName, ... )
 	local ret = {hook.Call(HookName,nil,self,...)}
-	if (#ret>0) then
-		for k,v in ipairs( ret ) do
+	if (ret and table.Count(ret) >0) then
+		for k,v in pairs( ret ) do
 			if (type(v) == "number") then return v end
 		end
 	end
@@ -101,6 +101,45 @@ function pewpew:ReduceBlastDamage( Damage, NumberOfProps )
 	local NrOfProps = math.max(NumberOfProps-5,2)
 	Damage = Damage / NrOfProps
 	return Damage
+end
+
+local PLAYER = _R.Player
+if (PLAYER) then
+	local OldFunc = _R.Player.GodEnable
+	function _R.Player:GodEnable()
+		self.PewPew_God = true
+		OldFunc( self )
+	end
+	local OldFunc = _R.Player.GodDisable
+	function _R.Player:GodDisable()
+		self.PewPew_God = false
+		OldFunc( self )
+	end
+end
+
+-- Helper function. Used in place of pewpew:PlayerBlastDamage in all pewpew weapons
+function pewpew:PlayerBlastDamage( Inflictor, Attacker, Pos, Radius, Damage )
+	
+	-- Check safe zone
+	if (self:FindSafeZone( Pos )) then return end
+	
+	local disablegod = {}
+	
+	local plys = ents.FindInSphere(Pos, Radius)
+	for k,v in pairs( plys ) do
+		if (v:IsPlayer() and !v.PewPew_God) then
+			if (!pewpew:CallHookBool( "PewPew_ShouldDamage", v, Damage, Inflictor )) then
+				v:GodEnable()
+				table.insert( disablegod, v )
+			end
+		end
+	end
+	
+	util.BlastDamage( Inflictor, Attacker, Pos, Radius, Damage )
+	
+	for k,v in ipairs( disablegod ) do
+		v:GodDisable()
+	end
 end
 
 -- Point Damage - (Deals damage to 1 single entity)
@@ -460,11 +499,13 @@ function pewpew:CheckNeverEverList( entity )
 end
 
 function pewpew:CheckValid( entity )
+	if (!entity) then return false end
 	if (!entity:IsValid()) then return false end
 	if (entity:IsWorld()) then return false end
 	if (entity:GetMoveType() != MOVETYPE_VPHYSICS) then return false end
-	if (!entity:GetPhysicsObject():IsValid()) then return false end
-	if (!entity:GetPhysicsObject():GetVolume()) then return false end
-	if (!entity:GetPhysicsObject():GetMass()) then return false end
+	local phys = entity:GetPhysicsObject()
+	if (!phys:IsValid()) then return false end
+	if (!phys:GetVolume()) then return false end
+	if (!phys:GetMass()) then return false end
 	return true
 end

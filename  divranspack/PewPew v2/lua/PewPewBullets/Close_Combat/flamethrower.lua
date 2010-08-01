@@ -109,7 +109,7 @@ function BULLET:ThinkFunc( self )
 				if (trace.Entity and trace.Entity:IsValid()) then
 					-- Stargate shield damage
 					if (trace.Entity:GetClass() == "shield") then
-						trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage,trace.HitNormal)
+						trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
 					else
 						pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
 					end
@@ -121,7 +121,7 @@ function BULLET:ThinkFunc( self )
 			
 			-- Player Damage
 			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew:GetConVar( "Damage" )) then
-				util.BlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
+				pewpew:PlayerBlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
 			end
 			
 			self.Entity:SetPos( trace.HitPos )

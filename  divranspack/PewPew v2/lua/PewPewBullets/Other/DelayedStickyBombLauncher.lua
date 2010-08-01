@@ -78,7 +78,7 @@ function BULLET:ThinkFunc( self )
 	
 	if (self.Sticked and CurTime() >= self.StickBlow) then
 		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew:GetConVar( "Damage" )) then
-			util.BlastDamage(self.Entity, self.Entity, self:GetPos(), self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
+			pewpew:PlayerBlastDamage(self.Entity, self.Entity, self:GetPos(), self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
 		end
 		
 		if (self.Bullet.ExplosionEffect) then
