@@ -1,4 +1,5 @@
 if (CLIENT) then
+	local EGP_HUD_FirstPrint = true
 	local tbl = {}
 
 	--------------------------------------------------------
@@ -17,7 +18,12 @@ if (CLIENT) then
 				LocalPlayer():ChatPrint("[EGP] EGP HUD Disconnected.")
 			else
 				ent.On = true
-				LocalPlayer():ChatPrint("[EGP] EGP HUD Connected.")
+				if (EGP_HUD_FirstPrint) then
+					LocalPlayer():ChatPrint("[EGP] EGP HUD Connected. NOTE: Type 'wire_egp_hud_unlink' in console to disconnect yourself from all EGP HUDs.")
+					EGP_HUD_FirstPrint = nil
+				else
+					LocalPlayer():ChatPrint("[EGP] EGP HUD Connected.")
+				end
 			end
 		end
 	end
@@ -26,7 +32,7 @@ if (CLIENT) then
 	--------------------------------------------------------
 	-- Disconnect all HUDs
 	--------------------------------------------------------
-	concommand.Add("wire_egp_hud_disconnect",function()
+	concommand.Add("wire_egp_hud_unlink",function()
 		local en = ents.FindByClass("gmod_wire_egp_hud")
 		LocalPlayer():ChatPrint("[EGP] Disconnected from all EGP HUDs.")
 		for k,v in ipairs( en ) do
