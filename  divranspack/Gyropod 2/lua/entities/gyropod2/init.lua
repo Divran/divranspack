@@ -311,7 +311,7 @@ function ENT:Think()
 	if (self.DirMode == 0) then
 		Force = ent:LocalToWorld(Force)-ent:GetPos()
 	elseif (self.DirMode == 2) then
-		Force = ((Force - ent:GetPos()) * 10 - ent:GetVelocity() * 0.25)
+		Force = ((Force - ent:GetPos()) * 10 - ent:GetVelocity() * 0.5)
 	end
 	
 	-- Angular force
