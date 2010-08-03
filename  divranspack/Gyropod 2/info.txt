@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Gyropod 2"
+	"version"     "SVN"
+	"author_name" "Divran"
+	"author_url"  ""
+	"info"        "Gyropod 2"
+	"override"    "0"
+}
