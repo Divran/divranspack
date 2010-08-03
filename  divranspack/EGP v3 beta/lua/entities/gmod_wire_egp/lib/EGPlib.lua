@@ -610,9 +610,9 @@ function EGP:Transmit( Ent, E2, CustomQueue )
 	
 	if (Ent.EGP_FrameSave != nil) then			
 		if (Ent.RenderTable and #Ent.RenderTable > 0) then
-			if (!self:CheckInterval( ply )) then return end
-			
 			local ply = Ent.EGP_FrameSave.ply
+			if (!self:CheckInterval( ply )) then return end
+
 			local index = Ent.EGP_FrameSave.index
 			umsg.Start("EGP_SaveFrame")
 				umsg.Entity( ply )
@@ -627,9 +627,9 @@ function EGP:Transmit( Ent, E2, CustomQueue )
 		Ent.EGP_FrameSave = nil
 	end
 	if (Ent.EGP_FrameLoad != nil) then
+		local ply = Ent.EGP_FrameLoad.ply
 		if (!self:CheckInterval( ply )) then return end
 		
-		local ply = Ent.EGP_FrameLoad.ply
 		local index = Ent.EGP_FrameLoad.index
 		if (!EGP.Frames[ply]) then EGP.Frames[ply] = {} end
 		local frame = EGP.Frames[ply][index]
