@@ -58,7 +58,7 @@ if (SERVER) then
 		
 		Ent.RenderTable = {}
 		Ent.OldRenderTable = {}
-		EGP.umsg.Start( "EGP_Transmit_Data" )
+		if (!EGP.umsg.Start( "EGP_Transmit_Data" )) then return end
 			EGP.umsg.Entity( Ent )
 			EGP.umsg.String( "ClearScreen" )
 		EGP.umsg.End()
@@ -77,7 +77,7 @@ if (SERVER) then
 		end
 		
 		umsg.PoolString( FrameName )
-		EGP.umsg.Start( "EGP_Transmit_Data" )
+		if (!EGP.umsg.Start( "EGP_Transmit_Data" )) then return end
 			EGP.umsg.Entity( Ent )
 			EGP.umsg.String( "SaveFrame" )
 			EGP.umsg.Entity( ply )
@@ -101,7 +101,7 @@ if (SERVER) then
 		local Frame = EGP:LoadFrame( ply, Ent, FrameName )
 		if (!Frame) then return end
 
-		EGP.umsg.Start( "EGP_Transmit_Data" )
+		if (!EGP.umsg.Start( "EGP_Transmit_Data" )) then return end
 			EGP.umsg.Entity( Ent )
 			EGP.umsg.String( "LoadFrame" )
 			EGP.umsg.Entity( ply )
@@ -119,10 +119,6 @@ if (SERVER) then
 	
 	umsg.PoolString( "ReceiveObjects" )
 	local function SendObjects( Ent, ply, DataToSend )
-		if (EGP.CurrentCost != 0) then 
-			ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
-			return
-		end
 		local Done = 0
 		
 		-- Check interval
@@ -135,7 +131,7 @@ if (SERVER) then
 		
 		local removetable = {}
 		
-		EGP.umsg.Start( "EGP_Transmit_Data" )
+		if (!EGP.umsg.Start( "EGP_Transmit_Data" )) then return end
 			EGP.umsg.Entity( Ent )
 			EGP.umsg.String( "ReceiveObjects" )
 			
@@ -167,8 +163,8 @@ if (SERVER) then
 				end
 				
 				Done = Done + 1
-				if (EGP.CurrentCost > 200) then -- Getting close to the max size! Start over
-					if (Done == 1 and CurrentCost > 256) then -- The object was too big
+				if (EGP.umsg.CurrentCost() > 200) then -- Getting close to the max size! Start over
+					if (Done == 1 and EGP.umsg.CurrentCost() > 256) then -- The object was too big
 						ErrorNoHalt("[EGP] Umsg error. An object was too big to send!")
 						table.remove( DataToSend, 1 )
 					end

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 local EGP = EGP
 
-EGP.CurrentCost = 0
+local CurrentCost = 0
 --[[ Transmit Sizes:
 	Angle = 12
 	Bool = 1
@@ -16,65 +16,76 @@ EGP.CurrentCost = 0
 	Vector = 12
 	VectorNormal = 12
 ]]
+
+
 	
 EGP.umsg = {}
+
+-- Allow others to get the current cost
+function EGP.umsg.CurrentCost() return CurrentCost end
+
 -- Start
 function EGP.umsg.Start( name, repicient )
-	EGP.CurrentCost = 0
+	if (CurrentCost != 0) then
+		ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
+		return false
+	end
+	CurrentCost = 0
 	umsg.Start( name, repicient )
+	return true
 end
 -- End
 function EGP.umsg.End()
-	EGP.CurrentCost = 0
+	CurrentCost = 0
 	umsg.End()
 end
 -- Angle
 function EGP.umsg.Angle( data )
-	EGP.CurrentCost = EGP.CurrentCost + 12
+	CurrentCost = CurrentCost + 12
 	umsg.Angle( data )
 end
 -- Boolean
 function EGP.umsg.Bool( data )
-	EGP.CurrentCost = EGP.CurrentCost + 1
+	CurrentCost = CurrentCost + 1
 	umsg.Bool( data )
 end
 -- Char
 function EGP.umsg.Char( data )
-	EGP.CurrentCost = EGP.CurrentCost + 1
+	CurrentCost = CurrentCost + 1
 	umsg.Char( data )
 end
 -- Entity
 function EGP.umsg.Entity( data )
-	EGP.CurrentCost = EGP.CurrentCost + 2
+	CurrentCost = CurrentCost + 2
 	umsg.Entity( data )
 end
 -- Float
 function EGP.umsg.Float( data )
-	EGP.CurrentCost = EGP.CurrentCost + 4
+	CurrentCost = CurrentCost + 4
 	umsg.Float( data )
 end
 -- Long
 function EGP.umsg.Long( data )
-	EGP.CurrentCost = EGP.CurrentCost + 4
+	CurrentCost = CurrentCost + 4
 	umsg.Long( data )
 end
 -- Short
 function EGP.umsg.Short( data )
-	EGP.CurrentCost = EGP.CurrentCost + 2
+	CurrentCost = CurrentCost + 2
 	umsg.Short( data )
 end
 -- String
 function EGP.umsg.String( data )
-	EGP.CurrentCost = EGP.CurrentCost + #data
+	CurrentCost = CurrentCost + #data
 	umsg.String( data )
 end
 -- Vector
 function EGP.umsg.Vector( data )
-	EGP.CurrentCost = EGP.CurrentCost + 12
+	CurrentCost = CurrentCost + 12
 	umsg.Vector( data )
 end
 -- VectorNormal
 function EGP.umsg.VectorNormal( data )
-	EGP.CurrentCost = EGP.CurrentCost + 12
+	CurrentCost = CurrentCost + 12
 	umsg.VectorNormal( data )
 end

@@ -1,5 +1,5 @@
 local function Update(self,this)
-	self.data.EGP[this] = true
+	self.data.EGP.UpdatesNeeded[this] = true
 end
 
 --------------------------------------------------------
@@ -645,6 +645,12 @@ end
 -- Useful functions
 --------------------------------------------------------
 
+-----------------------------
+-- ConVars
+-----------------------------
+
+__e2setcost(10)
+
 e2function number wirelink:egpNumObjects()
 	if (!EGP:ValidEGP( this )) then return -1 end
 	return #this.RenderTable
@@ -658,9 +664,15 @@ e2function number egpMaxUmsgPerSecond()
 	return EGP.ConVars.MaxPerSec:GetInt()
 end
 
+__e2setcost(5)
+
 e2function number egpCanSendUmsg()
 	return (EGP:CheckInterval( self.player, true ) and 1 or 0)
 end
+
+-----------------------------
+-- Queue system
+-----------------------------
 
 e2function number egpClearQueue()
 	if (EGP.Queue[self.player]) then
@@ -671,10 +683,12 @@ e2function number egpClearQueue()
 	return 0
 end
 
-e2function number wirelink:egpClearQueue()
+--[[ currently does not work
+e2 function number wirelink:egpClearQueue()
 	if (!EGP:ValidEGP( this )) then return end
 	if (EGP.Queue[self.player]) then
 		EGP:StopQueueTimer( self.player )
+		EGP.Queue[self.player].DONTADDMORE = true
 		local removetable = {}
 		for k,v in ipairs( EGP.Queue[self.player] ) do
 			if (v.Ent == this) then
@@ -685,12 +699,17 @@ e2function number wirelink:egpClearQueue()
 		for k,v in ipairs( removetable ) do
 			table.remove( EGP.Queue[self.player], v )
 		end
-		--EGP:SendQueueItem( self.player )
+		EGP:SendQueueItem( self.player )
 		EGP:StartQueueTimer( self.player )
+		timer.Simple(1,function() EGP.Queue[self.player].DONTADDMORE = nil end)
 	end
 	return 0
 end
+]]
 
+__e2setcost(10)
+
+-- Returns the amount of items in your queue
 e2function number egpQueue()
 	if (EGP.Queue[self.player]) then
 		return #EGP.Queue[self.player]
@@ -698,20 +717,59 @@ e2function number egpQueue()
 	return 0
 end
 
---[[
-e2 function number egpQueueClk()
+-- Choose whether or not to make this E2 run when the queue has finished sending all items for <this>
+e2function void wirelink:egpRunOnQueue( yesno )
+	if (!EGP:ValidEGP( this )) then return end
+	local bool = false
+	if (yesno != 0) then bool = true end
+	self.data.EGP.RunOnEGP[this] = bool
+end
+
+-- Returns 1 if the current execution was caused by the EGP queue system OR if the EGP queue system finished in the current execution
+e2function number egpQueueClk()
 	if (EGP.RunByEGPQueue) then
 		return 1
 	end
 	return 0
 end
 
-e2 function entity egpQueueScreen()
+-- Returns 1 if the current execution was caused by the EGP queue system regarding the entity <screen> OR if the EGP queue system finished in the current execution
+e2function number egpQueueClk( wirelink screen )
+	if (EGP.RunByEGPQueue and EGP.RunByEGPQueue_Ent == screen) then
+		return 1
+	end
+	return 0
+end
+
+-- Returns 1 if the current execution was caused by the EGP queue system regarding the entity <screen> OR if the EGP queue system finished in the current execution
+e2function number egpQueueClk( entity screen )
+	if (EGP.RunByEGPQueue and EGP.RunByEGPQueue_Ent == screen) then
+		return 1
+	end
+	return 0
+end
+
+-- Returns the screen which the queue finished sending items for
+e2function entity egpQueueScreen()
 	if (EGP.RunByEGPQueue) then
 		return EGP.RunByEGPQueue_Ent
 	end
 end
-]]
+
+-- Returns the player which ordered the current items to be sent (This is usually yourself, but if you're sharing pp with someone it might be them. Good way to check if someone is fucking with your screens)
+e2function entity egpQueuePlayer()
+	if (EGP.RunByEGPQueue) then
+		return EGP.RunByEGPQueue_ply
+	end
+end
+
+-- Returns 1 if the current execution was caused by the EGP queue system and the player <ply> was the player whom ordered the item to be sent (This is usually yourself, but if you're sharing pp with someone it might be them.)
+e2function number egpQueueClk( entity ply )
+	if (EGP.RunByEGPQueue and EGP.RunByEGPQueue_ply == ply) then
+		return 1
+	end
+	return 0
+end
 
 --------------------------------------------------------
 -- Callbacks
@@ -719,15 +777,12 @@ end
 
 __e2setcost(nil)
 
---registerCallback("preexecute",function(self) self.data.EGP.TRIGGERING = true end)
-
 registerCallback("postexecute",function(self)
-	for k,v in pairs( self.data.EGP ) do
+	for k,v in pairs( self.data.EGP.UpdatesNeeded ) do
 		if (k and k:IsValid()) then
 			if (v == true) then
 				EGP:SendQueueItem( self.player )
 				EGP:StartQueueTimer( self.player )
-				--EGP:DoAction( k, self, "Send" )
 				self.data.EGP[k] = nil
 			end
 		else
@@ -738,4 +793,6 @@ end)
 
 registerCallback("construct",function(self)
 	self.data.EGP = {}
+	self.data.EGP.RunOnEGP = {}
+	self.data.EGP.UpdatesNeeded = {}
 end)

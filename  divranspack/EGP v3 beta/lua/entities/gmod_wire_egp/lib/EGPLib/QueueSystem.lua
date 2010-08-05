@@ -25,13 +25,11 @@ end
 function EGP:AddQueue( Ent, ply, Function, ... )
 	if (!EGP.Queue[ply]) then EGP.Queue[ply] = {} end
 	table.insert( EGP.Queue[ply], { Function = Function, Ent = Ent, Args = ... } )
-	--self:StartQueueTimer( ply:EntIndex() )
 end
 
 function EGP:InsertQueue( Ent, ply, Function, ... )
 	if (!EGP.Queue[ply]) then EGP.Queue[ply] = {} end
 	table.insert( EGP.Queue[ply], 1, { Function = Function, Ent = Ent, Args = ... } )
-	--self:StartQueueTimer( ply:EntIndex() )
 end
 
 function EGP:GetNextItem( ply )
@@ -41,6 +39,8 @@ function EGP:GetNextItem( ply )
 	return ret
 end
 
+local AlreadyChecking = 0
+
 function EGP:SendQueueItem( ply )
 	if (!ply or !ply:IsValid()) then self:StopQueueTimer( ply ) end
 	local NextAction = self:GetNextItem( ply )
@@ -48,9 +48,6 @@ function EGP:SendQueueItem( ply )
 		self:StopQueueTimer( ply ) 
 	else
 		local Func = NextAction.Function
-		if (!Func) then
-			PrintTable(NextAction)
-		end
 		local Ent = NextAction.Ent
 		local Args = NextAction.Args
 		if (Args and #Args>0) then
@@ -58,6 +55,31 @@ function EGP:SendQueueItem( ply )
 		else
 			Func( Ent, ply )
 		end
+		
+		if (CurTime() != AlreadyChecking) then -- Had to use this hacky way of checking, because the E2 triggered 4 times for some strange reason. If anyone can figure out why, go ahead and tell me.
+			AlreadyChecking = CurTime()
+			
+			-- Check if the queue has no more items for this screen
+			local Items = self:GetQueueItemsForScreen( ply, Ent )
+			if (Items and #Items == 0) then
+				EGP.RunByEGPQueue = 1
+				EGP.RunByEGPQueue_Ent = Ent
+				EGP.RunByEGPQueue_ply = ply
+				for k,v in ipairs( ents.FindByClass( "gmod_wire_expression2" ) ) do -- Find all E2s
+					local context = v.context
+					if (context) then	
+						local owner = context.player
+						 -- Check if friends, whether or not the E2 is already executing, and if the E2 wants to be triggered by the queue system regarding the screen in question.
+						if (E2Lib.isFriend( ply, owner ) and context.data and context.data.EGP and context.data.EGP.RunOnEGP and context.data.EGP.RunOnEGP[Ent] == true) then
+							v:Execute()
+						end
+					end
+				end
+				EGP.RunByEGPQueue_ply = nil
+				EGP.RunByEGPQueue_Ent = nil
+				EGP.RunByEGPQueue = nil	
+			end
+		end		
 	end
 end
 
@@ -75,20 +97,15 @@ function EGP:StopQueueTimer( ply )
 	if (timer.IsTimer( TimerName )) then
 		timer.Destroy( TimerName )
 	end
-	--[[ TODO: Make E2 run here
-	timer.Simple( 0.1, function()
-		for k,v in pairs( ents.FindByClass("gmod_wire_expression2") ) do
-			if (v.context.data.EGP.RunByEGPQueue == true and E2Lib.isOwner( v, ply )) then
-			
-				
-	timer.Simple( 0, function( Ent, E2 ) -- Run next tick
-		if (E2 and E2.entity and E2.entity:IsValid()) then
-			EGP.RunByEGPQueue = 1
-			EGP.RunByEGPQueue_Ent = Ent
-			E2.entity:Execute()
-			EGP.RunByEGPQueue_Ent = nil
-			EGP.RunByEGPQueue = nil
+end
+
+function EGP:GetQueueItemsForScreen( ply, Ent )
+	if (!EGP.Queue[ply]) then return {} end
+	local ret = {}
+	for k,v in ipairs( EGP.Queue[ply] ) do
+		if (v.Ent == Ent) then
+			table.insert( ret, v )
 		end
-	end, Ent, E2)
-	]]
+	end
+	return ret
 end
