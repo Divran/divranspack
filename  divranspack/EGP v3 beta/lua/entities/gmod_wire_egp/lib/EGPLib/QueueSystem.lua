@@ -27,6 +27,24 @@ function EGP:AddQueue( Ent, ply, Function, ... )
 	table.insert( EGP.Queue[ply], { Function = Function, Ent = Ent, Args = ... } )
 end
 
+function EGP:InsertQueueObjects( Ent, ply, Function, Objects )
+	if (!EGP.Queue[ply]) then EGP.Queue[ply] = {} end
+	local n = #EGP.Queue[ply]
+	if (n > 0) then
+		local FirstItem = EGP.QUeue[ply][1]
+		if (FirstItem.Ent == Ent and FirstItem.Function == Function) then
+			local Args = FirstItem.Args
+			for k,v in ipairs( Objects ) do
+				table.insert( Args, v )
+			end
+		else
+			self:InsertQueue( Ent, ply, Function, Objects )
+		end
+	else
+		self:InsertQueue( Ent, ply, Function, Objects )
+	end
+end
+
 function EGP:InsertQueue( Ent, ply, Function, ... )
 	if (!EGP.Queue[ply]) then EGP.Queue[ply] = {} end
 	table.insert( EGP.Queue[ply], 1, { Function = Function, Ent = Ent, Args = ... } )

@@ -119,12 +119,14 @@ if (SERVER) then
 	
 	umsg.PoolString( "ReceiveObjects" )
 	local function SendObjects( Ent, ply, DataToSend )
+		if (!Ent or !ply or !DataToSend) then return end
+		
 		local Done = 0
 		
 		-- Check interval
 		if (ply and ply:IsValid() and ply:IsPlayer()) then 
 			if (EGP:CheckInterval( ply ) == false) then 
-				EGP:InsertQueue( Ent, ply, SendObjects, DataToSend )
+				EGP:InsertQueueObjects( Ent, ply, SendObjects, DataToSend )
 				return
 			end
 		end
@@ -171,7 +173,7 @@ if (SERVER) then
 					EGP.umsg.End()
 					for i=1,Done do table.remove( DataToSend, 1 ) end
 					removetbl( removetable, Ent )
-					EGP:InsertQueue( Ent, ply, SendObjects, DataToSend )
+					EGP:InsertQueueObjects( Ent, ply, SendObjects, DataToSend )
 					EGP:SendQueueItem( ply )
 					return
 				end

@@ -103,7 +103,7 @@ if (SERVER) then
 		
 		local ply = self:GetOwner()
 		if (self:GetStage() == 0) then
-			if (!trace.Entity:GetClass() == "gmod_wire_egp_hud") then return false end
+			if (trace.Entity:GetClass() != "gmod_wire_egp_hud") then return false end
 			self:SetStage(1)
 			ply:ChatPrint("[EGP] Now right click a vehicle, or right click the same EGP HUD again to unlink it.")
 			self.Selected = trace.Entity

@@ -4,6 +4,7 @@
 local EGP = EGP
 
 local CurrentCost = 0
+local LastErrorTime = 0
 --[[ Transmit Sizes:
 	Angle = 12
 	Bool = 1
@@ -27,8 +28,16 @@ function EGP.umsg.CurrentCost() return CurrentCost end
 -- Start
 function EGP.umsg.Start( name, repicient )
 	if (CurrentCost != 0) then
-		ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
-		return false
+		if (LastErrorTime + 1 < CurTime()) then
+			ErrorNoHalt("[EGP] Umsg error. It seems another umsg is already sending, but it occured over 1 second ago. Ending umsg.")
+			umsg.End()
+		else
+			ErrorNoHalt("[EGP] Umsg error. Another umsg is already sending!")
+			if (LastErrorTime + 2 < CurTime()) then
+				LastErrorTime = CurTime()
+			end
+			return false
+		end
 	end
 	CurrentCost = 0
 	umsg.Start( name, repicient )
