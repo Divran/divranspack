@@ -119,7 +119,7 @@ if (SERVER) then
 	
 	umsg.PoolString( "ReceiveObjects" )
 	local function SendObjects( Ent, ply, DataToSend )
-		if (!Ent or !ply or !DataToSend) then return end
+		if (!Ent or !Ent:IsValid() or !ply or !DataToSend) then return end
 		
 		local Done = 0
 		
@@ -269,6 +269,8 @@ if (SERVER) then
 else -- SERVER/CLIENT
 	function EGP:Receive( um )
 		local Ent = um:ReadEntity()
+		if (!Ent or !Ent:IsValid()) then return end
+		
 		local Action = um:ReadString()
 		if (Action == "ClearScreen") then
 			Ent.RenderTable = {}

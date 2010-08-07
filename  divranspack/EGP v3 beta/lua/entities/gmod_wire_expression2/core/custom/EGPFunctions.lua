@@ -611,34 +611,54 @@ end
 __e2setcost(20)
 
 e2function vector2 wirelink:egpCursor( entity ply )
-	if (!EGP:ValidEGP( this )) then return {-1,-1} end
-	if (!ply or !ply:IsValid() or !ply:IsPlayer()) then return {-1,-1} end
+	if (!EGP:ValidEGP( this ) or !ply or !ply:IsValid() or !ply:IsPlayer()) then return {-1,-1} end
 	
-	local monitor = WireGPU_Monitors[this:GetModel()]
-	local ang = this:LocalToWorldAngles(monitor.rot)
-	local pos = this:LocalToWorld(monitor.offset)
-	local h = 512
-	local w = h/monitor.RatioX
-	local x = -w/2
-	local y = -h/2
-
-	local trace = ply:GetEyeTraceNoCursor()
-	local ent = trace.Entity
-
-	local cx = -1
-	local cy = -1
-	
-	if (!EGP:ValidEGP( ent )) then return {-1,-1} end
-	
-	if (ent == this) then
-		local dist = trace.Normal:Dot(trace.HitNormal)*trace.Fraction*-16384
-		dist = math.max(dist, trace.Fraction*16384-ent:BoundingRadius())
-		local cpos = WorldToLocal(trace.HitPos, Angle(), pos, ang)
-		cx = (0.5+cpos.x/(monitor.RS*w)) * 512
-		cy = (0.5-cpos.y/(monitor.RS*h)) * 512	
+	local Normal, Pos, monitor
+	-- If it's an emitter, set custom normal and pos
+	if (this:GetClass() == "gmod_wire_egp_emitter") then
+		Normal = this:GetRight()
+		Pos = this:LocalToWorld( Vector( -64, 0, 135 ) )
+		
+		monitor = { Emitter = true }
+	else
+		-- Get monitor screen pos & size
+		monitor = WireGPU_Monitors[ this:GetModel() ]
+		
+		-- Monitor does not have a valid screen point
+		if (!monitor) then return {-1,-1} end
+		
+		local Ang = this:LocalToWorldAngles( monitor.rot )
+		Pos = this:LocalToWorld( monitor.offset )
+		
+		Normal = Ang:Up()
 	end
 	
-	return {cx,cy}
+	local Start = ply:GetShootPos()
+	local Dir = ply:GetAimVector()
+	
+	local A = Normal:Dot(Dir)
+	
+	-- If ray is parallel or behind the screen
+	if (A == 0 or A > 0) then return {-1,-1} end
+	
+	local B = Normal:Dot(Pos-Start) / A
+
+	if (B >= 0) then
+		if (monitor.Emitter) then
+			local HitPos = Start + Dir * B
+			HitPos = this:WorldToLocal( HitPos ) - Vector( -64, 0, 135 )
+			local x = HitPos.x*(512/128)
+			local y = HitPos.z*-(512/128)
+			return {x,y}			
+		else
+			local HitPos = this:WorldToLocal(Start + Dir * B)
+			local x = (0.5+HitPos.y/(monitor.RS*512/monitor.RatioX)) * 512
+			local y = (0.5+HitPos.x/(monitor.RS*512)) * 512	
+			return {x,y}
+		end
+	end
+	
+	return {-1,-1}
 end
 
 --------------------------------------------------------
