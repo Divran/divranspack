@@ -31,7 +31,7 @@ function EGP:InsertQueueObjects( Ent, ply, Function, Objects )
 	if (!EGP.Queue[ply]) then EGP.Queue[ply] = {} end
 	local n = #EGP.Queue[ply]
 	if (n > 0) then
-		local FirstItem = EGP.QUeue[ply][1]
+		local FirstItem = EGP.Queue[ply][1]
 		if (FirstItem.Ent == Ent and FirstItem.Function == Function) then
 			local Args = FirstItem.Args
 			for k,v in ipairs( Objects ) do
