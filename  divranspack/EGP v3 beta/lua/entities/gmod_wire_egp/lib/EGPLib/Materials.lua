@@ -1,20 +1,20 @@
 --------------------------------------------------------
--- Materials
+-- Materials (And fonts)
 --------------------------------------------------------
 local EGP = EGP
 
 -- Valid fonts table
 EGP.ValidFonts_Lookup = {}
 EGP.ValidFonts = {}
-EGP.ValidFonts[0] = "WireGPU_ConsoleFont"
-EGP.ValidFonts[1] = "Coolvetica"
-EGP.ValidFonts[2] = "Arial"
-EGP.ValidFonts[3] = "Lucida Console"
-EGP.ValidFonts[4] = "Trebuchet"
-EGP.ValidFonts[5] = "Courier New"
-EGP.ValidFonts[6] = "Times New Roman"
-EGP.ValidFonts[7] = "ChatFont"
-EGP.ValidFonts[8] = "Marlett"
+EGP.ValidFonts[1] = "WireGPU_ConsoleFont"
+EGP.ValidFonts[2] = "Coolvetica"
+EGP.ValidFonts[3] = "Arial"
+EGP.ValidFonts[4] = "Lucida Console"
+EGP.ValidFonts[5] = "Trebuchet"
+EGP.ValidFonts[6] = "Courier New"
+EGP.ValidFonts[7] = "Times New Roman"
+EGP.ValidFonts[8] = "ChatFont"
+EGP.ValidFonts[9] = "Marlett"
 if (CLIENT) then
 	local new = {}
 	for k,v in ipairs( EGP.ValidFonts ) do

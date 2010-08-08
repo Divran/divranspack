@@ -11,7 +11,7 @@ function EGP:GetGlobalPos( Ent, index )
 			local vec, ang = LocalToWorld( Vector( v.x or 0, v.y or 0, 0 ), Angle( 0, v.angle or 0, 0 ), Vector( x or 0, y or 0, 0 ), Angle( 0, -ang or 0, 0 ) )
 			return vec.x, vec.y, ang.y
 		end
-		return v.x, v.y, v.angle
+		return v.x, v.y, v.angle or 0
 	end
 end
 

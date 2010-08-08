@@ -71,7 +71,7 @@ EGP.HomeScreen = {}
 -- Create table
 local tbl = {
 	{ ID = EGP.Objects.Names["Box"], Settings = { x = 256, y = 256, h = 356, w = 356, material = "expression 2/cog", r = 150, g = 34, b = 34, a = 255 } },
-	{ ID = EGP.Objects.Names["Text"], Settings = {x = 256, y = 256, text = "EGP 3", fontid = 0, valign = 1, halign = 1, size = 50, r = 135, g = 135, b = 135, a = 255 } }
+	{ ID = EGP.Objects.Names["Text"], Settings = {x = 256, y = 256, text = "EGP 3", fontid = 1, valign = 1, halign = 1, size = 50, r = 135, g = 135, b = 135, a = 255 } }
 }
 	
 --[[ Old homescreen (EGP v2 home screen design contest winner)
