@@ -67,7 +67,9 @@ function ENT:SetOptions( BULLET, Cannon, ply )
 	self.Cannon = Cannon
 	self.Owner = ply
 	self.Entity:SetNWString("BulletName", self.Bullet.Name)
-	self:SetNWString( "PewPew_OwnerName", ply:Nick() )
+	local name = "- error -"
+	if (ply and ply:IsValid()) then name = ply:Nick() end
+	self:SetNWString( "PewPew_OwnerName", name )
 end
 
 function ENT:Explode(trace)
