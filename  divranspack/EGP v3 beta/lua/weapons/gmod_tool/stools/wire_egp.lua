@@ -22,9 +22,9 @@ if (SERVER) then
 		if (model) then ent:SetModel(model) end
 		ent:SetAngles(Ang)
 		ent:SetPos(Pos)
-		ent:Spawn()
 		ent:SetPlayer(ply)
-		
+		ent:Spawn()
+
 		ply:AddCount( "wire_egps", ent )
 		
 		return ent
