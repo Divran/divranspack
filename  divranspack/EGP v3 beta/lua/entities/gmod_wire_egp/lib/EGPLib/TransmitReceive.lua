@@ -139,6 +139,12 @@ if (SERVER) then
 			
 			EGP.umsg.Short( #DataToSend ) -- Send estimated number of objects to be sent
 			for k,v in ipairs( DataToSend ) do
+				
+				-- Check if the object doesn't exist serverside anymore (It may have been removed by a command in the queue before this, like egpClear or egpRemove)
+				if (!EGP:HasObject( Ent, v.index )) then
+					EGP:CreateObject( Ent, v.ID, v )
+				end
+			
 				EGP.umsg.Short( v.index ) -- Send index of object
 				
 				if (v.remove == true) then

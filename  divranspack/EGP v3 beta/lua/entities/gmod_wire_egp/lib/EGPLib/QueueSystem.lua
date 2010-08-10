@@ -3,7 +3,6 @@
 --------------------------------------------------------
 local EGP = EGP
 
-
 EGP.Queue = {}
 
 function EGP:AddQueueObject( Ent, ply, Function, Object )
@@ -12,8 +11,16 @@ function EGP:AddQueueObject( Ent, ply, Function, Object )
 	if (n > 0) then
 		local LastItem = EGP.Queue[ply][n]
 		if (LastItem.Ent == Ent and LastItem.Function == Function) then
-			local Args = LastItem.Args
-			table.insert( Args, Object )
+			local found = false
+			for k,v in ipairs( LastItem.Args ) do
+				if (v.index == Object.index) then
+					found = true
+					self:EditObject( v, Object )
+				end
+			end
+			if (!found) then
+				table.insert( LastItem.Args, Object )
+			end
 		else
 			self:AddQueue( Ent, ply, Function,  { Object } )
 		end
@@ -53,8 +60,7 @@ end
 function EGP:GetNextItem( ply )
 	if (!EGP.Queue[ply]) then return false end
 	if (#EGP.Queue[ply] <= 0) then return false end
-	local ret = table.remove( EGP.Queue[ply], 1 )
-	return ret
+	return table.remove( EGP.Queue[ply], 1 )
 end
 
 local AlreadyChecking = 0

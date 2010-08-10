@@ -18,26 +18,12 @@ Obj.Draw = function( self )
 		end
 		surface.SetFont( font )
 		
-		--[[
-		local w,h
-		local x, y = self.x, self.y
-		if (self.halign != 0) then
-			w,h = surface.GetTextSize( self.text )
-			x = x - (w * ((self.halign%10)/2))
-		end
-		]]
-		local y = 0
-		if (self.valign) then
-			_,h = surface.GetTextSize( self.text )
-			y = -(h * ((self.valign%10)/2))
-		end
-		
+		--if (!self.layouter) then self.layouter = EGP:MakeTextLayouter() end -- Trying to make my own layouter...
+		--self.layouter:SetText( self.text, self.x, self.y, self.w, self.h, self.halign, self.valign )
+		--self.layouter:DrawText()
 		
 		if (!self.layouter) then self.layouter = MakeTextScreenLayouter() end
-		self.layouter:DrawText( self.text, self.x, self.y + y, self.w, self.h, self.halign, self.valign )
-		
-		--surface.SetTextPos( x, y )
-		--surface.DrawText( self.text )
+		self.layouter:DrawText(self.text, self.x, self.y, self.w, self.h, self.halign, self.valign)
 	end
 end
 Obj.Transmit = function( self )

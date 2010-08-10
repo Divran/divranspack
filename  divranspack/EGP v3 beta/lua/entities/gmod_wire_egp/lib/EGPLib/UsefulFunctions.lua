@@ -35,7 +35,7 @@ end
 -- IsAllowed check
 ----------------------------
 function EGP:IsAllowed( E2, Ent )
-	if (!EGP:ValidEGP( Ent )) then return end
+	if (!EGP:ValidEGP( Ent )) then return false end
 	if (E2 and E2.entity and E2.entity:IsValid()) then
 		if (!E2Lib.isOwner(E2,Ent)) then
 			return E2Lib.isFriend(E2.player,E2Lib.getOwner(Ent))
@@ -80,7 +80,7 @@ end
 -- Create / edit objects
 ----------------------------
 
-function EGP:CreateObject( Ent, ObjID, Settings, ply )
+function EGP:CreateObject( Ent, ObjID, Settings )
 	if (!self:ValidEGP( Ent )) then return false end
 
 	Settings.index = math.Round(math.Clamp(Settings.index or 1, 1, self.ConVars.MaxObjects:GetInt()))
@@ -106,7 +106,7 @@ function EGP:CreateObject( Ent, ObjID, Settings, ply )
 	end
 end
 
-function EGP:EditObject( Obj, Settings, ply )
+function EGP:EditObject( Obj, Settings )
 	local ret = false
 	for k,v in pairs( Settings ) do
 		if (Obj[k] and Obj[k] != v) then
@@ -116,9 +116,6 @@ function EGP:EditObject( Obj, Settings, ply )
 	end
 	return ret
 end
-
-
-
 
 --------------------------------------------------------
 -- Transmitting / Receiving helper functions
