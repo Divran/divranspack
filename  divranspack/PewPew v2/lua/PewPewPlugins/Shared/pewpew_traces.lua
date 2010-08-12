@@ -42,7 +42,7 @@ function pewpew:Trace( pos, dir, filter )
 			return trace		
 		else
 			for k,v in ipairs( pewpew.SGShields ) do
-				if (v and ValidEntity( v )) then
+				if (v and ValidEntity( v ) and !v:GetNWBool("depleted", false) and !v:GetNWBool("containment",false)) then
 					local HitPos = RaySphereIntersection( pos, dir, v:GetPos(), v:GetNWInt("size",1) )
 					if (HitPos and pos:Distance(HitPos) <= dir:Length()) then
 						local ret = {}
