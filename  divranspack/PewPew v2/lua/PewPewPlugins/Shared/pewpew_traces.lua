@@ -14,31 +14,54 @@ local function RaySphereIntersection( Start, Dir, Pos, Radius ) -- Thanks to Feh
 end
 
 function pewpew:Trace( pos, dir, filter )
-	if (StarGate and StarGate.Trace) then -- If Stargate is installed
-		local trace = StarGate.Trace:New( pos, dir, filter )
-		
-		trace.HitShield = false
-		
-		if (trace.Hit and trace.Entity and trace.Entity:IsValid() and trace.Entity:GetClass() == "shield") then
-			local HitPos = RaySphereIntersection( trace.HitPos, dir, trace.Entity:GetPos(), trace.Entity:GetNWInt("size",0) )
-			if (HitPos) then
-				trace.HitPos = HitPos
-				trace.HitNormal = (HitPos - trace.Entity:GetPos()):GetNormal()
-				trace.HitShield = true
-				return trace
-			else
-				if (filter and type(filter) == "Entity") then
-					filter = { filter }
-				elseif (!filter) then 
-					filter = {} 
+	if (StarGate) then -- If Stargate is installed
+		if (SERVER) then
+			local trace = StarGate.Trace:New( pos, dir, filter )
+			
+			trace.HitShield = false
+			
+			if (trace.Hit and trace.Entity and trace.Entity:IsValid() and trace.Entity:GetClass() == "shield") then
+				local HitPos = RaySphereIntersection( trace.HitPos, dir, trace.Entity:GetPos(), trace.Entity:GetNWInt("size",0) )
+				if (HitPos) then
+					trace.HitPos = HitPos
+					trace.HitNormal = (HitPos - trace.Entity:GetPos()):GetNormal()
+					trace.HitShield = true
+					return trace
+				else
+					if (filter and type(filter) == "Entity") then
+						filter = { filter }
+					elseif (!filter) then 
+						filter = {} 
+					end
+					
+					table.insert( filter, trace.Entity )
+					return self:Trace( trace.HitPos, dir, filter )
 				end
-				
-				table.insert( filter, trace.Entity )
-				return self:Trace( trace.HitPos, dir, filter )
 			end
+			
+			return trace		
+		else
+			for k,v in ipairs( pewpew.SGShields ) do
+				if (v and ValidEntity( v )) then
+					local HitPos = RaySphereIntersection( pos, dir, v:GetPos(), v:GetNWInt("size",1) )
+					if (HitPos and pos:Distance(HitPos) <= dir:Length()) then
+						local ret = {}
+						ret.HitPos = HitPos
+						ret.Hit = true
+						ret.HitNormal = (HitPos - v:GetPos()):GetNormal()
+						ret.Entity = v
+						return ret
+					end
+				end
+			end
+			
+			-- If no SG shield was hit, go on with a regular trace..
+			local tr = {}
+			tr.start = pos
+			tr.endpos = pos + dir
+			tr.filter = filter
+			return util.TraceLine( tr )
 		end
-		
-		return trace		
 	else -- If Stargate isn't installed
 		local tr = {}
 		tr.start = pos

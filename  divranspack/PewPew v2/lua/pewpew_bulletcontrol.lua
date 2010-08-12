@@ -12,8 +12,28 @@ function pewpew:FireBullet( Pos, Dir, Owner, WeaponData, Cannon, FireDir )
 	-- Does any other addon have anything to say about this?
 	if (self:CallHookBool("PewPew_FireBullet",Pos,Dir,WeaponData,Cannon,Owner) == false) then return end
 	
-	if (#pewpew.Bullets<255) then -- Only send if there are less than 255 bullets in the air
-		umsg.Start("PewPew_FireBullet")
+	local receivers = RecipientFilter()
+	local send = false
+	for k,v in ipairs( player.GetAll() ) do
+		local n = v.PewPew_BulletBlock or -1
+		local amount = v:GetNWInt( "PewPew_BulletAmount", 0 )
+		if (amount < 255) then
+			if (n == -1) then
+				receivers:AddPlayer( v )
+				v:SetNWInt( "PewPew_BulletAmount", amount + 1 )
+				send = true
+			elseif (n > 0) then
+				if (CurTime() > (v.PewPew_LastBullet or 0) + n / 1000) then
+					receivers:AddPlayer( v )
+					v:SetNWInt( "PewPew_BulletAmount", amount + 1 )
+					send = true
+					v.PewPew_LastBullet = CurTime()
+				end
+			end
+		end
+	end
+	if ( send ) then
+		umsg.Start("PewPew_FireBullet",receivers)
 			umsg.Entity(Cannon)
 			umsg.Float(Dir.x)
 			umsg.Float(Dir.y)
@@ -23,6 +43,7 @@ function pewpew:FireBullet( Pos, Dir, Owner, WeaponData, Cannon, FireDir )
 			umsg.String(WeaponData.Name)
 		umsg.End()
 	end
+
 	local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, Cannon = Cannon, WeaponData = WeaponData, BulletData = {}, RemoveTimer = CurTime() + 60 }
 	table.insert( self.Bullets, NewBullet )
 	self:BulletInitialize( NewBullet )
@@ -70,12 +91,25 @@ function pewpew:RemoveBullet( Index )
 	table.insert( RemoveBulletsTable, Index )
 end
 
+if (SERVER) then
+	concommand.Add("PewPew_BulletWasRemovedClientSide",function(ply,cmd,args)
+		local n = ply:GetNWInt( "PewPew_BulletAmount", 0 )
+		if (n > 0) then
+			ply:SetNWInt( "PewPew_BulletAmount", n - 1 )
+		end
+	end)
+end
+
 function pewpew:ClearRemoveBulletsTable()
 	for k,v in ipairs( RemoveBulletsTable ) do
 		if (self.Bullets[v]) then
 			if (CLIENT) then
 				if (self.Bullets[v].Prop and self.Bullets[v].Prop:IsValid()) then
 					self.Bullets[v].Prop:Remove()
+				end
+				local n = LocalPlayer():GetNWInt( "PewPew_BulletAmount", 0 )
+				if (n > 0) then
+					RunConsoleCommand( "PewPew_BulletWasRemovedClientSide" )
 				end
 			end
 			table.remove( self.Bullets, v )
@@ -381,7 +415,6 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 					setmetatable(b,a)
 					trace.Entity:Hit(b,trace.HitPos,D.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
 					damaged = true
-					self:RemoveClientBullet( Index )
 				else
 					pewpew:PointDamage( trace.Entity, D.Damage, damagedealer )
 				end

@@ -61,3 +61,20 @@ pewpew:CreateConVar( "EnergyUsage", "bool", ((CAF and CAF.GetAddon("Life Support
 	end
 end )
 pewpew:CreateConVar( "WeaponDesigner", "bool", false )
+pewpew:CreateConVar( "AlwaysUseOldSystem", "bool", false )
+
+
+-- Special command to block bullet spawning
+concommand.Add("PewPew_BlockClientSideBullets",function( ply, cmd, args )
+	if (!args or #args == 0) then
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Command usage: -1 = All bullets visible (max 255 bullets), 0 = No bullets visible, Greater than 0 = Wait that many miliseconds before spawning the next bullet." )
+	else
+		local n = tonumber(args[1])
+		if (n == -1) then
+			ply.PewPew_BulletBlock = nil
+		else
+			ply.PewPew_BulletBlock = n
+		end
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Bullet blocking set to: " .. n )
+	end
+end)
