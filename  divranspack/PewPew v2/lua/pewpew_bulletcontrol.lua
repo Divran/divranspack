@@ -63,20 +63,39 @@ if (CLIENT) then
 	usermessage.Hook("PewPew_FireBullet",ClientFireBullet)
 end
 
+local RemoveBulletsTable = {}
+
 function pewpew:RemoveBullet( Index )
-	timer.Simple( 0, 
-		function(Index) 
-			if (#pewpew.Bullets>0) then 
-				if (pewpew.Bullets[Index]) then
-					if (CLIENT) then
-						if (pewpew.Bullets[Index].Prop and pewpew.Bullets[Index].Prop:IsValid()) then
-							pewpew.Bullets[Index].Prop:Remove()
-						end
-					end
-					table.remove( pewpew.Bullets, Index )
+	--ErrorNoHalt("ADDING BULLET:",Index,"TO REMOVE LIST\n")
+	table.insert( RemoveBulletsTable, Index )
+end
+
+function pewpew:ClearRemoveBulletsTable()
+	for k,v in ipairs( RemoveBulletsTable ) do
+		if (self.Bullets[v]) then
+			if (CLIENT) then
+				if (self.Bullets[v].Prop and self.Bullets[v].Prop:IsValid()) then
+					self.Bullets[v].Prop:Remove()
 				end
-			end 
-		end, Index ) -- Remove next tick
+			end
+			table.remove( self.Bullets, v )
+			--ErrorNoHalt("REMOVED BULLET:",v,"\n")
+		end
+	end
+	RemoveBulletsTable = {}
+end
+
+if (SERVER) then
+	function pewpew:RemoveClientBullet( Index )
+		umsg.Start("PewPew_RemoveBullet")
+			umsg.Char( Index - 128 )
+		umsg.End()
+	end
+else
+	usermessage.Hook( "PewPew_RemoveBullet", function( um )
+		local Index = um:ReadChar() + 128
+		pewpew:RemoveBullet( Index )
+	end)
 end
 
 ------------------------------------------------------------------------------------------------------------
@@ -193,15 +212,17 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 	end
 	
 	if (CLIENT) then 
-		if (Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) then -- There's no way a bullet can fly for that long.
-			pewpew:RemoveBullet( Index )
+		local contents = util.PointContents( Bullet.Pos )
+		local contents2 = util.PointContents( Bullet.Pos + Bullet.Dir * D.Speed * (LagCompensation or 1) )
+		if ((Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
+			or contents == CONTENTS_SOLID or contents == CONTENTS_HITBOX -- It flew out of the map, or hit something
+			or contents2 == CONTENTS_SOLID or contents2 == CONTENTS_HITBOX) then -- It's going to fly out of the map or hit something in the next tick
+			self:RemoveBullet( Index )
 		elseif (Bullet.Prop and Bullet.Prop:IsValid()) then
 			Bullet.Prop:SetPos( Bullet.Pos )
 			Bullet.Prop:SetAngles( Bullet.Dir:Angle() + Angle( 90,0,0 ) + (D.AngleOffset or Angle(0,0,0)) )
 			if (CurTime() > B.TraceDelay) then
 				local trace = pewpew:DefaultTraceBullet( Bullet )
-				
-				if (!trace) then error("[PewPew] Invalid trace") return end
 				
 				if (trace.Hit and !B.Exploded) then
 					B.Exploded = true
@@ -210,28 +231,31 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 			end
 		end
 	else
-		if (Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) then self:RemoveBullet( Index ) end -- There's no way a bullet can fly for that long.
+		local contents = util.PointContents( Bullet.Pos )
+		if ((Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
+			or contents == CONTENTS_SOLID or contents == CONTENTS_HITBOX) then -- It flew out of the map, or hit something
+			self:ExplodeBullet( Index, Bullet, pewpew:DefaultTraceBullet( Bullet ) )
+		else
 	
-		-- Lifetime
-		if (B.Lifetime) then
-			if (CurTime() > B.Lifetime) then
-				if (D.ExplodeAfterDeath) then
-					local trace = pewpew:DefaultTraceBullet( Bullet )					
-					self:ExplodeBullet( Index, Bullet, trace )
-				else
-					self:RemoveBullet( Index )
+			-- Lifetime
+			if (B.Lifetime) then
+				if (CurTime() > B.Lifetime) then
+					if (D.ExplodeAfterDeath) then
+						local trace = pewpew:DefaultTraceBullet( Bullet )					
+						self:ExplodeBullet( Index, Bullet, trace )
+					else
+						self:RemoveBullet( Index )
+					end
 				end
 			end
-		end
-		
-		if (CurTime() > B.TraceDelay) then
-			local trace = pewpew:DefaultTraceBullet( Bullet )
 			
-			if (!trace) then error("[PewPew] Invalid trace") return end
-			
-			if (trace.Hit and !B.Exploded) then
-				B.Exploded = true
-				self:ExplodeBullet( Index , Bullet, trace )
+			if (CurTime() > B.TraceDelay) then
+				local trace = pewpew:DefaultTraceBullet( Bullet )
+				
+				if (trace.Hit and !B.Exploded) then
+					B.Exploded = true
+					self:ExplodeBullet( Index , Bullet, trace )
+				end
 			end
 		end
 	end
@@ -293,7 +317,8 @@ function pewpew:BulletThink()
 			end
 			
 		end
-	end -- Loop end		
+	end -- Loop end
+	self:ClearRemoveBulletsTable()
 	if (CLIENT) then LastTick = CurTime() end
 end
 hook.Add("Tick","PewPew_BulletThink",function() pewpew:BulletThink() end)
@@ -356,6 +381,7 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 					setmetatable(b,a)
 					trace.Entity:Hit(b,trace.HitPos,D.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
 					damaged = true
+					self:RemoveClientBullet( Index )
 				else
 					pewpew:PointDamage( trace.Entity, D.Damage, damagedealer )
 				end

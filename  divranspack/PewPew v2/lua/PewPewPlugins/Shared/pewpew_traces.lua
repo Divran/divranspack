@@ -1,16 +1,16 @@
+local v = _R.Vector
+local Length = v.Length
+local Dot = v.Dot
+local sqrt = math.sqrt
+
 local function RaySphereIntersection( Start, Dir, Pos, Radius ) -- Thanks to Feha
-	Dir = Dir:GetNormal()
-	local A = Start + Dir
-	local B = Dir:Dot(Pos-Start) / Dir:Dot(A-Start)
-	local HitPos = Start + (A - Start) * B
-	if (HitPos and B > 0) then
-		local Dist = Pos:Distance(HitPos)
-		if (Dist < Radius) then
-			HitPos = HitPos - Dir * math.sqrt(Radius ^ 2 - Dist ^ 2)
-			return HitPos
-		end
+	local A = 2 * Length(Dir)^2
+	local B = 2 * Dot(Dir,Start - Pos)
+	local C = Length(Pos)^2 + Length(Start)^2 - 2 * Dot(Pos,Start) - Radius^2
+	local BAC4 = B^2-(2*A*C)
+	if (BAC4 >= 0 and B < 0) then
+		return Start + ((-sqrt(BAC4) - B) / A)*Dir
 	end
-	return false
 end
 
 function pewpew:Trace( pos, dir, filter )
