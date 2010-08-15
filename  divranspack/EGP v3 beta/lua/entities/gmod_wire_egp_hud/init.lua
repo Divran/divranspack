@@ -23,3 +23,5 @@ end
 function ENT:Use( ply )
 	umsg.Start( "EGP_HUD_Use", ply ) umsg.Entity( self ) umsg.End()
 end
+
+function ENT:UpdateTransmitState() return TRANSMIT_ALWAYS end

@@ -35,7 +35,12 @@ if (SERVER) then
 			ply:ChatPrint("[EGP] The server has blocked EGP screens.")
 			return
 		end
-		return SpawnEnt( ply, Pos, Ang, model, "gmod_wire_egp" )
+		local ent = SpawnEnt( ply, Pos, Ang, model, "gmod_wire_egp" )
+		if (ent and ent:IsValid()) then
+			ent.EGP_Duplicated = true
+			timer.Simple(0.5,function(ent) ent.EGP_Duplicated = nil end, ent)
+		end
+		return ent
 	end
 	duplicator.RegisterEntityClass("gmod_wire_egp", SpawnEGP, "Pos", "Ang", "model")
 	local function SpawnHUD( ply, Pos, Ang )
@@ -43,7 +48,12 @@ if (SERVER) then
 			ply:ChatPrint("[EGP] The server has blocked EGP HUDs.")
 			return
 		end
-		return SpawnEnt( ply, Pos, Ang, "models/bull/dynamicbutton.mdl", "gmod_wire_egp_hud" )
+		local ent = SpawnEnt( ply, Pos, Ang, "models/bull/dynamicbutton.mdl", "gmod_wire_egp_hud" )
+		if (ent and ent:IsValid()) then
+			ent.EGP_Duplicated = true
+			timer.Simple(0.5,function(ent) ent.EGP_Duplicated = nil end, ent)
+		end
+		return ent
 	end
 	duplicator.RegisterEntityClass("gmod_wire_egp_hud", SpawnHUD, "Pos", "Ang")
 	local function SpawnEmitter( ply, Pos, Ang )
@@ -51,7 +61,12 @@ if (SERVER) then
 			ply:ChatPrint("[EGP] The server has blocked EGP emitters.")
 			return
 		end
-		return SpawnEnt( ply, Pos, Ang, "models/bull/dynamicbutton.mdl", "gmod_wire_egp_emitter" )
+		local ent = SpawnEnt( ply, Pos, Ang, "models/bull/dynamicbutton.mdl", "gmod_wire_egp_emitter" )
+		if (ent and ent:IsValid()) then
+			ent.EGP_Duplicated = true
+			timer.Simple(0.5,function(ent) ent.EGP_Duplicated = nil end, ent)
+		end
+		return ent
 	end
 	duplicator.RegisterEntityClass("gmod_wire_egp_emitter",SpawnEmitter,"Pos","Ang" )
 

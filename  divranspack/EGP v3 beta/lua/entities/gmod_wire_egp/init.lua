@@ -15,3 +15,5 @@ function ENT:Initialize()
 	self.Outputs = WireLib.CreateOutputs( self, { "link [WIRELINK]" } )
 	WireLib.TriggerOutput( self, "link", self )
 end
+
+function ENT:UpdateTransmitState() return TRANSMIT_ALWAYS end

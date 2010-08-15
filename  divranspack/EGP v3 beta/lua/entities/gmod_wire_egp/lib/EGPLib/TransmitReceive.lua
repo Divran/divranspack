@@ -123,6 +123,12 @@ if (SERVER) then
 		
 		local Done = 0
 		
+		-- Check duped
+		if (Ent.EGP_Duplicated) then
+			EGP:InsertQueueObjects( Ent, ply, SendObjects, DataToSend )
+			return
+		end
+		
 		-- Check interval
 		if (ply and ply:IsValid() and ply:IsPlayer()) then 
 			if (EGP:CheckInterval( ply ) == false) then 
@@ -292,6 +298,8 @@ else -- SERVER/CLIENT
 			local Nr = um:ReadShort() -- Estimated amount
 			for i=1,Nr do
 				local index = um:ReadShort()
+				if (index == 0) then break end -- In case the umsg had to abort early
+				
 				local ID = um:ReadChar()
 				if (ID == -128) then -- Remove object
 					local bool, k, v = EGP:HasObject( Ent, index )
@@ -307,8 +315,7 @@ else -- SERVER/CLIENT
 					if (ChangeOrder_From != 0) then
 						ChangeOrder_To = um:ReadShort()
 					end
-					
-					if (index == 0) then break end -- In case the umsg had to abort early
+				
 					ID = ID + 128
 					local bool, k, v = self:HasObject( Ent, index )
 					if (bool) then -- Object already exists
@@ -339,17 +346,7 @@ else -- SERVER/CLIENT
 			end
 		end
 		
-		if (Ent.EGP_Update) then -- this..
-			Ent:EGP_Update()
-		else
-			 -- ..and this is because it bugs on dupe (EGP_Update does not exist at first)
-			timer.Simple(1,function(Ent) 
-				if (Ent and Ent:IsValid() and Ent.EGP_Update) then 
-					Ent:EGP_Update() 
-				end 
-			end,Ent)
-		end
-			
+		Ent:EGP_Update()			
 	end
 	usermessage.Hook( "EGP_Transmit_Data", function(um) EGP:Receive( um ) end )
 
@@ -360,7 +357,7 @@ require("datastream")
 if (SERVER) then
 
 	function EGP:SpawnFunc( ply )
-		timer.Simple(2,function(ply)
+		timer.Simple(10,function(ply)
 			if (ply and ply:IsValid()) then -- In case the player crashed
 				local tbl = {}
 				local en = ents.FindByClass("gmod_wire_egp")
@@ -372,7 +369,7 @@ if (SERVER) then
 						for k2,v2 in pairs( v.RenderTable ) do 
 							table.insert( DataToSend, { ID = v2.ID, index = v2.index, Settings = v2:DataStreamInfo() } )
 						end
-						table.insert( tbl, { entid = v:EntIndex(), Objects = DataToSend } )
+						table.insert( tbl, { Ent = v, Objects = DataToSend } )
 					end
 				end
 				if (tbl and #tbl>0) then
@@ -387,7 +384,7 @@ else
 
 	function EGP:ReceiveSpawn( decoded )
 		for k,v in ipairs( decoded ) do
-			local Ent = Entity(v.entid)
+			local Ent = v.Ent
 			if (Ent and Ent:IsValid()) then
 				for k2,v2 in pairs( v.Objects ) do
 					local Obj = EGP:GetObjectByID(v2.ID)
