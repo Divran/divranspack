@@ -181,7 +181,7 @@ end
 		if (!self.GhostEntity or !self.GhostEntity:IsValid()) then
 			local trace = self:GetOwner():GetEyeTrace()
 			self:MakeGhostEntity( Model("models/bull/dynamicbutton.mdl"), trace.HitPos, trace.HitNormal:Angle() + Angle(90,0,0) )
-		elseif (!self.GhostEntity.Type or self.GhostEntity.Type != Type) then
+		elseif (!self.GhostEntity.Type or self.GhostEntity.Type != Type or (self.GhostEntity.Type == 1 and self.GhostEntity:GetModel() != self:GetClientInfo("model"))) then
 			if (Type == 1) then
 				self.GhostEntity:SetModel(self:GetClientInfo("model"))
 			elseif (Type == 2 or Type == 3) then

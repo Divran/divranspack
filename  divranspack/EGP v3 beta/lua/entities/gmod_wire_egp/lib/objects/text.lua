@@ -35,8 +35,8 @@ Obj.Draw = function( self )
 	end
 end
 Obj.Transmit = function( self )
-	EGP.umsg.Float( self.x )
-	EGP.umsg.Float( self.y )
+	EGP.umsg.Short( self.x )
+	EGP.umsg.Short( self.y )
 	EGP.umsg.String( self.text )
 	EGP.umsg.Char( self.fontid-128 )
 	EGP.umsg.Char( math.Clamp(self.size,0,128)-128 )
@@ -47,8 +47,8 @@ Obj.Transmit = function( self )
 end
 Obj.Receive = function( self, um )
 	local tbl = {}
-	tbl.x = um:ReadFloat()
-	tbl.y = um:ReadFloat()
+	tbl.x = um:ReadShort()
+	tbl.y = um:ReadShort()
 	tbl.text = um:ReadString()
 	tbl.fontid = um:ReadChar()+128
 	tbl.size = um:ReadChar()+128

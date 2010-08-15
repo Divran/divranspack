@@ -195,10 +195,10 @@ end
 -- Other
 -----------------------
 function EGP:SendPosSize( obj )
-	EGP.umsg.Float( obj.w )
-	EGP.umsg.Float( obj.h )
-	EGP.umsg.Float( obj.x )
-	EGP.umsg.Float( obj.y )
+	EGP.umsg.Short( obj.w )
+	EGP.umsg.Short( obj.h )
+	EGP.umsg.Short( obj.x )
+	EGP.umsg.Short( obj.y )
 end
 
 function EGP:SendColor( obj )
@@ -209,10 +209,10 @@ function EGP:SendColor( obj )
 end
 
 function EGP:ReceivePosSize( tbl, um ) -- Used with SendPosSize
-	tbl.w = um:ReadFloat()
-	tbl.h = um:ReadFloat()
-	tbl.x = um:ReadFloat()
-	tbl.y = um:ReadFloat()
+	tbl.w = um:ReadShort()
+	tbl.h = um:ReadShort()
+	tbl.x = um:ReadShort()
+	tbl.y = um:ReadShort()
 end
 
 function EGP:ReceiveColor( tbl, obj, um ) -- Used with SendColor

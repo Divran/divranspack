@@ -16,10 +16,10 @@ end
 Obj.Transmit = function( self )
 	EGP.umsg.Char(math.Clamp(#self.vertices,0,128)-128)
 	for i=1,math.min(#self.vertices,128) do
-		EGP.umsg.Float( self.vertices[i].x )
-		EGP.umsg.Float( self.vertices[i].y )
-		EGP.umsg.Float( self.vertices[i].u or 0 )
-		EGP.umsg.Float( self.vertices[i].v or 0 )
+		EGP.umsg.Short( self.vertices[i].x )
+		EGP.umsg.Short( self.vertices[i].y )
+		EGP.umsg.Short( self.vertices[i].u or 0 )
+		EGP.umsg.Short( self.vertices[i].v or 0 )
 	end
 	EGP:SendMaterial( self )
 	EGP:SendColor( self )
@@ -29,7 +29,7 @@ Obj.Receive = function( self, um )
 	local nr = um:ReadChar()+128
 	tbl.vertices = {}
 	for i=1,nr do
-		table.insert( tbl.vertices, { x = um:ReadFloat(), y = um:ReadFloat(), u = um:ReadFloat(), v = um:ReadFloat() } )
+		table.insert( tbl.vertices, { x = um:ReadShort(), y = um:ReadShort(), u = um:ReadShort(), v = um:ReadShort() } )
 	end
 	EGP:ReceiveMaterial( tbl, um )
 	EGP:ReceiveColor( tbl, self, um )

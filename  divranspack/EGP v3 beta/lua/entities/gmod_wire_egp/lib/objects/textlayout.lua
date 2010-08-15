@@ -19,8 +19,9 @@ Obj.Draw = function( self )
 		surface.SetFont( font )
 		
 		--if (!self.layouter) then self.layouter = EGP:MakeTextLayouter() end -- Trying to make my own layouter...
-		--self.layouter:SetText( self.text, self.x, self.y, self.w, self.h, self.halign, self.valign )
+		--self.layouter:SetText( self.text, self.x, self.y, self.w, self.h, self.halign, self.valign, (self.fontid != self.oldfontid) )
 		--self.layouter:DrawText()
+		--self.oldfontid = self.fontid
 		
 		if (!self.layouter) then self.layouter = MakeTextScreenLayouter() end
 		self.layouter:DrawText(self.text, self.x, self.y, self.w, self.h, self.halign, self.valign)
