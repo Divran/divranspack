@@ -2,25 +2,6 @@
 -- These functions take care of damage.
 ------------------------------------------------------------------------------------------------------------
 
--- Default Values
---[[
-pewpew:GetConVar( "Damage" ) = true
-pewpew:GetConVar( "Firing" ) = true
-pewpew:GetConVar( "Numpads" ) = true
-pewpew:GetConVar( "DamageMul" ) = 1
-pewpew:GetConVar( "CoreDamageMul" ) = 1
-pewpew:GetConVar( "CoreDamageOnly" ) = false
-pewpew:GetConVar( "RepairToolHeal" ) = 75
-pewpew:GetConVar( "RepairToolHealCores" ) = 200
-pewpew:GetConVar( "EnergyUsage" ) = false
-pewpew:GetConVar( "PropProtDamage" ) = false
-pewpew:GetConVar( "WeaponDesigner" ) = false
-
-if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
-	pewpew:GetConVar( "EnergyUsage" ) = true
-end
-]]
-
 ------------------------------------------------------------------------------------------------------------
 -- Whitelist/Blacklist
 

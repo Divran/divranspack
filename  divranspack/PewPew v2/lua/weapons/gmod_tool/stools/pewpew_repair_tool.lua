@@ -16,9 +16,9 @@ if (SERVER) then
 				local trace = ply:GetEyeTrace()
 				if (!trace.Hit) then return end
 				if (trace.HitPos:Distance(ply:GetShootPos()) < 125 and trace.Entity and pewpew:CheckValid( trace.Entity )) then
-					if (trace.Entity:GetClass() == "pewpew_core" and trace.Entity.pewpew.CoreHealth) then
+					if (trace.Entity:GetClass() == "pewpew_core" and trace.Entity.pewpew and trace.Entity.pewpew.CoreHealth) then
 						pewpew:RepairCoreHealth( trace.Entity, pewpew:GetConVar( "RepairToolHealCores" ) )
-					elseif (trace.Entity.pewpewHealth) then
+					elseif (trace.Entity.pewpew and trace.Entity.pewpew.Health) then
 						pewpew:RepairHealth( trace.Entity, pewpew:GetConVar( "RepairToolHeal" ) )
 					end
 					-- Effect
@@ -28,6 +28,7 @@ if (SERVER) then
 					util.Effect( "Sparks", effectdata )
 					-- Run slower!
 					self.Timer = CurTime() + 0.1
+					return true
 				end
 			end
 		end

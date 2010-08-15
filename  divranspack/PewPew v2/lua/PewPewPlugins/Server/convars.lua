@@ -62,6 +62,7 @@ pewpew:CreateConVar( "EnergyUsage", "bool", ((CAF and CAF.GetAddon("Life Support
 end )
 pewpew:CreateConVar( "WeaponDesigner", "bool", false )
 pewpew:CreateConVar( "AlwaysUseOldSystem", "bool", false )
+pewpew:CreateConVar( "DamageLogSending", "bool", true )
 
 
 -- Special command to block bullet spawning
