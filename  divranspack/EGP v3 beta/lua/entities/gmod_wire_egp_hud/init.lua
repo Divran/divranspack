@@ -16,8 +16,15 @@ function ENT:Initialize()
 	
 	self:SetUseType(SIMPLE_USE)
 	
+	self.Inputs = WireLib.CreateInputs( self, { "0 to 512" } )
 	self.Outputs = WireLib.CreateOutputs( self, { "link [WIRELINK]" } )
 	WireLib.TriggerOutput( self, "link", self )
+end
+
+function ENT:TriggerInput( name, value )
+	if (name == "0 to 512") then
+		self:SetNWBool( "Resolution", value != 0 )
+	end
 end
 
 function ENT:Use( ply )
