@@ -1,11 +1,15 @@
 E2Lib.RegisterExtension("pewpew", true)
 
+__e2setcost( 5 )
+
 -- Returns 1 if the entity is a PewPew Cannon
 e2function number entity:pewIsCannon()
 	if (!validPhysics(this)) then return 0 end
 	if (this:GetClass() == "pewpew_base_cannon") then return 1 end
 	return 0
 end
+
+__e2setcost( 10 )
 
 -- Returns the health of the entity
 e2function number entity:pewHealth()
@@ -19,13 +23,15 @@ e2function number entity:pewMaxHealth()
 	return pewpew:GetMaxHealth( this ) or 0
 end
 
+__e2setcost( 15 )
+
 -- Returns the health of the core or the entity's core
 e2function number entity:pewCoreHealth()
 	if (!validPhysics(this)) then return 0 end
-	if (this:GetClass() == "pewpew_core" and this.pewpewCoreHealth) then 
-		return this.pewpewCoreHealth 
-	elseif (this.Core and validPhysics(this.Core) and this.Core.pewpewCoreHealth) then
-		return this.Core.pewpewCoreHealth
+	if (this:GetClass() == "pewpew_core" and this.pewpew and this.pewpew.CoreHealth) then 
+		return this.pewpew.CoreHealth 
+	elseif (this.Core and validPhysics(this.Core) and this.Core.pewpew and this.Core.pewpew.CoreHealth) then
+		return this.Core.pewpew.CoreHealth
 	end
 	return 0
 end
@@ -33,13 +39,15 @@ end
 -- Returns the maximum health of the core or the entity's core
 e2function number entity:pewCoreMaxHealth()
 	if (!validPhysics(this)) then return 0 end
-	if (this:GetClass() == "pewpew_core" and this.pewpewCoreMaxHealth) then 
-		return this.pewpewCoreMaxHealth 
-	elseif (this.Core and validPhysics(this.Core) and this.Core.pewpewCoreMaxHealth) then
-		return this.Core.pewpewCoreMaxHealth
+	if (this:GetClass() == "pewpew_core" and this.pewpew and this.pewpew.CoreMaxHealth) then 
+		return this.pewpew.CoreMaxHealth 
+	elseif (this.Core and validPhysics(this.Core) and this.Core.pewpew and this.Core.pewpew.CoreMaxHealth) then
+		return this.Core.pewpew.CoreMaxHealth
 	end
 	return 0
 end
+
+__e2setcost( 10 )
 
 -- Returns the name of the bullet of the cannon
 e2function string entity:pewBulletName()
@@ -185,6 +193,8 @@ e2function number entity:pewCanFire()
 	end
 	return ret
 end
+
+__e2setcost( 20 )
 
 e2function void entity:pewFire( number fire )
 	if (!validPhysics(this)) then return end
