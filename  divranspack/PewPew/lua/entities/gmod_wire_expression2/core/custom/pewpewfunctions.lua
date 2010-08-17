@@ -41,8 +41,8 @@ e2function number entity:pewCoreMaxHealth()
 	if (!validPhysics(this)) then return 0 end
 	if (this:GetClass() == "pewpew_core" and this.pewpew and this.pewpew.CoreMaxHealth) then 
 		return this.pewpew.CoreMaxHealth 
-	elseif (this.Core and validPhysics(this.Core) and this.Core.pewpew and this.Core.pewpew.CoreMaxHealth) then
-		return this.Core.pewpew.CoreMaxHealth
+	elseif (this.pewpew and this.pewpew.Core and validPhysics(this.pewpew.Core) and this.pewpew.Core.pewpew and this.Core.pewpew.CoreMaxHealth) then
+		return this.pewpew.Core.pewpew.CoreMaxHealth
 	end
 	return 0
 end
