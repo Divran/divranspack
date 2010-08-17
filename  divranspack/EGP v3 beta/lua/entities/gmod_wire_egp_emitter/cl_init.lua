@@ -90,6 +90,7 @@ function ENT:Draw()
 				v:Draw() 
 				EGP:FixMaterial( oldtex )
 			end
+			render.SetScissorRect( 0, 0, 512, 512, false )
 		cam.End3D2D()
 	end
 end

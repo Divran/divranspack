@@ -10,6 +10,7 @@ Obj.Draw = function( self )
 	if (self.text and #self.text>0) then
 		surface.SetTextColor( self.r, self.g, self.b, self.a )
 		
+		if (!EGP.ValidFonts[self.fontid]) then self.fontid = 1 end
 		local font = "WireEGP_" .. self.size .. "_" .. self.fontid
 		if (!EGP.ValidFonts_Lookup[font]) then
 			surface.CreateFont( EGP.ValidFonts[self.fontid], self.size, 800, true, false, font )
