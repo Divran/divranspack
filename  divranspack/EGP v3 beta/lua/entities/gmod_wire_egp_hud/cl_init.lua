@@ -51,9 +51,9 @@ function ENT:Initialize()
 	EGP:AddHUDEGP( self )
 end
 
-function ENT:EGP_Update() 
+function ENT:EGP_Update( forcechangepos ) 
 	for k,v in ipairs( self.RenderTable ) do
-		if (self.Resolution != self.OldResolution) then 
+		if (self.Resolution == true or forcechangepos) then 
 			self:ChangePositions( v, self.Resolution )
 		end
 		if (v.parent and v.parent != 0) then
@@ -71,7 +71,7 @@ end
 function ENT:Draw()
 	self.Resolution = self:GetNWBool("Resolution",false)
 	if (self.Resolution != self.OldResolution) then
-		self:EGP_Update()
+		self:EGP_Update(true)
 	end
 	self.Entity.DrawEntityOutline = function() end
 	self.Entity:DrawModel()
