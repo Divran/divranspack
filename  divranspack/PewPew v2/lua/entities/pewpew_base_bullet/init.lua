@@ -162,6 +162,7 @@ function ENT:DefaultThink()
 	
 	if (grav and grav != 0) then -- Only pull it down if needed
 		self.FlightDirection = self.FlightDirection - Vector(0,0,grav / (self.Bullet.Speed or 1))
+		self.FlightDirection:Normalize()
 	end
 		
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
@@ -170,7 +171,7 @@ function ENT:DefaultThink()
 	if (self.Lifetime) then
 		if (CurTime() > self.Lifetime) then
 			if (self.Bullet.ExplodeAfterDeath) then
-				local trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.Direction * self.Bullet.Speed )
+				local trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self )
 				self:Explode( trace )
 			else
 				self.Entity:Remove()
@@ -179,7 +180,7 @@ function ENT:DefaultThink()
 	end
 	
 	if (CurTime() > self.TraceDelay) then
-		local trace = pewpew:Trace( self:GetPos(), self.FlightDirection, self )
+		local trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self )
 
 		if (!trace) then error("[PewPew] Invalid trace") return end
 			

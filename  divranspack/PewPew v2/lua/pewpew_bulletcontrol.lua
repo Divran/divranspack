@@ -139,7 +139,7 @@ function pewpew:DefaultBulletInitialize( Bullet )
 	local B = Bullet.BulletData
 	B.Exploded = false
 	local tk = self.ServerTick or 66.7
-	B.TraceDelay = CurTime() + (D.Speed + (1/((D.Speed*tk))) * 0) / (1/tk) * tk
+	B.TraceDelay = CurTime() + (D.Speed + (1/(D.Speed*tk)) * 0) / (1/tk) * tk
 	
 	-- Lifetime
 	B.Lifetime = false
@@ -243,14 +243,31 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 	
 	if (grav and grav != 0) then -- Only pull if needed
 		Bullet.Dir = Bullet.Dir - Vector(0,0,grav / (D.Speed or 1)) * (LagCompensation or 1)
+		Bullet.Dir:Normalize()
+	end
+	
+	-- Lifetime
+	if (B.Lifetime) then
+		if (CurTime() > B.Lifetime) then
+			if (CLIENT) then
+				self:RemoveBullet( Index )
+			else
+				if (D.ExplodeAfterDeath) then
+					local trace = pewpew:DefaultTraceBullet( Bullet )
+						self:ExplodeBullet( Index, Bullet, trace )
+				else
+					self:RemoveBullet( Index )
+				end
+			end
+		end
 	end
 	
 	if (CLIENT) then 
 		local contents = util.PointContents( Bullet.Pos )
 		local contents2 = util.PointContents( Bullet.Pos + Bullet.Dir * D.Speed * (LagCompensation or 1) )
 		if ((Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
-			or contents == CONTENTS_SOLID or contents == CONTENTS_HITBOX -- It flew out of the map, or hit something
-			or contents2 == CONTENTS_SOLID or contents2 == CONTENTS_HITBOX) then -- It's going to fly out of the map or hit something in the next tick
+			or contents == 1 -- It flew out of the map
+			or contents2 == 1) then -- It's going to fly out of the map in the next tick
 			self:RemoveBullet( Index )
 		elseif (Bullet.Prop and Bullet.Prop:IsValid()) then
 			Bullet.Prop:SetPos( Bullet.Pos )
@@ -267,22 +284,9 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 	else
 		local contents = util.PointContents( Bullet.Pos )
 		if ((Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
-			or contents == CONTENTS_SOLID or contents == CONTENTS_HITBOX) then -- It flew out of the map, or hit something
+			or contents == 1) then -- It flew out of the map
 			self:ExplodeBullet( Index, Bullet, pewpew:DefaultTraceBullet( Bullet ) )
-		else
-	
-			-- Lifetime
-			if (B.Lifetime) then
-				if (CurTime() > B.Lifetime) then
-					if (D.ExplodeAfterDeath) then
-						local trace = pewpew:DefaultTraceBullet( Bullet )					
-						self:ExplodeBullet( Index, Bullet, trace )
-					else
-						self:RemoveBullet( Index )
-					end
-				end
-			end
-			
+		else			
 			if (CurTime() > B.TraceDelay) then
 				local trace = pewpew:DefaultTraceBullet( Bullet )
 				

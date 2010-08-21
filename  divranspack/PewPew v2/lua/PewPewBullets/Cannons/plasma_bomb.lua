@@ -27,10 +27,9 @@ BULLET.ExplosionEffect = "Enersplosion"
 
 -- Movement
 BULLET.Speed = 160
-BULLET.PitchChange = 0
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
-BULLET.Gravity = 0.03
+BULLET.Gravity = 0.06
 BULLET.AffectedBySBGravity = true
 
 -- Damage
@@ -38,8 +37,6 @@ BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 280
 BULLET.Radius = 500
 BULLET.RangeDamageMul = 0.6
-BULLET.NumberOfSlices = nil
-BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 99
 BULLET.PlayerDamageRadius = 100
 
@@ -48,11 +45,7 @@ BULLET.Reloadtime = 3
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
-BULLET.Lifetime = nil
 BULLET.ExplodeAfterDeath = true
 BULLET.EnergyPerShot = 6000
-
-BULLET.CustomInputs = nil
-BULLET.CustomOutputs = nil
 
 pewpew:AddWeapon( BULLET )

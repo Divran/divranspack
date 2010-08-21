@@ -191,7 +191,7 @@ function ENT:FireBullet()
 		-- Allows you to override the fire function
 		self.Bullet:Fire( self )
 	else
-		if (self.Bullet.UseOldSystem == true) then
+		if (self.Bullet.UseOldSystem == true or pewpew:GetConVar("AlwaysUseOldSystem") == true) then
 			local ent = self:OldSystem_FireBullet()
 				
 			WireLib.TriggerOutput( self.Entity, "Last Fired", ent )
