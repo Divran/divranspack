@@ -32,14 +32,28 @@ concommand.Add("PewPew_ReloadWeapons",function(ply,cmd,args)
 end)
 
 local CurrentCategory = ""
+local CurrentCategoryTable = {}
 
 function pewpew:LoadDirectory( Dir ) -- Thanks to Jcw87 for fixing this function
 	-- Get the category
 	if (string.find(Dir, "/")) then
 		CurrentCategory = string.Right( Dir, string.find( string.reverse( Dir ), "/", 1, true ) - 1 )
 		CurrentCategory = string.gsub( CurrentCategory, "_", " " )
+		local Temp = string.Explode( "/", Dir )
+		
+		local Temp2 = self.Categories
+		for k,v in ipairs( Temp ) do
+			if (k != 1) then
+				if (!Temp2[v]) then
+					Temp2[v] = {}
+				end
+				Temp2 = Temp2[v]
+			end
+		end
+		CurrentCategoryTable = Temp2
 	else
-		CurrentCategory = "other"
+		CurrentCategory = "PewPewBullets"
+		CurrentCategoryTable = self.Categories
 	end
 	
 	local entries = file.FindInLua( Dir .. "/*")
@@ -65,11 +79,8 @@ end
 function pewpew:AddWeapon( weapon )
 	if (SERVER) then print("[PewPew] Added Bullet: " .. weapon.Name) end
 	table.insert( self.Weapons, weapon )
-	if (!self.Categories[CurrentCategory]) then
-		self.Categories[CurrentCategory] = {}
-	end
 	weapon.Category = CurrentCategory
-	table.insert( self.Categories[CurrentCategory], weapon.Name )
+	table.insert( CurrentCategoryTable, weapon.Name )
 	if (SERVER) then umsg.PoolString(weapon.Name) end
 end
 

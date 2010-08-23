@@ -77,6 +77,7 @@ if (CLIENT) then
 				ent:Spawn()
 			end
 			local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, WeaponData = Weapon, BulletData = {}, Prop = ent, RemoveTimer = CurTime() + 30 }
+			if (ent) then ent.PewPewTable = NewBullet end
 			table.insert( pewpew.Bullets, NewBullet )
 			pewpew:BulletInitialize( NewBullet )
 		end
@@ -87,7 +88,6 @@ end
 local RemoveBulletsTable = {}
 
 function pewpew:RemoveBullet( Index )
-	--ErrorNoHalt("ADDING BULLET:",Index,"TO REMOVE LIST\n")
 	table.insert( RemoveBulletsTable, Index )
 end
 
@@ -113,7 +113,6 @@ function pewpew:ClearRemoveBulletsTable()
 				end
 			end
 			table.remove( self.Bullets, v )
-			--ErrorNoHalt("REMOVED BULLET:",v,"\n")
 		end
 	end
 	RemoveBulletsTable = {}

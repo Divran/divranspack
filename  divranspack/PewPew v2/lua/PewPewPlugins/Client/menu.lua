@@ -1,91 +1,146 @@
--- PewPew Use Menu
+-- Weapon Selection & Options Menu
 
-if (SERVER) then
-	AddCSLuaFile("pewpew_menu.lua")
-	return
-end
+local frame
+local w,h = 600,600
 
-local pewpew_frame
-local pewpew_list
-
--- Use Menu
 local function CreateMenu()
-	pewpew_frame = vgui.Create("DFrame")
-	pewpew_frame:SetPos( ScrW()/2+100,ScrH()/2-420/2 )
-	pewpew_frame:SetSize( 600, 420 )
-	pewpew_frame:SetTitle( "PewPew Cannon Information" )
-	pewpew_frame:SetVisible( false )
-	pewpew_frame:SetDraggable( true )
-	pewpew_frame:ShowCloseButton( true )
-	pewpew_frame:SetDeleteOnClose( false )
-	pewpew_frame:SetScreenLock( true )
-	pewpew_frame:MakePopup()
+	frame = vgui.Create("DFrame")
+	frame:SetPos( ScrW()/2-w/2, ScrH()/2-h/2 )
+	frame:SetSize( w, h )
+	frame:SetTitle( "PewPew Weapon Selection & Options Menu" )
+	frame:SetVisible( false)
+	frame:SetDraggable( true )
+	frame:ShowCloseButton( true )
+	frame:SetDeleteOnClose( false )
+	frame:SetScreenLock( false )
+	frame:MakePopup()
 	
-	pewpew_list = vgui.Create( "DPanelList", pewpew_frame )
-	pewpew_list:StretchToParent( 2, 23, 2, 2 )
-	pewpew_list:SetSpacing( 2 )
-	pewpew_list:EnableHorizontal( true )
-	pewpew_list:EnableVerticalScrollbar( true )
-end
-timer.Simple( 2, CreateMenu )
-
-local list = {}		
-local function SetTable( Bullet )
-	local rld = Bullet.Reloadtime
-	if (!rld or rld == 0) then rld = 1 end
-	list[1] = 	{"Name", 				Bullet.Name}
-	list[2] = 	{"Author", 				Bullet.Author}
-	list[3] = 	{"Description", 		Bullet.Description}
-	list[4] = 	{"Category", 			Bullet.Category }
-	list[5] = 	{"Damage Type",			Bullet.DamageType}
-	list[6] = 	{"Damage",	 			Bullet.Damage}
-	list[7] = 	{"DPS",					(Bullet.Damage or 0) * (1/rld)}
-	list[8] = 	{"Radius", 				Bullet.Radius}
-	list[9] = 	{"PlayerDamage", 		Bullet.PlayerDamage}
-	list[10] = 	{"PlayerDamageRadius", 	Bullet.PlayerDamageRadius}
-	list[11] = 	{"Speed", 				Bullet.Speed}
-	list[12] = 	{"Gravity", 			Bullet.Gravity}
-	list[13] =	{"RecoilForce", 		Bullet.RecoilForce}
-	list[14] = 	{"Spread",				Bullet.Spread}
-	list[15] = 	{"Reloadtime", 			Bullet.Reloadtime}
-	list[16] = 	{"Ammo", 				Bullet.Ammo}
-	list[17] = 	{"AmmoReloadtime", 		Bullet.AmmoReloadtime}
-	list[18] = 	{"EnergyPerShot",		Bullet.EnergyPerShot}
-end
-
-local function OpenUseMenu( bulletname )
-	local Bullet = pewpew:GetWeapon( bulletname )
-	if (Bullet) then
-		pewpew_list:Clear()
-		SetTable( Bullet )
-		for _, value in ipairs( list ) do
-			local pnl = vgui.Create("DPanel")
-			pnl:SetSize( 594, 20 )
-			--function pnl:Paint() return true end
+	local psheet = vgui.Create("DPropertySheet",frame)
+	psheet:SetPos( 4, 24 )
+	psheet:SetSize( w - 8, h - 24 - 4 )
+	
+		-- Weapon selection tab
+		local frame2 = vgui.Create("DPanel")
+		frame2:StretchToParent( 2, 2, 2, 2 )
+		function frame2:Paint() end
 		
-			local label = vgui.Create("DLabel",pnl)
-			label:SetPos( 4, 4 )
-			label:SetText( value[1] )
-			label:SizeToContents()
+		local sliders = { 
+				["Damage"] = { 	"Damage", -- Pretty name
+								0, 3000, -- Min, max
+								function( value ) return value or 0 end -- Change value if necessary
+							 },
+				["Spread"] = { 	"Accuracy",
+								0, 3,
+								function( value ) return value or 0 end
+							 },
+				["Reloadtime"] = { 	"Reload Time",
+									0, 20,
+									function( value ) return value or 0 end
+								  },
+				["Ammo"] = { 	"Ammo",
+								0, 200,
+								function( value ) return value or 0 end
+						   },
+				["AmmoReloadtime"] = { 	"Ammo Reload Time",
+										0, 20,
+										function( value ) return value or 0 end
+									  },
+				["EnergyPerShot"] = { 	"Energy Per Shot",
+										0, 10000,
+										function( value ) return value or 0 end
+									},
+			}
 			
-			local box = vgui.Create("DTextEntry",pnl)
-			box:SetPos( 135, 0 )
-			box:SetText( tostring(value[2] or "- none -") or "- none -" )
-			box:SetWidth( 592 )
-			box:SetMultiline( false )
-			
-			pewpew_list:AddItem( pnl )
+		
+		
+		local n = 0
+		for k,v in pairs( sliders ) do
+			local slider = vgui.Create("PewPew_StatusBar",frame2)
+			sliders[k][5] = slider
+			slider:SetPos( 310, 5 + n * 30 )
+			slider:SetSize( 270, 25 )
+			slider:SetText( v[1] )
+			slider:SetMinMax( v[2], v[3] )
+			n = n + 1
 		end
-		pewpew_frame:SetVisible( true )
-	else
-		LocalPlayer():ChatPrint("Bullet not found!")
-	end
+
+		-- DTree
+		local tree = vgui.Create("DTree", frame2)
+		tree:SetPadding( 5 )
+		tree:SetPos( 2, 2 )
+		tree:SetSize( 300, frame2:GetTall() - 4 )
+		
+		
+		local function UpdateSliders( wpn )
+			if (!wpn) then return end
+			for k,v in pairs( sliders ) do
+				v[5]:SetValue( v[4](wpn[k]) )
+			end
+		end
+		
+		local function AddNode( parent, folder, curtbl, curcat )
+			parent = folder
+			for k,v in pairs( curtbl ) do
+				if (type(v) == "string") then
+					local wpn = folder:AddNode( string.gsub( v, "_", " " ) )
+					wpn.WeaponName = v
+					wpn.Icon:SetImage( "vgui/spawnmenu/file" )
+					wpn.IsWeapon = true
+				elseif (type(v) == "table") then	
+					local temp = parent:AddNode( string.gsub( k, "_", " " ) )
+					AddNode( parent, temp, v, k )
+				end
+			end
+		end
+		AddNode( tree, tree, pewpew.Categories, curcat )
+		
+		local oldfunc = tree.DoClick
+		function tree:DoClick( node )
+			if (self.SelectedNode and self.SelectedNode == node and node.IsWeapon) then
+				RunConsoleCommand("pewpew_bulletname", node.WeaponName)
+				RunConsoleCommand("gmod_tool", "pewpew")
+				RunConsoleCommand("pewpew_closeusemenu")
+				frame:SetVisible( false )
+			else
+				if (node.IsWeapon) then
+					UpdateSliders( pewpew:GetWeapon( node.WeaponName ) )
+				else
+					oldfunc( self, node )
+				end
+				self.SelectedNode = node
+			end
+		end
+		
+		local oldfunc = tree.DoRightClick
+		function tree:DoRightClick( node )
+			if (node.IsWeapon) then
+				RunConsoleCommand("PewPew_UseMenu", node.WeaponName)
+			else
+				oldfunc( self, node )
+			end
+		end
+		
+		psheet:AddSheet( "Weapon", frame2, nil, false, false, "Select Weapon" )
 end
 
-concommand.Add("PewPew_UseMenu", function( ply, cmd, arg )
-	OpenUseMenu( table.concat(arg, " ") )
+timer.Simple(2, CreateMenu )
+
+concommand.Add("PewPew_WeaponMenu", function( ply, cmd, arg )
+	-- Open weapons menu
+	frame:SetVisible( true )	
 end)
 
+concommand.Add("+PewPew_WeaponMenu", function( ply, cmd, arg )
+	-- Open weapons menu
+	frame:SetVisible( true )
+end)
+
+concommand.Add("-PewPew_WeaponMenu", function( ply, cmd, arg )
+	-- Close weapons menu
+	frame:SetVisible( false )
+end)
+
+--[[
 local pewpew_weaponframe
 
 -- Weapons Menu
@@ -177,3 +232,4 @@ concommand.Add("-PewPew_WeaponMenu", function( ply, cmd, arg )
 	-- Open weapons menu
 	pewpew_weaponframe:SetVisible( false )
 end)
+]]

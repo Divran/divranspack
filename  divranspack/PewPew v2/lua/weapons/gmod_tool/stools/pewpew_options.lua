@@ -12,15 +12,6 @@ if (CLIENT) then
 	
 	pewpew.DamageLog = {}
 	
-	require("datastream")
-	datastream.Hook( "PewPew_Option_Tool_SendLog", function( handler, id, encoded, decoded )
-		for k,v in pairs( decoded ) do
-			if (v[7] == true) then v[7] = "Yes" else v[7] = "No" end
-			table.insert( pewpew.DamageLog, 1, v )
-		end
-		UpdateLogMenu()
-	end)
-	
 	local pewpew_logframe
 	local pewpew_loglist
 	
@@ -41,6 +32,16 @@ if (CLIENT) then
 			end			
 		end
 	end
+	
+	require("datastream")
+	datastream.Hook( "PewPew_Option_Tool_SendLog", function( handler, id, encoded, decoded )
+		for k,v in pairs( decoded ) do
+			if (v[7] == true) then v[7] = "Yes" else v[7] = "No" end
+			table.insert( pewpew.DamageLog, 1, v )
+		end
+		UpdateLogMenu()
+	end)
+	
 	
 	local function OpenLogMenu()
 		pewpew_logframe:SetVisible( true )
@@ -139,27 +140,21 @@ if (CLIENT) then
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
 	
-	function TOOL:DrawHUD()
-		local cannons = ents.FindByClass("pewpew_base_cannon")
-		local bullets = ents.FindByClass("pewpew_base_bullet")
-		
-		for k,v in ipairs( cannons ) do
-			local pos = v:GetPos():ToScreen()
-			local name = v:GetNWString("PewPew_OwnerName","- Error -")
-			surface.SetFont("ScoreboardText")
-			local w = surface.GetTextSize( name )
-			draw.WordBox( 1, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
-		end
-		
-		for k,v in ipairs( bullets ) do
-			local pos = v:GetPos():ToScreen()
-			local name = v:GetNWString("PewPew_OwnerName","- Error -")
-			surface.SetFont("ScoreboardText")
-			local w = surface.GetTextSize( name )
-			draw.WordBox( 6, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
-		end
-		
+	local function drawname( v, owner )
+		local pos = v:GetPos():ToScreen()
+		local name = v:GetNWString("PewPew_OwnerName",(owner or "- Error -"))
+		surface.SetFont("ScoreboardText")
+		local w = surface.GetTextSize( name )
+		draw.WordBox( 2, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
 	end
 	
-	
+	function TOOL:DrawHUD()
+		for k,v in ipairs( ents.FindByClass("pewpew_base_cannon") ) do drawname( v ) end
+		for k,v in ipairs( ents.FindByClass("pewpew_base_bullet") ) do drawname( v ) end
+		for k,v in ipairs( pewpew.Bullets ) do
+			if (v.Prop and ValidEntity(v.Prop) and v.Owner) then
+				drawname(v.Prop,v.Owner:Nick())
+			end
+		end
+	end
 end
