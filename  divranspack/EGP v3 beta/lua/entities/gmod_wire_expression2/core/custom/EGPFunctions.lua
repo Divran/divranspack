@@ -523,7 +523,7 @@ e2function vector2 wirelink:egpSize( number index )
 	return {-1,-1}
 end
 
-e2function number wirelink:egpSize( number index )
+e2function number wirelink:egpSizeNum( number index )
 	local bool, k, v = EGP:HasObject( this, index )
 	if (bool) then
 		if (v.size) then

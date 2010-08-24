@@ -29,5 +29,5 @@ EGP.ConVars.AllowHUD = CreateConVar( "wire_egp_allow_hud", 1, { FCVAR_NOTIFY, FC
 EGP.ConVars.AllowScreen = CreateConVar( "wire_egp_allow_screen", 1, { FCVAR_NOTIFY, FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE  }  )
 
 -- If other addons want to do something with EGP, this makes sure everything has loaded first.
--- It needs to be inside an Initialize hook because if it isn't, the other addon's hook.Add may not have been called yet.
+-- It needs to be inside an Initialize hook because if it isn't, the other addon's hook.Add may not have been run yet.
 hook.Add("Initialize","EGP_Initialize",function() hook.Call("WireEGP_Initialize", {}) end)
