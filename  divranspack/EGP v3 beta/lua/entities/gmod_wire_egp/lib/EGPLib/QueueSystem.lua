@@ -66,7 +66,7 @@ end
 local AlreadyChecking = 0
 
 function EGP:SendQueueItem( ply )
-	if (!ply or !ply:IsValid()) then self:StopQueueTimer( ply ) end
+	if (!ply or !ply:IsValid()) then self:StopQueueTimer() end
 	local NextAction = self:GetNextItem( ply )
 	if (NextAction == false) then 
 		self:StopQueueTimer( ply ) 
@@ -107,9 +107,12 @@ function EGP:SendQueueItem( ply )
 	end
 end
 
+EGP.Queue.Timers = {} -- Table used to fix player leaving errors
+
 function EGP:StartQueueTimer( ply )
 	local TimerName = "EGP_Queue_"..ply:UniqueID()
 	if (!timer.IsTimer(TimerName)) then
+		self.Queue.Timers[#self.Queue.Timers+1] = { ply, ply:UniqueID() } -- Fix for players who leave while their queue is sending
 		timer.Create( TimerName, 1, 0, function( ply )
 			self:SendQueueItem( ply )
 		end, ply)
@@ -117,9 +120,30 @@ function EGP:StartQueueTimer( ply )
 end
 
 function EGP:StopQueueTimer( ply )
-	local TimerName = "EGP_Queue_"..ply:UniqueID()
-	if (timer.IsTimer( TimerName )) then
-		timer.Destroy( TimerName )
+	-- If a player left the server while their queue was sending
+	if (!ply or !ply:IsValid()) then -- If the argument is invalid
+		local removetable = {}
+		for k,v in ipairs( self.Queue.Timers ) do -- Loop through all timers
+			if (!v[1] or !v[1]:IsValid()) then -- Check if the player no longer exists
+				local TimerName = "EGP_Queue_"..v[2]
+				if (timer.IsTimer( TimerName )) then
+					timer.Destroy( TimerName ) -- Stop the timer
+				end
+				removetable[#removetable+1] = k -- Add to remove table
+			end
+		end
+		for k,v in ipairs( removetable ) do table.remove( self.Queue.Timers, v ) end -- Remove all stopped timers from the table
+	else -- If the player is still here, go ahead as usual
+		local TimerName = "EGP_Queue_"..ply:UniqueID()
+		if (timer.IsTimer( TimerName )) then
+			timer.Destroy( TimerName )
+			for k,v in ipairs( self.Queue.Timers ) do
+				if (v[1] == ply) then
+					table.remove( self.Queue.Timers, k )
+					break
+				end
+			end
+		end
 	end
 end
 
