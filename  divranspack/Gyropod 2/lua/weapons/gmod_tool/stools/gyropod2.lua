@@ -7,21 +7,19 @@ cleanup.Register("gyropod2")
 
 TOOL.ClientConVar[ "model" ] = "models/props_c17/oildrum001.mdl"
 
-local Models	 = { 	["models/combatmodels/tank_gun.mdl"] = {},
-						["models/bull/pewpew_cannon_small.mdl"] = {},
-						["models/bull/pewpew_cannon_medium.mdl"] = {},
-						["models/bull/pewpew_cannon_big.mdl"] = {},
-						["models/props_junk/TrafficCone001a.mdl"] = {},
+local Models	 = { 	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {},
+						["models/props_trainstation/trainstation_ornament001.mdl"] = {},
+						["models/props_trainstation/trainstation_ornament002.mdl"] = {},
+						["models/props_combine/breenglobe.mdl"] = {},
+						["models/props_combine/headcrabcannister01a.mdl"] = {},
+						["models/props_combine/weaponstripper.mdl"] = {},
 						["models/props_lab/huladoll.mdl"] = {},
 						["models/props_c17/oildrum001.mdl"] = {},
-						["models/props_trainstation/trainstation_column001.mdl"] = {},
-						["models/Items/combine_rifle_ammo01.mdl"] = {},
-						["models/props_combine/combine_mortar01a.mdl"] = {},
-						["models/props_combine/breenlight.mdl"] = {},
-						["models/props_c17/pottery03a.mdl"] = {},
-						["models/props_junk/PopCan01a.mdl"] = {},
-						["models/props_trainstation/trainstation_post001.mdl"] = {},
-						["models/props_c17/signpole001.mdl"] = {} }
+						["models/Slyfo/Goldfish.mdl"] = {},
+						["models/Slyfo/t-eng.mdl"] = {},
+						["models/Slyfo/rover1_engine.mdl"] = {},
+						["models/Slyfo/finfunnel.mdl"] = {},
+						["models/Slyfo/sat_grappler.mdl"] = {} }
 
 
 -- This needs to be shared...

@@ -17,8 +17,23 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetMaterial( "spacebuild/SBLight5" )
 	
-	self.Inputs = WireLib.CreateInputs( self, { "Activate", "Movement Force World [VECTOR]", "Movement Force Local [VECTOR]","Fly To Vector [VECTOR]", "Aim To Vector [VECTOR]", "Aim To Angle [ANGLE]", "Angular Force [ANGLE]", "Freeze", "Level", "Base Entity [ENTITY]" } )
-	self.Outputs = WireLib.CreateOutputs( self, { "On", "Frozen", "MPH", "KMH", "Total Mass", "Nr Of Props Linked", "Props Linked [ARRAY]" } )
+	self.Inputs = WireLib.CreateInputs( self, { "Activate", 
+												"Movement Force World [VECTOR]", 
+												"Movement Force Local [VECTOR]",
+												"Fly To Vector [VECTOR]", 
+												"Aim To Vector [VECTOR]", 
+												"Aim To Angle [ANGLE]", 
+												"Angular Force [ANGLE]", 
+												"Freeze", 
+												"Level", 
+												"Base Entity [ENTITY]" } )
+	self.Outputs = WireLib.CreateOutputs( self, { 	"On", 
+													"Frozen", 
+													"MPH", 
+													"KMH", 
+													"Total Mass", 
+													"Nr Of Props Linked", 
+													"Props Linked [ARRAY]" } )
 	
 	self.phys = self:GetPhysicsObject()
 	
@@ -384,7 +399,7 @@ function ENT:PreEntityCopy()
 	
 	duplicator.StoreEntityModifier(self, "SBEPGyro2", DI)
 end
-duplicator.RegisterEntityModifier( "SBEPGyroAdv" , function() end)
+duplicator.RegisterEntityModifier( "SBEPGyro2" , function() end)
 
 function ENT:PostEntityPaste(pl, Ent, CreatedEntities)
 
@@ -398,6 +413,7 @@ end
 ------------------------------------------------------------------------
 -- Joystick
 ------------------------------------------------------------------------
+--[[
 
 local Gyrojcon = {}  --Joystick control stuff
 local GyroJoystickControl = function()
@@ -547,3 +563,4 @@ function ENT:UseJoystick()  --Joystick Controls (I've never tested this)
 		end
 	end
 end
+]]
