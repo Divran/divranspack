@@ -29,7 +29,7 @@ BULLET.RecoilForce = 500
 BULLET.Spread = 0
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "BlastDamage" -- Look in pewpew_damagecontrol.lua for available damage types
 BULLET.Damage = 250
 BULLET.Radius = 800
 BULLET.RangeDamageMul = 0.3 -- This is only used with "BlastDamage". It determines how much less damage it deals depending on the distance from the center of the blast.
