@@ -1,6 +1,7 @@
--- Basic Cannon
-
 local BULLET = {}
+
+-- Important Information
+BULLET.Version = 2
 
 -- General Information
 BULLET.Name = "Minigun"
@@ -11,9 +12,6 @@ BULLET.SuperAdminOnly = false
 
 -- Appearance
 BULLET.Model = "models/combatmodels/tankshell_25mm.mdl"
-BULLET.Material = nil
-BULLET.Color = nil
-BULLET.Trail = nil
 
 -- Effects / Sounds
 BULLET.FireSound = {"arty/mg42.wav"}

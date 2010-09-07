@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "105mm Cannon"
 BULLET.Author = "Divran"
@@ -32,7 +35,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 1000
 BULLET.Radius = 600
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 400

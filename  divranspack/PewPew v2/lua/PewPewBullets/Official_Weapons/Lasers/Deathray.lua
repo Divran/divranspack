@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Deathray"
 BULLET.Author = "Free Fall"
@@ -31,7 +34,7 @@ BULLET.Spread = nil
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 600
 BULLET.Radius = 500
-BULLET.RangeDamageMul = 0.3
+BULLET.RangeDamageMul = 1.6
 BULLET.PlayerDamage = 140
 BULLET.PlayerDamageRadius = 400
 

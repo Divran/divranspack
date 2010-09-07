@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Water Balloons"
 BULLET.Author = "Kouta"
@@ -32,7 +35,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 120
 BULLET.Radius = 50
-BULLET.RangeDamageMul = 0.95
+BULLET.RangeDamageMul = 2.9
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 150

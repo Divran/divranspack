@@ -1,6 +1,7 @@
--- Bomb Rack
-
 local BULLET = {}
+
+-- Important Information
+BULLET.Version = 2
 
 -- General Information
 BULLET.Name = "Carpet Bomber"
@@ -31,7 +32,7 @@ BULLET.Spread = nil
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 200
 BULLET.Radius = 200
-BULLET.RangeDamageMul = 0.6
+BULLET.RangeDamageMul = 2.2
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 600

@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Plasma Cannon"
 BULLET.Author = "Colonel Thirty Two"
@@ -36,7 +39,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 280
 BULLET.Radius = 500
-BULLET.RangeDamageMul = 0.6
+BULLET.RangeDamageMul = 2.2
 BULLET.PlayerDamage = 99
 BULLET.PlayerDamageRadius = 100
 

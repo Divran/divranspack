@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Firework"
 BULLET.Author = "Kouta"
@@ -31,7 +34,7 @@ BULLET.Spread = 5
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 150
 BULLET.Radius = 300
-BULLET.RangeDamageMul = 0.5
+BULLET.RangeDamageMul = 2
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 100

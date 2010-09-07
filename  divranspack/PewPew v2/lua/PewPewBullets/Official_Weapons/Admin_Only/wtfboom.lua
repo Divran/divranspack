@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "WTF BOOM"
 BULLET.Author = "Divran"
@@ -17,7 +20,7 @@ BULLET.FireEffect = "pewpew_wtf_boom_explosion"
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 100000000
 BULLET.Radius = 5000
-BULLET.RangeDamageMul = 1
+BULLET.RangeDamageMul = 3
 BULLET.PlayerDamage = 100000000
 BULLET.PlayerDamageRadius = 5000
 

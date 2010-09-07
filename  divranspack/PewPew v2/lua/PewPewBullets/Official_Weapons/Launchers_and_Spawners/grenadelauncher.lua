@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Grenade Launcher"
 BULLET.Author = "Divran"
@@ -36,7 +39,7 @@ BULLET.Spread = 0
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 450
 BULLET.Radius = 400
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.Duration = nil

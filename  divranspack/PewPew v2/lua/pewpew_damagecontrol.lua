@@ -39,7 +39,7 @@ end
 ------------------------------------------------------------------------------------------------------------
 -- Damage Types:
 
--- Blast Damage (A normal explosion)  (The damage formula is " (1-(Distance/Radius)^(2-(1-RangeDamageMul)))")
+-- Blast Damage (A normal explosion)  (The damage formula is " (1-(Distance/Radius)^RangeDamageMul))")
 function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt, DamageDealer )
 		if (!self:GetConVar( "Damage" )) then return end
 	if (!Radius or Radius <= 0) then return end
@@ -76,7 +76,8 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 	tr.mask = MASK_SOLID
 	tr.filter = tooclose
 	
-	local Mul = (3-(1-RangeDamageMul)*2)
+	--local Mul = (3-(1-RangeDamageMul)*2)
+	local Mul = RangeDamageMul
 	
 	for _, ent in ipairs( DamagedProps ) do		
 		tr.endpos = ent:LocalToWorld( ent:OBBCenter() )
@@ -106,7 +107,7 @@ if (PLAYER) then
 	end
 end
 
--- Helper function. Used in place of pewpew:PlayerBlastDamage in all pewpew weapons
+-- Helper function. Should be used in place of util.BlastDamage in all pewpew weapons
 function pewpew:PlayerBlastDamage( Inflictor, Attacker, Pos, Radius, Damage )
 	
 	-- Check safe zone
@@ -491,7 +492,7 @@ function pewpew:CheckValid( entity )
 	if (!entity) then return false end
 	if (!entity:IsValid()) then return false end
 	if (entity:IsWorld()) then return false end
-	if (entity:GetMoveType() != MOVETYPE_VPHYSICS) then return false end
+	--if (entity:GetMoveType() != MOVETYPE_VPHYSICS) then return false end -- This made it unable to kill parented props
 	local phys = entity:GetPhysicsObject()
 	if (!phys:IsValid()) then return false end
 	if (!phys:GetVolume()) then return false end

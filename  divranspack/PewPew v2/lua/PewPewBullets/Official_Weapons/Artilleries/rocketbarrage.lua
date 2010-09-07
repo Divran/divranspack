@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Rocket Barrage"
 BULLET.Author = "Divran"
@@ -32,7 +35,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 150
 BULLET.Radius = 250
-BULLET.RangeDamageMul = 0.5
+BULLET.RangeDamageMul = 2
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 150

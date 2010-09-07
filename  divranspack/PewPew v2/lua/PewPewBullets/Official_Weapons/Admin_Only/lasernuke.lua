@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Laser Nuke"
 BULLET.Author = "Divran"
@@ -19,7 +22,7 @@ BULLET.ExplosionEffect = "breachsplode"
 BULLET.DamageType = "BlastDamage" -- custom
 BULLET.Damage = 100000
 BULLET.Radius = 7000
-BULLET.RangeDamageMul = 0.6
+BULLET.RangeDamageMul = 2.2
 BULLET.PlayerDamage = 5000
 BULLET.PlayerDamageRadius = 5000
 

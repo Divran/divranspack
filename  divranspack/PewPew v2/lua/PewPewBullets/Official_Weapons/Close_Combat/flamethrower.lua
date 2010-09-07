@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Flamethrower"
 BULLET.Author = "Divran"
@@ -33,7 +36,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 80
 BULLET.Radius = 60
-BULLET.RangeDamageMul = 1
+BULLET.RangeDamageMul = 3
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.Duration = nil

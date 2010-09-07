@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Helicopter Bomb"
 BULLET.Author = "Divran"
@@ -31,7 +34,7 @@ BULLET.Spread = nil
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 600
 BULLET.Radius = 800
-BULLET.RangeDamageMul = 0.6
+BULLET.RangeDamageMul = 2.2
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 500

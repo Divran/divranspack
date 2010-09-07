@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Modifiable Artillery"
 BULLET.Author = "Divran"
@@ -33,7 +36,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 350
 BULLET.Radius = 300
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.Duration = nil

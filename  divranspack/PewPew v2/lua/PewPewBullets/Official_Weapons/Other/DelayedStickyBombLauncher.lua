@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Delayed Sticky-Bomb Launcher"
 BULLET.Author = "Free Fall"
@@ -27,7 +30,7 @@ BULLET.Spread = 0
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 300
 BULLET.Radius = 800
-BULLET.RangeDamageMul = 0.3
+BULLET.RangeDamageMul = 1.6
 BULLET.PlayerDamage = 150
 BULLET.PlayerDamageRadius = 300
 

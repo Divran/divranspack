@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Gauss Gun"
 BULLET.Author = "Divran"
@@ -32,7 +35,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 40
 BULLET.Radius = 75
-BULLET.RangeDamageMul = 0.9
+BULLET.RangeDamageMul = 2.8
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamageRadius = 58

@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "C4"
 BULLET.Author = "Divran"
@@ -14,10 +17,10 @@ BULLET.FireSound = {"weapons/explode1.wav","weapons/explode2.wav"}
 BULLET.FireEffect = "pewpew_c4_explosion"
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 2000
 BULLET.Radius = 350
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.PlayerDamage = 500
 BULLET.PlayerDamageRadius = 350
 

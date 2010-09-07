@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Homing Missile - Air to surface"
 BULLET.Author = "Divran"
@@ -31,7 +34,7 @@ BULLET.Spread = nil
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 1800
 BULLET.Radius = 550
-BULLET.RangeDamageMul = 0.7
+BULLET.RangeDamageMul = 2.4
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 500

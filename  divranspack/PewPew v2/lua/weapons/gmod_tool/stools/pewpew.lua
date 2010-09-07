@@ -250,6 +250,7 @@ else
 		Directions.Options["Back"] = { pewpew_direction = 6 }
 		CPanel:AddControl("ComboBox",Directions)
 
+		--[[
 			-- Bullets	
 			local label = vgui.Create("DLabel")
 			label:SetText("Left click to select, right click for info.")
@@ -308,6 +309,12 @@ else
 			
 		CPanel:AddItem(label)
 		CPanel:AddItem(list1)
+		]]
+		
+		local btn = vgui.Create("DButton")
+		btn:SetText("Menu")
+		function btn:DoClick() RunConsoleCommand("pewpew_weaponmenu") end
+		CPanel:AddItem(btn)
 		
 		local label = vgui.Create("DLabel")
 		label:SetText([[To open this weapons menu in a seperate 

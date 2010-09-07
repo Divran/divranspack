@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "HP Sauce"
 BULLET.Author = "Divran"
@@ -32,7 +35,7 @@ BULLET.Spread = 3
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 100
 BULLET.Radius = 80
-BULLET.RangeDamageMul = 0.7
+BULLET.RangeDamageMul = 2.4
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.Duration = nil

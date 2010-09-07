@@ -1,6 +1,7 @@
--- Smoke Emitter
-
 local BULLET = {}
+
+-- Important Information
+BULLET.Version = 2
 
 -- General Information
 BULLET.Name = "Smoke Emitter"
@@ -15,7 +16,6 @@ BULLET.FireEffect = "pewpew_bigsmoke"
 BULLET.Reloadtime = 9
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
--- Overrides
 
 
 -- Fire (Is called before the cannon is about to fire)

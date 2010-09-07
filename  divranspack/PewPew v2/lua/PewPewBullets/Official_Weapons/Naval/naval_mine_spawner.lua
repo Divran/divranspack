@@ -1,6 +1,7 @@
--- Naval Mine
-
 local BULLET = {}
+
+-- Important Information
+BULLET.Version = 2
 
 -- General Information
 BULLET.Name = "Naval Mine Spawner"

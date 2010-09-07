@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Basic Rocket Launcher"
 BULLET.Author = "Divran"
@@ -35,7 +38,7 @@ BULLET.Spread = 1.5
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 700
 BULLET.Radius = 300
-BULLET.RangeDamageMul = 0.5
+BULLET.RangeDamageMul = 2
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 150

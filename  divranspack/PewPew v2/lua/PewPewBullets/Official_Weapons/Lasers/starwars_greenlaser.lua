@@ -2,10 +2,13 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Green Star Wars Laser"
 BULLET.Author = "Divran"
-BULLET.Description = "The green Star Wars laser."
+BULLET.Description = "A green Star Wars laser."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 

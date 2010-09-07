@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Naval Mine"
 BULLET.Author = "Divran"
@@ -31,7 +34,7 @@ BULLET.Spread = nil
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 3000
 BULLET.Radius = 1000
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.PlayerDamage = 2000
 BULLET.PlayerDamageRadius = 950
 

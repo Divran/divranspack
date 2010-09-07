@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Warhead"
 BULLET.Author = "Divran"
@@ -17,7 +20,7 @@ BULLET.FireEffect = "scud_splosion"
 BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
 BULLET.Damage = 950
 BULLET.Radius = 1000
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.PlayerDamage = 500
 BULLET.PlayerDamageRadius = 250
 

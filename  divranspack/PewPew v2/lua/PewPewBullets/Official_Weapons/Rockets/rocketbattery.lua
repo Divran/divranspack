@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Rocket Battery"
 BULLET.Author = "Divran"
@@ -37,7 +40,7 @@ BULLET.AngleOffset = Angle(-90,0,0)
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 200
 BULLET.Radius = 145
-BULLET.RangeDamageMul = 0.9
+BULLET.RangeDamageMul = 2.8
 BULLET.PlayerDamage = 50
 BULLET.PlayerDamageRadius = 100
 

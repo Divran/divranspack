@@ -2,6 +2,10 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2 -- This number specifies which version PewPew is in at the time you create this bullet. 
+				   -- This allows the backwards compatibility file to automatically convert your file to work with the latest version.
+
 -- General Information
 BULLET.Name = "Example"
 BULLET.Author = "Divran"
@@ -31,10 +35,19 @@ BULLET.RecoilForce = 500
 BULLET.Spread = 0
 
 -- Damage
-BULLET.DamageType = "BlastDamage" -- Look in gcombat_damagecontrol.lua for available damage types
+BULLET.DamageType = "BlastDamage" -- Look in pewpew_damagecontrol.lua for available damage types
 BULLET.Damage = 250
 BULLET.Radius = 800
+
 BULLET.RangeDamageMul = 0.3 -- This is only used with "BlastDamage". It determines how much less damage it deals depending on the distance from the center of the blast.
+-- The number must not be equal to or below 0, but it can be as high as you want (although higher than 20 makes almost no difference)
+-- Here are a few examples of what the damage looks like at different RangeDamageMuls using 2000 damage and 900 radius (the 230mm cannon)
+-- 0.1 = http://www.wolframalpha.com/input/?i=y%3D2000*%281-%28X%2F900%29^0.1
+-- 0.5 = http://www.wolframalpha.com/input/?i=y%3D2000*%281-%28X%2F900%29^0.5
+-- 1.0 = http://www.wolframalpha.com/input/?i=y%3D2000*%281-%28X%2F900%29^1
+-- 3.5 = http://www.wolframalpha.com/input/?i=y%3D2000*%281-%28X%2F900%29^3.5
+-- 5.0 = http://www.wolframalpha.com/input/?i=y%3D2000*%281-%28X%2F900%29^5
+
 BULLET.NumberOfSlices = nil -- this is only used with "SliceDamage". It determines how many props in a line you want to deal damage to.
 BULLET.SliceDistance = nil -- This is only used with "SliceDamage". It determines the total maximum range the trace will travel.
 BULLET.Duration = nil -- This is only used with "EMPDamage". It determines how long the target entities will be disabled.

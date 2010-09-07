@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Nebelwerfer"
 BULLET.Author = "Free Fall"
@@ -31,7 +34,7 @@ BULLET.Spread = 2
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 400
 BULLET.Radius = 900
-BULLET.RangeDamageMul = 0.8
+BULLET.RangeDamageMul = 2.6
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.PlayerDamage = 80

@@ -71,6 +71,7 @@ concommand.Add("PewPew_BlockClientSideBullets",function( ply, cmd, args )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Command usage: -1 = All bullets visible (max 255 bullets), 0 = No bullets visible, Greater than 0 = Wait that many miliseconds before spawning the next bullet." )
 	else
 		local n = tonumber(args[1])
+		if (!n) then ply:PrintMessage( HUD_PRINTCONSOLE, "Command usage: -1 = All bullets visible (max 255 bullets), 0 = No bullets visible, Greater than 0 = Wait that many miliseconds before spawning the next bullet." ) return end
 		if (n == -1) then
 			ply.PewPew_BulletBlock = nil
 		else

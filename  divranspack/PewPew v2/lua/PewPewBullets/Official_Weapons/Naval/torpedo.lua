@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Torpedo"
 BULLET.Author = "Divran"
@@ -33,7 +36,7 @@ BULLET.AffectedBySBGravity = true
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 500
 BULLET.Radius = 700
-BULLET.RangeDamageMul = 0.7
+BULLET.RangeDamageMul = 2.4
 BULLET.NumberOfSlices = nil
 BULLET.SliceDistance = nil
 BULLET.Duration = nil

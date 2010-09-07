@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Railgun"
 BULLET.Author = "Divran"
@@ -11,8 +14,6 @@ BULLET.SuperAdminOnly = false
 
 -- Appearance
 BULLET.Model = "models/combatmodels/tankshell_120mm.mdl"
-BULLET.Material = nil
-BULLET.Color = nil
 BULLET.Trail = { StartSize = 10,
 				 EndSize = 2,
 				 Length = 0.3,
@@ -21,8 +22,6 @@ BULLET.Trail = { StartSize = 10,
 
 -- Effects / Sounds
 BULLET.FireSound = {"arty/railgun.wav"}
-BULLET.ExplosionSound = nil
-BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "HEATsplode"
 
 -- Movement
@@ -35,12 +34,8 @@ BULLET.AffectedBySBGravity = true
 -- Damage
 BULLET.DamageType = "SliceDamage"
 BULLET.Damage = 1000
-BULLET.Radius = nil
-BULLET.RangeDamageMul = nil
 BULLET.NumberOfSlices = 5
 BULLET.SliceDistance = 750
-BULLET.PlayerDamageRadius = nil
-BULLET.PlayerDamage = nil
 
 -- Reload/Ammo
 BULLET.Reloadtime = 6.2

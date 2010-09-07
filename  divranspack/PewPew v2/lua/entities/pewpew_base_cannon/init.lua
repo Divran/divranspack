@@ -133,7 +133,7 @@ end
 ----------------------------------------------------------------------------------------------
 -- Default Old System FireBullet
 ----------------------------------------------------------------------------------------------
-function ENT:OldSystem_FireBullet()	
+function ENT:OldSystem_FireBullet()
 	-- Create Bullet
 	local ent = ents.Create( "pewpew_base_bullet" )
 	if (!ent or !ent:IsValid()) then return end
@@ -191,7 +191,7 @@ function ENT:FireBullet()
 		-- Allows you to override the fire function
 		self.Bullet:Fire( self )
 	else
-		if (self.Bullet.UseOldSystem == true or pewpew:GetConVar("AlwaysUseOldSystem") == true) then
+		if (self.Bullet.UseOldSystem == true or pewpew:GetConVar("AlwaysUseOldSystem") == true or self.Bullet.Version <= 1) then
 			local ent = self:OldSystem_FireBullet()
 				
 			WireLib.TriggerOutput( self.Entity, "Last Fired", ent )

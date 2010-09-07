@@ -2,6 +2,9 @@
 
 local BULLET = {}
 
+-- Important Information
+BULLET.Version = 2
+
 -- General Information
 BULLET.Name = "Rapid Fire Laser"
 BULLET.Author = "Colonel Thirty Two"

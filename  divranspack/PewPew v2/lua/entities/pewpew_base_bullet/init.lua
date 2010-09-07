@@ -162,7 +162,7 @@ function ENT:DefaultThink()
 	
 	if (grav and grav != 0) then -- Only pull it down if needed
 		self.FlightDirection = self.FlightDirection - Vector(0,0,grav / (self.Bullet.Speed or 1))
-		self.FlightDirection:Normalize()
+		if (self.Bullet.Version > 1) then self.FlightDirection:Normalize() end -- Only normalize if the bullet version is 2 or higher
 	end
 		
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )

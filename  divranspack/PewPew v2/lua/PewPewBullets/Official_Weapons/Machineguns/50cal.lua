@@ -1,6 +1,7 @@
--- Basic Cannon
-
 local BULLET = {}
+
+-- Important Information
+BULLET.Version = 2
 
 -- General Information
 BULLET.Name = "50 cal machinegun"
