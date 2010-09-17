@@ -1,9 +1,9 @@
 "AddonInfo"
 {
-	"name"        "EGP v3 Beta"
+	"name"        "EGP v3"
 	"version"     "SVN"
 	"author_name" "Divran"
 	"author_url"  "http://www.wiremod.com/"
-	"info"        "Expression 2 Graphics Processor v3 Beta."
+	"info"        "Expression 2 Graphics Processor v3"
 	"override"    "0"
 }
