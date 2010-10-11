@@ -48,7 +48,7 @@ function ENT:Initialize()
 	self.Entities = {}
 	self.AllEntities = {}
 	self.NumOfEntities = 0
-	self:GetConstrainedEntities()
+	self:_GetConstrainedEntities()
 	
 	self.TotalMass = self.phys:GetMass()
 	self.Activated = false
@@ -197,15 +197,15 @@ function ENT:CalculateAimToVector( TargetVec, ent )
 end
 
 ------------------------------------------------------------------------
--- GetConstrainedEntities
+-- _GetConstrainedEntities
 ------------------------------------------------------------------------
 
-function ENT:GetConstrainedEntities()
+function ENT:_GetConstrainedEntities()
 	local temp = constraint.GetAllConstrainedEntities( self )
 	
 	self.TotalMass = self.phys:GetMass()
 	self.AllEntities = {}
-	self.Multipliers = { forward = math.huge, back = math.huge, right = math.huge, left = math.huge }
+	self.Multipliers = {}
 	
 	local pos = self:GetPos()
 	local forward =  pos + self:GetForward() * 5000
@@ -226,33 +226,33 @@ function ENT:GetConstrainedEntities()
 				local pos = v:GetPos()
 				-- forward mul
 				local temp = pos:Distance(forward)
-				if (temp < self.Multipliers.forward) then
+				if (self.Multipliers.forward == nil or temp < self.Multipliers.forward) then
 					self.Multipliers.forward = temp
 					forwardent = v
 				end
 				
 				-- back mul
 				local temp = pos:Distance(back)
-				if (temp < self.Multipliers.back) then
+				if (self.Multipliers.back == nil or temp < self.Multipliers.back) then
 					self.Multipliers.back = temp
 					backent = v
 				end
 				
 				-- right mul
 				local temp = pos:Distance(right)
-				if (temp < self.Multipliers.right) then
+				if (self.Multipliers.right == nil or temp < self.Multipliers.right) then
 					self.Multipliers.right = temp
 					rightent = v
 				end
 				
 				-- left mul
 				local temp = pos:Distance(left)
-				if (temp < self.Multipliers.left) then
+				if (self.Multipliers.left == nil or temp < self.Multipliers.left) then
 					self.Multipliers.left = temp
 					leftent = v
 				end
 				
-				local mass = math.Round(mass)
+				local mass = math.floor(mass)
 				if (mass > heaviest) then
 					heaviest = mass
 				end
@@ -268,8 +268,8 @@ function ENT:GetConstrainedEntities()
 	self.Entities = { self, forwardent, backent, rightent, leftent }
 	
 	for k,v in pairs( temp ) do
+		local mass = v:GetPhysicsObject():GetMass()
 		if (math.Round(mass) == heaviest and !table.HasValue( self.Entities, v )) then
-			local mass = v:GetPhysicsObject():GetMass()
 			table.insert( self.Entities, v )
 		end
 	end
@@ -285,11 +285,11 @@ end
 ------------------------------------------------------------------------
 
 function ENT:Think()
-	
+
 	-- Get constrained entities table
 	if (self.CheckConstrainedEntsTimer < CurTime()) then
 		self.CheckConstrainedEntsTimer = CurTime() + 3 -- Only do this every third second to minimize lag
-		self:GetConstrainedEntities()
+		self:_GetConstrainedEntities()
 	end
 	
 	if (!self.On) then return end
