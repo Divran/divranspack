@@ -57,8 +57,7 @@ BULLET.UseOldSystem = true
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Initialize (Is called when the bullet initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc( self )   
+function BULLET:Initialize()   
 	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
 	self.Entity:SetMoveType( MOVETYPE_NONE )
 	self.Entity:SetSolid( SOLID_NONE )    
@@ -70,8 +69,7 @@ function BULLET:InitializeFunc( self )
 end
 
 -- Think
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think()
 	-- Make it fly
 	self.Speed = self.Speed - 0.5
 	if (self.Speed < 3) then
@@ -144,15 +142,13 @@ end
 
 -- Client side overrides:
 
-BULLET.CLInitializeOverride = true
-function BULLET:CLInitializeFunc()
+function BULLET:CLInitialize()
 	self.emitter = ParticleEmitter( Vector(0,0,0) )
 	self.delta = 15
 	self.delay = CurTime() + 0.01
 end
 
-BULLET.CLThinkOverride = true
-function BULLET:CLThinkFunc()
+function BULLET:CLThink()
 	if (CurTime() > self.delay) then
 		local add = 2
 		if (self.delta > 100) then add = 4 end

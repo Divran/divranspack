@@ -25,7 +25,7 @@ BULLET.EmptyMagSound = { "npc/turret_floor/click1.wav" }
 
 -- Movement
 BULLET.Speed = 100
-BULLET.Gravity = 0.15
+--BULLET.Gravity = 0.15
 BULLET.RecoilForce = 400
 BULLET.Spread = 0.5
 BULLET.AffectedBySBGravity = true
@@ -40,8 +40,14 @@ BULLET.Lifetime = {0,0}
 BULLET.ExplodeAfterDeath = false
 BULLET.EnergyPerShot = 1000
 
-BULLET.ExplodeOverride = true
-function BULLET:Explode( self, Index, trace )
+function BULLET:Explode( Index, trace )
+	print("SELF------------")
+	PrintTable(self)
+	print("SELF------------")
+	print("Index: " .. Index)
+	print("TRACE------------")
+	PrintTable(trace)
+	print("TRACE------------")
 	if (!trace or !trace.Hit) then return end
 	if (trace.Entity and trace.Entity:IsValid()) then
 		local dir = (self.Pos - trace.HitPos):GetNormalized()

@@ -6,7 +6,7 @@ local BULLET = {}
 BULLET.Version = 2
 
 -- General Information
-BULLET.Name = "Water Balloons"
+BULLET.Name = "Water Balloons"	
 BULLET.Author = "Kouta"
 BULLET.Description = "Soak your childhood enemies"
 BULLET.AdminOnly = false
@@ -26,7 +26,7 @@ BULLET.ExplosionEffect = ""
 
 -- Movement
 BULLET.Speed = 25
-BULLET.Gravity = 0.25
+--BULLET.Gravity = 0.25
 BULLET.RecoilForce = 0
 BULLET.Spread = 1.5
 BULLET.AffectedBySBGravity = true
@@ -48,36 +48,20 @@ BULLET.AmmoReloadtime = 5
 
 BULLET.EnergyPerShot = 400
 
-BULLET.UseOldSystem = true -- Because I'm too lazy to convert it :/
-
 -- Initialize (Is called when the bullet initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc( self )   
-	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
-	self.Entity:SetMoveType( MOVETYPE_NONE )
-	self.Entity:SetSolid( SOLID_NONE )     
-	self.FlightDirection = self.Entity:GetUp()
-	self.Exploded = false
-	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 2
-	self.Entity:SetColor(math.random(25,255), math.random(25,255), math.random(25,255), 255)
+function BULLET:CLInitialize()   
+	pewpew:DefaultBulletInitialize( self )
+	self.Prop:SetColor(math.random(25,255), math.random(25,255), math.random(25,255), 255)
 end
 
 -- Explode (Is called when the bullet explodes)
-BULLET.ExplodeOverride = true
-function BULLET:Explode(self, trace)
-
-	local Pos = self.Entity:GetPos()
-	local Norm = self.Entity:GetUp()
-
-	if (pewpew:GetConVar( "Damage" )) then
-		pewpew:PlayerBlastDamage(self.Entity, self.Entity, Pos+Norm*10, self.Bullet.Damage, self.Bullet.Radius)
-		pewpew:BlastDamage(Pos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
-	end
+function BULLET:CLExplode(trace)
 	
 	local vOffset = trace.HitPos+Vector(0,0,2)
+	local Norm = trace.HitNormal
 	local splash = math.random(13,16)
 
-	self.Entity:EmitSound("weapons/ar2/npc_ar2_altfire.wav", 80, 130)
+	self.Prop:EmitSound("weapons/ar2/npc_ar2_altfire.wav", 80, 130)
 
 	local effectdata = EffectData()
 		effectdata:SetOrigin(vOffset)
@@ -87,8 +71,6 @@ function BULLET:Explode(self, trace)
 		effectdata:SetScale(splash)
 
 	util.Effect( "watersplash", effectdata )
-
-	self.Entity:Remove()
 end
 
 pewpew:AddWeapon( BULLET )

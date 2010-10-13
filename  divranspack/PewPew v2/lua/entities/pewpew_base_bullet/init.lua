@@ -11,6 +11,11 @@ function ENT:DefaultInitialize()
 	local tk = pewpew.ServerTick or 66.7
 	self.TraceDelay = CurTime() + (self.Bullet.Speed + (1/(self.Bullet.Speed*tk)) * 0) / (1/tk) * tk
 	
+	if (self.Bullet.Version >= 2) then
+		local n = self.Bullet.Spread
+		self.Vel = self.FlightDirection * self.Bullet.Speed * math.Rand(1-n/100,1+n/100) * (1/tk)
+	end
+	
 	-- Lifetime
 	self.Lifetime = false
 	if (self.Bullet.Lifetime) then
@@ -52,9 +57,9 @@ function ENT:Initialize()
 		end
 	end
 	
-	if (self.Bullet.InitializeOverride) then
+	if (self.Bullet.Initialize) then
 		-- Allows you to override the Initialize function
-		self.Bullet:InitializeFunc( self )
+		self.Bullet.Initialize( self )
 	else
 		self:DefaultInitialize()
 	end
@@ -138,34 +143,52 @@ function ENT:Explode(trace)
 	if (!trace) then
 		trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed)
 	end
-	if (self.Bullet.ExplodeOverride) then
+	if (self.Bullet.Explode) then
 		-- Allows you to override the Explode function
-		self.Bullet:Explode( self, trace )
+		self.Bullet.Explode( self, trace )
 	else
 		self:DefaultExplode( trace )
 	end
 end
 
 function ENT:DefaultThink()
-	-- Make it fly
-	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-	local grav = self.Bullet.Gravity or 0
-	
-	-- Make the bullet not fall down in space
-	if (self.Bullet.AffectedByNoGrav) then
-		if (CAF and CAF.GetAddon("Spacebuild")) then
-			if (self.environment) then
-				grav = grav * self.environment:GetGravity()
+
+	if (self.Bullet.Version <= 1 or self.Bullet.UseOldSystem) then
+		-- Make it fly
+		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
+		local grav = self.Bullet.Gravity or 0
+		
+		-- Make the bullet not fall down in space
+		if (self.Bullet.AffectedByNoGrav) then
+			if (CAF and CAF.GetAddon("Spacebuild")) then
+				if (self.environment) then
+					grav = grav * self.environment:GetGravity()
+				end
 			end
 		end
-	end
 	
-	if (grav and grav != 0) then -- Only pull it down if needed
-		self.FlightDirection = self.FlightDirection - Vector(0,0,grav / (self.Bullet.Speed or 1))
-		if (self.Bullet.Version > 1) then self.FlightDirection:Normalize() end -- Only normalize if the bullet version is 2 or higher
+	
+		if (grav and grav != 0) then -- Only pull it down if needed
+			self.FlightDirection = self.FlightDirection - Vector(0,0,grav / (self.Bullet.Speed or 1))
+			if (self.Bullet.Version == 1) then self.FlightDirection:Normalize() end
+		end
+		
+		self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+	else	
+		local grav = 600
+		local tk = pewpew.ServerTick or (1/66.667)
+		if (self.Bullet.Gravity != nil) then grav = self.Bullet.Gravity end
+		-- TODO: Spacebuild gravity
+		if (grav and grav > 0) then
+			self.Vel = self.Vel - Vector(0,0,grav) * tk
+		end
+		self.Pos = self.Pos + self.Vel * tk
+		
+		self:SetPos( self.Pos )
+		self:SetAngles( self.Vel:Angle() + Angle(90,0,0) + (self.Bullet.AngleOffset or Angle(0,0,0)) )
 	end
 		
-	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+
 	
 	-- Lifetime
 	if (self.Lifetime) then
@@ -200,16 +223,16 @@ function ENT:DefaultThink()
 end
 
 function ENT:Think()
-	if (self.Bullet.ThinkOverride) then
+	if (self.Bullet.Think) then
 		-- Allows you to override the think function
-		return self.Bullet:ThinkFunc( self )
+		return self.Bullet.Think( self )
 	else
 		return self:DefaultThink()
 	end
 end
 
 function ENT:PhysicsCollide(CollisionData, PhysObj)
-	if (self.Bullet.PhysicsCollideOverride) then
-		self.Bullet.PhysicsCollideFunc(self, CollisionData, PhysObj)
+	if (self.Bullet.PhysicsCollide) then
+		self.Bullet.PhysicsCollide(self, CollisionData, PhysObj)
 	end
 end

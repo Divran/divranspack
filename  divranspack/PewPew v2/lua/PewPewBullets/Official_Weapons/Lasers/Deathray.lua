@@ -48,15 +48,8 @@ BULLET.EnergyPerShot = 8000
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
--- Wire Input
-BULLET.WireInputOverride = false
-function BULLET:WireInput( inputname, value )
-	-- Nothing
-end
-
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self )
 		
 	self:EmitSound(self.Bullet.FireSound, 100, 100)
@@ -102,8 +95,7 @@ function BULLET:Fire( self )
 end
 
 -- Initialize (Is called when the bullet initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc(self)
+function BULLET:Initialize()
 	self.Entity:SetModel("models/weapons/w_bugbait.mdl") 
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_NONE)
@@ -118,8 +110,7 @@ function BULLET:InitializeFunc(self)
 end
 
 -- Think (Is called a lot of times :p)
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think( )
 	if (self.Living == false) then self:Remove() return false end
 	
 	if (self.MoreLeft > 0) then
@@ -150,23 +141,10 @@ function BULLET:ThinkFunc( self )
 	return true
 end
 
--- Explode (Is called when the bullet explodes) Note: this will not run if you override the think function (unless you call it from there as well)
-BULLET.ExplodeOverride = false
-
--- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
-BULLET.PhysicsCollideOverride = false
-
--- Client side overrides:
-
-BULLET.CLInitializeOverride = false
-
-BULLET.CLThinkOverride = false
-
 if (CLIENT) then
 	local Laser = Material( "sprites/rollermine_shock" )
 
-	BULLET.CLDrawOverride = true
-	function BULLET:CLDrawFunc()
+	function BULLET:CLDraw()
 		local Pos = self:GetPos()
 		
 		local LaserTarget = self:GetNetworkedEntity("LaserTarget")

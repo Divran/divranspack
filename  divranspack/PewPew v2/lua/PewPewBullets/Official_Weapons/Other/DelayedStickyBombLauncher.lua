@@ -45,8 +45,7 @@ BULLET.EnergyPerShot = 3500
 
 BULLET.FireOverride = false
 
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc(self)
+function BULLET:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -61,8 +60,7 @@ function BULLET:InitializeFunc(self)
 	self.Entity:NextThink(CurTime())
 end
 
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think()
 	if (not self.Propelled) then
 		local phys = self.Entity:GetPhysicsObject()
 		if (phys:IsValid()) then
@@ -111,8 +109,7 @@ function BULLET:ThinkFunc( self )
 	return true
 end
 
-BULLET.PhysicsCollideOverride = true
-function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+function BULLET:PhysicsCollide(CollisionData, PhysObj)
 	if (not (self.Cannon:IsValid() and PhysObj == self.Cannon:GetPhysicsObject()) and self.Propelled and not self.Sticked) then
 		local Entity = CollisionData.HitEntity
 		if (Entity:IsPlayer()) then return end

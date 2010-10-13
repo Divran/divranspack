@@ -25,7 +25,7 @@ BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "breachsplode"
 
 -- Movement
-BULLET.Speed = 30
+BULLET.Speed = 50
 BULLET.Gravity = 0
 BULLET.RecoilForce = 0
 BULLET.Spread = 0
@@ -51,7 +51,7 @@ BULLET.EnergyPerShot = 11000000
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Initialize (Is called when the entity initializes)
-BULLET.InitializeOverride = true
+BULLET.InitializeOverride = false
 function BULLET:InitializeFunc( self )   
 	self.flightvector = self.Entity:GetUp()
 	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	

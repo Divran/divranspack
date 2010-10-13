@@ -31,8 +31,7 @@ BULLET.Ammo = 0
 BULLET.EnergyPerShot = 100000000
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	-- Sound
 	self:EmitSound( self.Bullet.FireSound[1] )
 	

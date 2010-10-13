@@ -32,19 +32,25 @@ function pewpew:FireBullet( Pos, Dir, Owner, WeaponData, Cannon, FireDir )
 			end
 		end
 	end
+	local n = WeaponData.Spread
+	local SpeedOffset = 1
+	if (n and n > 0) then
+		SpeedOffset = math.Rand(1,1+n/100)
+	end
 	if ( send ) then
 		umsg.Start("PewPew_FireBullet",receivers)
 			umsg.Entity(Cannon)
 			umsg.Float(Dir.x)
 			umsg.Float(Dir.y)
 			umsg.Float(Dir.z)
+			umsg.Float(SpeedOffset)
 			umsg.Char(FireDir) -- FireDir is used to get the position on the client (better than sending the position as well)
 			umsg.Entity(Owner)
 			umsg.String(WeaponData.Name)
 		umsg.End()
 	end
-
-	local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, Cannon = Cannon, WeaponData = WeaponData, BulletData = {}, RemoveTimer = CurTime() + 60 }
+	
+	local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, Cannon = Cannon, WeaponData = WeaponData, BulletData = {}, RemoveTimer = CurTime() + 60, SpeedOffset = SpeedOffset }
 	table.insert( self.Bullets, NewBullet )
 	self:BulletInitialize( NewBullet )
 	
@@ -57,6 +63,7 @@ if (CLIENT) then
 		
 		-- Pos/Dir
 		local Dir = Vector(um:ReadFloat(),um:ReadFloat(),um:ReadFloat())
+		local SpeedOffset = um:ReadFloat()
 		local FireDir = um:ReadChar()
 		local temp, Pos = pewpew:GetFireDirection( FireDir, Cannon )
 		
@@ -76,7 +83,7 @@ if (CLIENT) then
 				ent:SetAngles(Dir:Angle() + Angle(90,0,0) + (Weapon.AngleOffset or Angle(0,0,0)) )
 				ent:Spawn()
 			end
-			local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, WeaponData = Weapon, BulletData = {}, Prop = ent, RemoveTimer = CurTime() + 30 }
+			local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, WeaponData = Weapon, BulletData = {}, Prop = ent, RemoveTimer = CurTime() + 30, SpeedOffset = SpeedOffset }
 			if (ent) then ent.PewPewTable = NewBullet end
 			table.insert( pewpew.Bullets, NewBullet )
 			pewpew:BulletInitialize( NewBullet )
@@ -137,8 +144,13 @@ function pewpew:DefaultBulletInitialize( Bullet )
 	local D = Bullet.WeaponData
 	local B = Bullet.BulletData
 	B.Exploded = false
-	local tk = self.ServerTick or 66.7
-	B.TraceDelay = CurTime() + (D.Speed + (1/(D.Speed*tk)) * 0) / (1/tk) * tk
+	local tk = self.ServerTick or (1/66.7)
+	B.TraceDelay = CurTime() + (D.Speed * Bullet.SpeedOffset) / (1/tk) * tk
+
+	--B.TraceDelay = CurTime() + (D.Speed) * (1/tk)
+	--B.TraceDelay = CurTime() + (D.Speed + (1/(D.Speed*tk)) * 0) / (1/tk) * tk
+	
+	Bullet.Vel = Bullet.Dir * D.Speed * Bullet.SpeedOffset * (1/tk)
 	
 	-- Lifetime
 	B.Lifetime = false
@@ -190,15 +202,15 @@ end
 
 function pewpew:BulletInitialize( Bullet )
 	if (SERVER) then
-		if (Bullet.WeaponData.InitializeOverride) then
+		if (Bullet.WeaponData.Initialize) then
 			-- Allows you to override the Initialize function
-			Bullet.WeaponData:InitializeFunc( Bullet )
+			Bullet.WeaponData.Initialize( Bullet )
 		else
 			self:DefaultBulletInitialize( Bullet )
 		end
 	else
-		if (Bullet.WeaponData.CLInitializeOverride) then
-			Bullet.WeaponData.CLInitializeFunc( Bullet )
+		if (Bullet.WeaponData.CLInitialize) then
+			Bullet.WeaponData.CLInitialize( Bullet )
 		else
 			self:DefaultBulletInitialize( Bullet )
 		end
@@ -228,6 +240,7 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 	local D = Bullet.WeaponData
 	local B = Bullet.BulletData
 	
+	--[[ OLD CODE
 	-- Make it fly
 	Bullet.Pos = Bullet.Pos + Bullet.Dir * D.Speed * (LagCompensation or 1)
 	local grav = D.Gravity or 0
@@ -244,6 +257,16 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 		Bullet.Dir = Bullet.Dir - Vector(0,0,grav / (D.Speed or 1)) * (LagCompensation or 1)
 		Bullet.Dir:Normalize()
 	end
+	]]
+	
+	local grav = 600
+	local tk = self.ServerTick or (1/66.667)
+	if (D.Gravity != nil) then grav = D.Gravity end
+	-- TODO: Spacebuild gravity
+	if (grav and grav > 0) then
+		Bullet.Vel = Bullet.Vel - Vector(0,0,grav) * tk * (LagCompensation or 1)
+	end
+	Bullet.Pos = Bullet.Pos + Bullet.Vel * tk * (LagCompensation or 1)
 	
 	-- Lifetime
 	if (B.Lifetime) then
@@ -253,7 +276,7 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 			else
 				if (D.ExplodeAfterDeath) then
 					local trace = pewpew:DefaultTraceBullet( Bullet )
-						self:ExplodeBullet( Index, Bullet, trace )
+					self:ExplodeBullet( Index, Bullet, trace )
 				else
 					self:RemoveBullet( Index )
 				end
@@ -263,19 +286,20 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 	
 	if (CLIENT) then 
 		local contents = util.PointContents( Bullet.Pos )
-		local contents2 = util.PointContents( Bullet.Pos + Bullet.Dir * D.Speed * (LagCompensation or 1) )
+		local contents2 = util.PointContents( Bullet.Pos + Bullet.Vel * (self.ServerTick or (1/66.667)) * (LagCompensation or 1) )
 		if ((Bullet.RemoveTimer and Bullet.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
 			or contents == 1 -- It flew out of the map
 			or contents2 == 1) then -- It's going to fly out of the map in the next tick
 			self:RemoveBullet( Index )
 		elseif (Bullet.Prop and Bullet.Prop:IsValid()) then
 			Bullet.Prop:SetPos( Bullet.Pos )
-			Bullet.Prop:SetAngles( Bullet.Dir:Angle() + Angle( 90,0,0 ) + (D.AngleOffset or Angle(0,0,0)) )
+			Bullet.Prop:SetAngles( Bullet.Vel:Angle() + Angle( 90,0,0 ) + (D.AngleOffset or Angle(0,0,0)) )
 			if (CurTime() > B.TraceDelay) then
 				local trace = pewpew:DefaultTraceBullet( Bullet )
 				
 				if (trace.Hit and !B.Exploded) then
 					B.Exploded = true
+					if (D.CLExplode) then D.CLExplode( Bullet, trace ) end
 					self:RemoveBullet( Index )
 				end
 			end
@@ -310,7 +334,7 @@ if (CLIENT) then
 	end)
 else
 	hook.Add("PlayerInitialSpawn","PewPew_ServerTick_InitialSpawn",function(ply)
-		timer.Simple(0.5,function(ply)
+		timer.Simple(2,function(ply)
 			if (ply and ply:IsValid()) then -- check if the client was disconnected on spawn
 				umsg.Start("PewPew_ServerTick",ply)
 					umsg.Float(pewpew.ServerTick)
@@ -338,17 +362,17 @@ function pewpew:BulletThink()
 			
 	for k,v in pairs( self.Bullets ) do
 		if (SERVER) then
-			if (v.WeaponData.ThinkOverride) then
+			if (v.WeaponData.Think) then
 				-- Allows you to override the think function
-				v.WeaponData:ThinkFunc( v )
+				v.WeaponData.Think( v )
 			else
 				self:DefaultBulletThink( v, k )
 			end
 		else
 			local LagCompensation = LastTick / self.ServerTick
-			if (v.WeaponData.CLThinkOverride) then
+			if (v.WeaponData.CLThink) then
 				-- Allows you to override the think function
-				v.WeaponData.CLThinkFunc( v, LagCompensation )
+				v.WeaponData.CLThink( v, LagCompensation )
 			else
 				self:DefaultBulletThink( v, k , LagCompensation)
 			end
@@ -369,11 +393,11 @@ function pewpew:DefaultTraceBullet( Bullet )
 	local D = Bullet.WeaponData
 	local B = Bullet.BulletData
 	
-	local Pos = Bullet.Pos - Bullet.Dir * D.Speed
-	local Dir = Bullet.Dir * D.Speed
+	local Pos = Bullet.Pos - Bullet.Vel * (self.ServerTick or (1/66.667))
+	local Dir = Bullet.Vel * (self.ServerTick or (1/66.667))
 	local Filter
 	if (CLIENT) then Filter = Bullet.Prop end
-	return pewpew:Trace( Pos, Dir, Filter )
+	return pewpew:Trace( Pos, Dir, Filter, Bullet )
 end
 
 ------------------------------------------------------------------------------------------------------------
@@ -433,7 +457,7 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 		elseif (damagetype == "PointDamage") then
 			self:PointDamage( trace.Entity, D.Damage, damagedealer )
 		elseif (damagetype == "SliceDamage") then
-			self:SliceDamage( trace.HitPos, Bullet.Dir, D.Damage, D.NumberOfSlices or 1, D.SliceDistance or 50, D.ReducedDamagePerSlice or 0, damagedealer )
+			self:SliceDamage( trace.HitPos, Bullet.Vel, D.Damage, D.NumberOfSlices or 1, D.SliceDistance or 50, D.ReducedDamagePerSlice or 0, damagedealer )
 		elseif (damagetype == "EMPDamage") then
 			self:EMPDamage( trace.HitPos, D.Radius, D.Duration, damagedealer )
 		elseif (damagetyp == "DefenseDamage") then
@@ -455,9 +479,9 @@ end
 function pewpew:ExplodeBullet( Index, Bullet, trace )
 	if (!trace) then return end
 	
-	if (Bullet.WeaponData.ExplodeOverride) then
+	if (Bullet.WeaponData.Explode) then
 		-- Allows you to override the Explode function
-		Bullet.WeaponData:Explode( Bullet, Index, trace )
+		Bullet.WeaponData.Explode( Bullet, Index, trace )
 	else
 		self:DefaultExplodeBullet( Index, Bullet, trace )
 	end

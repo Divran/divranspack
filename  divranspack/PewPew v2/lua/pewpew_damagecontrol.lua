@@ -6,7 +6,7 @@
 -- Whitelist/Blacklist
 
 -- Entities in the Never Ever list will NEVER EVER take damage by PewPew weaponry.
-pewpew.NeverEverList = { "pewpew_base_bullet", "gmod_ghost", "shield" }
+pewpew.NeverEverList = { "pewpew_base_bullet", "gmod_ghost", "shield", "trigger", "func", "event_horizon" }
 -- Entity types in the blacklist will deal their damage to the first non-blacklisted entity they are constrained to. If they are not constrained to one, they take the damage themselves
 pewpew.DamageBlacklist = { "gmod_wire" }
 -- Entity types in the whitelist will ALWAYS be harmed by PewPew weaponry, even if they are in the blacklist as well.
@@ -360,7 +360,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage, DamageDealer )
 	self:CheckIfDead( TargetEntity )
 	
 	-- Allow others to hook
-	self:CallHookBool("PewPew_Damage",TargetEntity,Damage,DamageDealer)
+	self:CallHookBool("PewPew_Damage",TargetEntity,Damage,DamageDealer)	
 end
 
 ------------------------------------------------------------------------------------------------------------
@@ -483,7 +483,7 @@ end
 
 function pewpew:CheckNeverEverList( entity )
 	for _, str in pairs( self.NeverEverList ) do
-		if (entity:GetClass() == str) then return false end
+		if (string.find( entity:GetClass(), str)) then return false end
 	end
 	return true
 end
@@ -492,7 +492,11 @@ function pewpew:CheckValid( entity )
 	if (!entity) then return false end
 	if (!entity:IsValid()) then return false end
 	if (entity:IsWorld()) then return false end
-	--if (entity:GetMoveType() != MOVETYPE_VPHYSICS) then return false end -- This made it unable to kill parented props
+	if (entity:GetMoveType() != MOVETYPE_VPHYSICS) then -- This made it unable to kill parented props
+		if (!(entity:GetMoveType() == MOVETYPE_NONE and entity:GetParent() != nil)) then -- So I added this check as well
+			return false 
+		end
+	end
 	local phys = entity:GetPhysicsObject()
 	if (!phys:IsValid()) then return false end
 	if (!phys:GetVolume()) then return false end

@@ -249,72 +249,136 @@ else
 		Directions.Options["Forward"] = { pewpew_direction = 5 }
 		Directions.Options["Back"] = { pewpew_direction = 6 }
 		CPanel:AddControl("ComboBox",Directions)
-
-		--[[
-			-- Bullets	
-			local label = vgui.Create("DLabel")
-			label:SetText("Left click to select, right click for info.")
-			label:SizeToContents()
-			
-			-- Panel List 1
-			local list1 = vgui.Create("DPanelList")
-			list1:SetHeight( 300 )
-			list1:SetAutoSize( false )
-			list1:SetSpacing( 1 )
-			list1:EnableHorizontal( false ) 
-			list1:EnableVerticalScrollbar( true )
-
-			-- Loop through all categories
-			pewpew.CategoryControls2 = {}
-			for key, value in pairs( pewpew.Categories ) do
-				-- Create a Collapsible Category for each
-				local cat = vgui.Create( "DCollapsibleCategory" )
-				cat:SetSize( 146, 50 )
-				cat:SetExpanded( 0 )
-				cat:SetLabel( key )
-				
-				-- Create a list inside each collapsible category
-				local list = vgui.Create("DPanelList")
-				list:SetAutoSize( true )
-				list:SetSpacing( 2 )
-				list:EnableHorizontal( false ) 
-				list:EnableVerticalScrollbar( true )
-				
-				-- Loop through all weapons in each category
-				for key2, value2 in pairs( pewpew.Categories[key] ) do
-					-- Create a button for each list
-					local btn = vgui.Create("DButton")
-					btn:SetSize( 48, 20 )
-					btn:SetText( value2 )
-					-- Set bullet, change weapon, and close menu
-					btn.DoClick = function()
-						RunConsoleCommand("pewpew_bulletname", value2)
-					end
-					btn.DoRightClick = function()
-						RunConsoleCommand("PewPew_UseMenu", value2)
-					end
-					list:AddItem( btn )
+		
+		local box = vgui.Create("DButton")
+		CPanel:AddItem(box)
+		box:SetText("Tree/Category")
+		-- false = tree, true = category
+		
+		local label = vgui.Create("DLabel")
+		label:SetText("Left click to select, right click for info.")
+		label:SizeToContents()
+		CPanel:AddItem(label)
+		
+		local panel = vgui.Create("DPanel")
+		CPanel:AddItem(panel)
+		panel:SetTall(500)
+		
+		----------------------------------------------------------------------------------------------------
+		-- Tree
+		----------------------------------------------------------------------------------------------------
+		local tree = vgui.Create("DTree",panel)
+		tree:SetWide( 260 )
+		tree:SetPadding( 5 )
+		
+		local function AddNode( parent, folder, curtbl, curcat )
+			parent = folder
+			for k,v in pairs( curtbl ) do
+				if (type(v) == "string") then
+					local wpn = folder:AddNode( string.gsub( v, "_", " " ) )
+					wpn.WeaponName = v
+					wpn.Icon:SetImage( "vgui/spawnmenu/file" )
+					wpn.IsWeapon = true
+				elseif (type(v) == "table") then	
+					local temp = parent:AddNode( string.gsub( k, "_", " " ) )
+					AddNode( parent, temp, v, k )
 				end
-				
-				cat:SetContents( list )
-					function cat.Header:OnMousePressed()
-					for k,v in ipairs( pewpew.CategoryControls2 ) do
+			end
+		end
+		AddNode( tree, tree, pewpew.Categories, curcat )
+		
+		local oldfunc = tree.DoClick
+		function tree:DoClick( node )
+			if (node.IsWeapon) then
+				RunConsoleCommand("pewpew_bulletname", node.WeaponName)
+				RunConsoleCommand("gmod_tool", "pewpew")
+				RunConsoleCommand("pewpew_closeusemenu")
+			else
+				oldfunc( self, node )
+			end
+		end
+		
+		local oldfunc = tree.DoRightClick
+		function tree:DoRightClick( node )
+			if (node.IsWeapon) then
+				RunConsoleCommand("PewPew_UseMenu", node.WeaponName)
+			else
+				oldfunc( self, node )
+			end
+		end
+		
+		----------------------------------------------------------------------------------------------------
+		-- Category
+		----------------------------------------------------------------------------------------------------
+		
+		-- Panel List 1
+		local list1 = vgui.Create("DPanelList",panel)
+		list1:SetAutoSize( false )
+		list1:SetSpacing( 1 )
+		list1:EnableHorizontal( false ) 
+		list1:EnableVerticalScrollbar( true )
+		
+		list1:SetVisible( false )
+		
+		local categories = {}
+		local catcontrols = {}
+		local list2
+		-- Loop through all weapons
+		for k, v in ipairs( pewpew.Weapons ) do
+			-- If the weapon is in a new category
+			if (!categories[v.Category]) then
+				categories[v.Category] = true
+				-- Create a collapsible category derma item
+				local cat = vgui.Create("DCollapsibleCategory",list1)
+				cat:SetSize(146,50)
+				cat:SetExpanded(0)
+				cat:SetLabel(v.Category)
+				catcontrols[#catcontrols+1] = cat
+				function cat.Header:OnMousePressed()
+					for k,v in ipairs( catcontrols ) do
 						if ( v:GetExpanded() and v.Header != self ) then v:Toggle() end
 						if (!v:GetExpanded() and v.Header == self ) then v:Toggle() end
 					end
 				end
-				table.insert( pewpew.CategoryControls2, cat )
-				list1:AddItem( cat )
+				
+				-- Create a list inside the category
+				list2 = vgui.Create("DPanelList")
+				list2:SetAutoSize( true )
+				list2:SetSpacing( 2 )
+				list2:EnableHorizontal( false )
+				list2:EnableVerticalScrollbar( true )
+				
+				cat:SetContents( list2 )
+				list1:AddItem(cat)
 			end
 			
-		CPanel:AddItem(label)
-		CPanel:AddItem(list1)
-		]]
+			-- Add a button for the weapon
+			local btn = vgui.Create("DButton")
+			btn:SetSize( 48,20 )
+			btn:SetText( v.Name )
+			function btn:DoClick() RunConsoleCommand("pewpew_bulletname",v.Name) end
+			function btn:DoRightClick() RunConsoleCommand("pewpew_usemenu",v.Name) end
+			list2:AddItem( btn )
+		end
 		
-		local btn = vgui.Create("DButton")
-		btn:SetText("Menu")
-		function btn:DoClick() RunConsoleCommand("pewpew_weaponmenu") end
-		CPanel:AddItem(btn)
+		box.val = true
+		function box:DoClick()
+			self.val = !self.val
+			if (self.val) then
+				tree:SetVisible(true)
+				list1:SetVisible(false)
+			else
+				tree:SetVisible(false)
+				list1:SetVisible(true)
+			end
+		end
+		
+		local old = panel.SetSize
+		function panel:SetSize( w, h )
+			old( self, w, h )
+			tree:SetSize( w, h )
+			list1:SetSize( w, h )
+		end
 		
 		local label = vgui.Create("DLabel")
 		label:SetText([[To open this weapons menu in a seperate 

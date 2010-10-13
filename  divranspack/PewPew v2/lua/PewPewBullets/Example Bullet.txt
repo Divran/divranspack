@@ -73,8 +73,8 @@ BULLET.CustomInputs = nil -- Use a table here to replace the default wire inputs
 BULLET.CustomOutputs = nil -- Use a table here to replace the default wire outputs (Only for adv users).
 
 -- Custom Functions (Only for adv users)
--- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
--- I suggest you erase any functions you are not using to minimize file size.
+-- If these functions are valid, they are called instead of the default functions.
+-- Set these to nil or erase them if you're not using them, or your bullet will not work!
 
 ---------------------------------------------------------------------------------------------------------------------------------
 -- Name: 	Wire Input
@@ -82,8 +82,7 @@ BULLET.CustomOutputs = nil -- Use a table here to replace the default wire outpu
 -- New/Old System Differences:	None
 -- Used on:	Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.WireInputOverride = false
-function BULLET:WireInput( self, inputname, value )
+function BULLET:WireInput( inputname, value )
 	-- Nothing
 end
 
@@ -93,20 +92,18 @@ end
 -- New/Old System Differences: None
 -- Used on:	Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.FireOverride = false
-function BULLET:Fire( self )
+function BULLET:Fire()
 	-- Nothing
 end
 
 ---------------------------------------------------------------------------------------------------------------------------------
 -- Name: 	Initialize
 -- Desc: 	This is called when the bullet initializes.
--- New/Old System Differences: 	Old: "Var" will be the bullet entity.
---				New: "Var" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
+-- New/Old System Differences: 	Old: "self" will be the bullet entity.
+--				New: "self" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
 -- Used on:	Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.InitializeOverride = false
-function BULLET:InitializeFunc( Var )   
+function BULLET:Initialize()   
 	-- Nothing
 end
 
@@ -116,34 +113,41 @@ end
 -- New/Old System Differences:	None
 -- Used on:	Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.CannonThinkOverride = false
-function BULLET:CannonThink( self )
+function BULLET:CannonThink()
 	-- Nothing
 end
 
 ---------------------------------------------------------------------------------------------------------------------------------
 -- Name: 	Bullet Think
 -- Desc: 	Think
--- New/Old System Differences:	Old: "Var" will be the bullet entity.
--- 				New: "Var" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
+-- New/Old System Differences:	Old: "self" will be the bullet entity.
+-- 				New: "self" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
 -- Used on:	Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.ThinkOverride = false
-function BULLET:ThinkFunc( Var )
+function BULLET:Think()
 	-- Nothing
 end
 
 ---------------------------------------------------------------------------------------------------------------------------------
 -- Name: 	Explode
 -- Desc: 	Is called when the bullet explodes
--- New/Old System Differences:	Old: "Var" will be the bullet entity. "trace" will be a trace.
--- 				New: "Var" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
+-- New/Old System Differences:	Old: "self" will be the bullet entity. "trace" will be a trace.
+-- 				New: "self" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
 --				There will be a new argument. The index of the bullet in the bullet table (use this with pewpew:RemoveBullet(Index))
 --				And "trace" will be the THIRD argument.
 -- Used on:	Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.ExplodeOverride = false
-function BULLET:Explode( Var, trace )
+function BULLET:Explode( trace )
+	-- Nothing
+end
+
+---------------------------------------------------------------------------------------------------------------------------------
+-- Name: 	CLExplode
+-- Desc: 	Is called when the bullet explodes
+-- New/Old System Differences:	Only works on the new system
+-- Used on:	Client Side Bullet
+---------------------------------------------------------------------------------------------------------------------------------
+function BULLET:CLExplode( trace )
 	-- Nothing
 end
 
@@ -153,8 +157,7 @@ end
 -- New/Old System Differences:	None
 -- Used on:	Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.CannonPhysicsCollideOverride = false
-function BULLET:CannonPhysicsCollideFunc(Data, PhysObj)
+function BULLET:CannonPhysicsCollide(Data, PhysObj)
 	-- Nothing
 end
 
@@ -164,8 +167,7 @@ end
 -- New/Old System Differences:	None
 -- Used on:	Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.CannonTouchOverride = false
-function BULLET:CannonTouchFunc(Ent)	
+function BULLET:CannonTouch(Ent)	
 
 end
 
@@ -175,8 +177,7 @@ end
 -- New/Old System Differences:	This function is not available at all if you use the new system.
 -- Used on:	Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.PhysicsCollideOverride = false
-function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+function BULLET:PhysicsCollide(CollisionData, PhysObj)
 	-- Nothing
 end
 
@@ -189,8 +190,7 @@ end
 --				New: "self" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
 -- Used on:	Client Side Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
-BULLET.CLInitializeOverride = false
-function BULLET:CLInitializeFunc()
+function BULLET:CLInitialize()
 	-- Nothing
 end
 
@@ -200,9 +200,7 @@ end
 -- New/Old System Differences:	None
 -- Used on:	Client Side Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
--- Cannon Initialize (Is run on: Cannon)
-BULLET.CLCannonInitializeOverride = false
-function BULLET:CLCannonInitializeFunc()
+function BULLET:CLCannonInitialize()
 	-- Nothing
 end
 
@@ -213,9 +211,7 @@ end
 --				New: "self" will be a table of information about the bullet. Check pewpew_bulletcontrol.lua for more info.
 -- Used on:	Client Side Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
--- Think (Is run on: Bullet)
-BULLET.CLThinkOverride = false
-function BULLET:CLThinkFunc()
+function BULLET:CLThink()
 	-- Nothing
 end
 
@@ -225,9 +221,7 @@ end
 -- New/Old System Differences:	None
 -- Used on:	Client Side Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
--- Cannon Think (Is run on: Cannon)
-BULLET.CLCannonThinkOverride = false
-function BULLET:CLCannonThinkFunc()
+function BULLET:CLCannonThink()
 	-- Nothing
 end
 
@@ -238,9 +232,7 @@ end
 -- New/Old System Differences:	This function will not be available at all if you use the new system.
 -- Used on:	Bullet
 ---------------------------------------------------------------------------------------------------------------------------------
--- Draw (Is run on: Bullet)
-BULLET.CLDrawOverride = false
-function BULLET:CLDrawFunc()
+function BULLET:CLDraw()
 	-- Nothing
 end
 
@@ -250,9 +242,7 @@ end
 -- New/Old System Differences:	None
 -- Used on:	Cannon
 ---------------------------------------------------------------------------------------------------------------------------------
--- Cannon Draw (Is run on: Cannon)
-BULLET.CLCannonDrawOverride = false
-function BULLET:CLCannonDrawFunc()
+function BULLET:CLCannonDraw()
 	-- Nothing
 end
 

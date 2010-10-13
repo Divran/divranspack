@@ -32,8 +32,7 @@ BULLET.ExplodeAfterDeath = false
 BULLET.EnergyPerShot = 200
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	-- Calculate initial position of bullet
 	local direction, startpos = pewpew:GetFireDirection( self.Direction, self )
 	

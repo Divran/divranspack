@@ -158,6 +158,40 @@ function ENT:OldSystem_FireBullet()
 	-- Spawn
 	ent:Spawn()
 	ent:Activate()
+
+	WireLib.TriggerOutput( self.Entity, "Last Fired", ent )
+	WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+	
+	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self, ent )
+		
+	-- Recoil
+	if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
+		self.Entity:GetPhysicsObject():AddVelocity( Dir * -self.Bullet.RecoilForce )
+	end
+	
+	-- Sound
+	if (self.Bullet.FireSound) then
+		local soundpath = ""
+		if (table.Count(self.Bullet.FireSound) > 1) then
+			soundpath = table.Random(self.Bullet.FireSound)
+		else
+			soundpath = self.Bullet.FireSound[1]
+		end
+		self:EmitSound( soundpath )
+	end
+	
+	-- Effect
+	if (self.Bullet.FireEffect) then
+		local effectdata = EffectData()
+		effectdata:SetOrigin( Pos )
+		effectdata:SetNormal( Dir )
+		util.Effect( self.Bullet.FireEffect, effectdata )
+	end
+	
+	if (self.Bullet.Ammo and self.Bullet.Ammo > 0) then
+		self.Ammo = self.Ammo - 1
+		WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
+	end
 	
 	return ent
 end
@@ -167,12 +201,42 @@ end
 function ENT:NewSystem_FireBullet()
 	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self, ent )
 	local num = self.Bullet.Spread or 0
-	local randomang = Angle(0,0,0)
 	if (num and num != 0) then
-		randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
+		local randomang = Angle( math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num) )
 		Dir:Rotate(randomang)
 	end
 	pewpew:FireBullet( Pos, Dir, self.Owner, self.Bullet, self, self.Direction )
+	
+	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self, ent )
+		
+	-- Recoil
+	if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
+		self.Entity:GetPhysicsObject():AddVelocity( Dir * -self.Bullet.RecoilForce )
+	end
+	
+	-- Sound
+	if (self.Bullet.FireSound) then
+		local soundpath = ""
+		if (table.Count(self.Bullet.FireSound) > 1) then
+			soundpath = table.Random(self.Bullet.FireSound)
+		else
+			soundpath = self.Bullet.FireSound[1]
+		end
+		self:EmitSound( soundpath )
+	end
+	
+	-- Effect
+	if (self.Bullet.FireEffect) then
+		local effectdata = EffectData()
+		effectdata:SetOrigin( Pos )
+		effectdata:SetNormal( Dir )
+		util.Effect( self.Bullet.FireEffect, effectdata )
+	end
+	
+	if (self.Bullet.Ammo and self.Bullet.Ammo > 0) then
+		self.Ammo = self.Ammo - 1
+		WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
+	end
 end
 	
 function ENT:FireBullet()
@@ -187,48 +251,14 @@ function ENT:FireBullet()
 		self:ConsumeResource("energy",req)
 	end
 	
-	if (self.Bullet.FireOverride) then
+	if (self.Bullet.Fire) then
 		-- Allows you to override the fire function
-		self.Bullet:Fire( self )
+		self.Bullet.Fire( self )
 	else
 		if (self.Bullet.UseOldSystem == true or pewpew:GetConVar("AlwaysUseOldSystem") == true or self.Bullet.Version <= 1) then
-			local ent = self:OldSystem_FireBullet()
-				
-			WireLib.TriggerOutput( self.Entity, "Last Fired", ent )
-			WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+			self:OldSystem_FireBullet()
 		else
 			self:NewSystem_FireBullet()
-		end
-		
-		local Dir, Pos = pewpew:GetFireDirection( self.Direction, self, ent )
-		
-		-- Recoil
-		if (self.Bullet.RecoilForce and self.Bullet.RecoilForce > 0) then
-			self.Entity:GetPhysicsObject():AddVelocity( Dir * -self.Bullet.RecoilForce )
-		end
-		
-		-- Sound
-		if (self.Bullet.FireSound) then
-			local soundpath = ""
-			if (table.Count(self.Bullet.FireSound) > 1) then
-				soundpath = table.Random(self.Bullet.FireSound)
-			else
-				soundpath = self.Bullet.FireSound[1]
-			end
-			self:EmitSound( soundpath )
-		end
-		
-		-- Effect
-		if (self.Bullet.FireEffect) then
-			local effectdata = EffectData()
-			effectdata:SetOrigin( Pos )
-			effectdata:SetNormal( Dir )
-			util.Effect( self.Bullet.FireEffect, effectdata )
-		end
-		
-		if (self.Bullet.Ammo and self.Bullet.Ammo > 0) then
-			self.Ammo = self.Ammo - 1
-			WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
 		end
 	end	
 end
@@ -238,8 +268,8 @@ end
 ----------------------------------------------------------------------------------------------
 function ENT:Think()
 	if (!self.Bullet) then return end
-	if (self.Bullet.CannonThinkOverride) then
-		return self.Bullet:CannonThink( self )
+	if (self.Bullet.CannonThink) then
+		return self.Bullet.CannonThink( self )
 	else
 		if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then -- if you can fire
 			if (self.Ammo <= 0 and self.Bullet.Ammo > 0) then -- check for ammo
@@ -295,20 +325,20 @@ end
 -- Other
 ----------------------------------------------------------------------------------------------
 function ENT:PhysicsCollide( data, physobj )
-	if (self.Bullet.CannonPhysicsCollideOverride) then
-		self.Bullet.CannonPhysicsCollideFunc( self, data, physobj )
+	if (self.Bullet.CannonPhysicsCollide) then
+		self.Bullet.CannonPhysicsCollide( self, data, physobj )
 	end
 end
 
 function ENT:Touch( Ent )
-	if (self.Bullet.CannonTouchOverride) then
-		self.Bullet.CannonTouchFunc( self, Ent )
+	if (self.Bullet.CannonTouch) then
+		self.Bullet.CannonTouch( self, Ent )
 	end
 end
 
 function ENT:OnRemove()
 	if (self.Bullet and self.Bullet.OnRemove) then
-		self.Bullet:OnRemove( self )
+		self.Bullet.OnRemove( self )
 	end
 end
 
@@ -347,8 +377,8 @@ end
 
 -- Wiring
 function ENT:TriggerInput(iname, value)
-	if (self.Bullet.WireInputOverride) then
-		self.Bullet:WireInput( self, iname, value )
+	if (self.Bullet.WireInput) then
+		self.Bullet.WireInput( self, iname, value )
 	else
 		self:InputChange( iname, value )
 	end
@@ -358,8 +388,8 @@ end
 local function NumpadOn( ply, self )
 	if (!pewpew:GetConVar("Numpads")) then return end
 	if (!self or !self:IsValid()) then return end
-	if (self.Bullet.WireInputOverride) then
-		self.Bullet:WireInput( self, "Fire", 1 )
+	if (self.Bullet.WireInput) then
+		self.Bullet.WireInput( self, "Fire", 1 )
 	else
 		self:InputChange( "Fire", 1 )
 	end
@@ -368,8 +398,8 @@ end
 local function NumpadOff( ply, self )
 	if (!pewpew:GetConVar("Numpads")) then return end
 	if (!self or !self:IsValid()) then return end
-	if (self.Bullet.WireInputOverride) then
-		self.Bullet:WireInput( self, "Fire", 0 )
+	if (self.Bullet.WireInput) then
+		self.Bullet.WireInput( self, "Fire", 0 )
 	else
 		self:InputChange( "Fire", 0 )
 	end
@@ -378,8 +408,8 @@ end
 local function NumpadReloadOn( ply, self )
 	if (!pewpew:GetConVar("Numpads")) then return end
 	if (!self or !self:IsValid()) then return end
-	if (self.Bullet.WireInputOverride) then
-		self.Bullet:WireInput( self, "Reload", 1 )
+	if (self.Bullet.WireInput) then
+		self.Bullet.WireInput( self, "Reload", 1 )
 	else
 		self:InputChange( "Reload", 1 )
 	end
@@ -388,8 +418,8 @@ end
 local function NumpadReloadOff( ply, self )
 	if (!pewpew:GetConVar("Numpads")) then return end
 	if (!self or !self:IsValid()) then return end
-	if (self.Bullet.WireInputOverride) then
-		self.Bullet:WireInput( self, "Reload", 0 )
+	if (self.Bullet.WireInput) then
+		self.Bullet.WireInput( self, "Reload", 0 )
 	else
 		self:InputChange( "Reload", 0 )
 	end
@@ -454,7 +484,6 @@ function ENT:DupeSpawn( ply, ent, info )
 				Reloadtime = 2,
 				Ammo = 0,
 				AmmoReloadtime = 0,
-				FireOverride = true
 			}
 			function blt:Fire(self) 
 				self.Owner:ChatPrint("[Pewpew] This server does not have a bullet named '" .. info.pewpewInfo.BulletName .. "'.\nIn order to fire, you must update this cannon with a valid bullet.")

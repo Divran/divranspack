@@ -27,7 +27,7 @@ BULLET.EmptyMagSound = nil
 
 -- Movement
 BULLET.Speed = 45
-BULLET.Gravity = 0.7
+--BULLET.Gravity = 0.7
 BULLET.RecoilForce = 0.1
 BULLET.Spread = 3
 
@@ -49,13 +49,11 @@ BULLET.AmmoReloadtime = 0
 
 BULLET.EnergyPerShot = 100
 
-BULLET.CLInitializeOverride = true
-function BULLET:CLInitializeFunc()
+function BULLET:CLInitialize()
 	self.emitter = ParticleEmitter( Vector(0,0,0) )
 end
 
-BULLET.CLThinkOverride = true
-function BULLET:CLThinkFunc()
+function BULLET:CLThink()
 	local Pos = self.Entity:GetPos()
 	local effectdata = EffectData()
 		effectdata:SetOrigin( Pos )

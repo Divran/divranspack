@@ -24,11 +24,6 @@ BULLET.ExplosionSound = {"weapons/explode3.wav","weapons/explode4.wav","weapons/
 BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "big_splosion"
 
--- Movement
-BULLET.Speed = nil
-BULLET.Gravity = nil
-BULLET.RecoilForce = nil
-BULLET.Spread = nil
 
 -- Damage
 BULLET.DamageType = "BlastDamage"
@@ -53,8 +48,7 @@ BULLET.UseOldSystem = true
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Initialize (Is called when the entity initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc(self)
+function BULLET:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -76,8 +70,7 @@ function BULLET:InitializeFunc(self)
 end
 
 -- Think (Is called a lot of times :p)
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think()
 	if (CurTime() > self.Timer) then
 		if (pewpew:GetConVar( "Damage" )) then
 			pewpew:PlayerBlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), self.Bullet.Damage, self.Bullet.Radius)
@@ -109,8 +102,7 @@ function BULLET:ThinkFunc( self )
 end
 
 -- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
-BULLET.PhysicsCollideOverride = true
-function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+function BULLET:PhysicsCollide(CollisionData, PhysObj)
 	if (CollisionData.HitEntity:IsWorld() and self.Collided == 0) then
 		self.Timer = CurTime() + 8
 		self.Collided = 1

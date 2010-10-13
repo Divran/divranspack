@@ -58,8 +58,7 @@ BULLET.CustomInputs = { "Fire", "X", "Y", "Z", "XYZ [VECTOR]" }
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Wire Input (This is called whenever a wire input is changed)
-BULLET.WireInputOverride = true
-function BULLET:WireInput( self, inputname, value )
+function BULLET:WireInput( inputname, value )
 	if (inputname == "Fire") then
 		if (value != 0) then
 			self.Firing = true
@@ -87,8 +86,7 @@ function BULLET:WireInput( self, inputname, value )
 end
 
 -- Initialize (Is called when the bullet initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc( self )   
+function BULLET:Initialize()   
 	self:DefaultInitialize()
 	
 	self.TargetDir = self.Entity:GetUp()
@@ -117,16 +115,14 @@ function BULLET:InitializeFunc( self )
 end
 
 -- Think
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think()
 	-- Make it fly
 	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-	if (self.TargetPos != Vector(0,0,0)) then
-		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
-		self.FlightDirection = self.FlightDirection:GetNormalized()
-	end
-	if (self.Cannon:IsValid()) then
-		if (self.Cannon.TargetPos and self.Cannon.TargetPos != Vector(0,0,0)) then
+	if (self.Cannon and self.Cannon:IsValid()) then 
+		if (self.Cannon.TargetPos != Vector(0,0,0)) then
+			self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
+			self.FlightDirection = self.FlightDirection:GetNormalized()
+
 			self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
 		end
 	end

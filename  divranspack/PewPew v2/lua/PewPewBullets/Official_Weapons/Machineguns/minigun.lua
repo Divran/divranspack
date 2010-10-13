@@ -21,7 +21,7 @@ BULLET.ExplosionEffect = "mghit"
 
 -- Movement
 BULLET.Speed = 100
-BULLET.Gravity = 0.1
+--BULLET.Gravity = 0.1
 BULLET.RecoilForce = 35
 BULLET.Spread = 0.5
 BULLET.AffectedBySBGravity = true
@@ -39,8 +39,7 @@ BULLET.AmmoReloadtime = 14
 BULLET.EnergyPerShot = 80
 
 -- Wire Input (This is called whenever a wire input is changed) (Is run on: Cannon)
-BULLET.WireInputOverride = true
-function BULLET:WireInput( self, name, value )
+function BULLET:WireInput( name, value )
 	if (name == "Fire") then
 		if (value != 0) then
 			self.Firing = true
@@ -70,8 +69,7 @@ function BULLET:WireInput( self, name, value )
 end
 
 -- Cannon Think (Is run on: Cannon)
-BULLET.CannonThinkOverride = true
-function BULLET:CannonThink( self )
+function BULLET:CannonThink()
 	if (!self.ChargeSound) then self.ChargeSound = CreateSound( self.Entity, "ambient/machines/spin_loop.wav" ) end
 	if (!self.ChargeUpTime) then self.ChargeUpTime = 0 end
 	if (CurTime() - self.LastFired > self.Bullet.Reloadtime and self.CanFire == false) then -- if you can fire
@@ -139,7 +137,7 @@ function BULLET:CannonThink( self )
 	end
 end
 
-function BULLET:OnRemove(self)
+function BULLET:OnRemove()
 	if (self.ChargeSound:IsPlaying()) then self.ChargeSound:Stop() end
 end
 

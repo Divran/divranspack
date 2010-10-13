@@ -175,12 +175,9 @@ end
 
 function ENT:BuildDupeInfo()
 	local info = self.BaseClass.BuildDupeInfo(self) or {}
-	info.pewpewInfo = {}
-	info.pewpewInfo.Owner = self.Owner
 	return info
 end
 
 function ENT:ApplyDupeInfo( ply, ent, info, GetEntByID )
-	if (info.pewpewInfo and info.pewpewInfo.Owner) then self.Owner = info.pewpewInfo.Owner end
 	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
 end

@@ -31,8 +31,7 @@ BULLET.EnergyPerShot = 10000
 
 BULLET.CustomInputs = { "Fire", "Height" }
 
-BULLET.WireInputOverride = true
-function BULLET:WireInput( self, inputname, value )
+function BULLET:WireInput( inputname, value )
 	if (inputname == "Height") then
 		self.TargetHeight = math.max( value, 0 )
 		if (self.TargetHeight == 0) then self.TargetHeight = nil end
@@ -41,8 +40,7 @@ function BULLET:WireInput( self, inputname, value )
 	end		
 end
 
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	local Dir, Pos = pewpew:GetFireDirection( self.Direction, self )
 	
 	local Bullet = pewpew:GetWeapon("Naval Mine")

@@ -57,8 +57,7 @@ BULLET.UseOldSystem = true -- because I'm too lazy to convert it :/
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Initialize (Is called when the bullet initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc( self )   
+function BULLET:Initialize()   
 	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
 	self.Entity:SetMoveType( MOVETYPE_NONE )
 	self.Entity:SetSolid( SOLID_NONE )    
@@ -85,9 +84,8 @@ function BULLET:InitializeFunc( self )
 	end
 end
 
--- Think (Is called a lot of times :p)
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+-- Think
+function BULLET:Think()
 	-- Make it fly
 	if (self.Entity:WaterLevel() == 0) then
 		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed / 2 )

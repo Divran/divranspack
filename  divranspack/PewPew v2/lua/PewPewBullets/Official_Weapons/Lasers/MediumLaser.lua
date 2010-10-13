@@ -32,8 +32,7 @@ BULLET.EnergyPerShot = 600
 
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	local direction, startpos = pewpew:GetFireDirection( self.Direction, self )
 	
 	-- Deal damage

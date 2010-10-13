@@ -19,8 +19,7 @@ BULLET.AmmoReloadtime = 0
 
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	self:EmitSound( "weapons/smokegrenade/sg_explode.wav" )
 
 	local effectdata = EffectData()

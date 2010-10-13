@@ -142,7 +142,7 @@ if (CLIENT) then
 	
 	local function drawname( v, owner )
 		local pos = v:GetPos():ToScreen()
-		local name = v:GetNWString("PewPew_OwnerName",(owner or "- Error -"))
+		local name = owner or v:GetNWString("PewPew_OwnerName","- Error -")
 		surface.SetFont("ScoreboardText")
 		local w = surface.GetTextSize( name )
 		draw.WordBox( 2, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
@@ -154,6 +154,8 @@ if (CLIENT) then
 		for k,v in ipairs( pewpew.Bullets ) do
 			if (v.Prop and ValidEntity(v.Prop) and v.Owner) then
 				drawname(v.Prop,v.Owner:Nick())
+			else
+				drawname(v)
 			end
 		end
 	end

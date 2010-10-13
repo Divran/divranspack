@@ -35,8 +35,7 @@ BULLET.CustomInputs = { "Fire", "Target [ENTITY]" }
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Wire Input (This is called whenever a wire input is changed)
-BULLET.WireInputOverride = true
-function BULLET:WireInput( self, inputname, value )
+function BULLET:WireInput( inputname, value )
 	if (inputname == "Target") then
 		if (value and value:IsValid() and value:GetClass() == "pewpew_base_bullet") then
 			self.Target = value
@@ -47,8 +46,7 @@ function BULLET:WireInput( self, inputname, value )
 end
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	local Distance = 3500
 	if (self.Target) then
 		Distance = self.Target:GetPos():Distance(self.Entity:GetPos())

@@ -29,14 +29,11 @@ BULLET.CustomOutputs = {}
 -- I suggest you erase any functions you are not using to minimize file size.
 
 -- Cannon Think (Is run on: Cannon)
-BULLET.CannonThinkOverride = true
 function BULLET:CannonThink() end
 
-BULLET.FireOverride = true
 function BULLET:Fire() end
 
-BULLET.CannonPhysicsCollideOverride = true
-function BULLET:CannonPhysicsCollideFunc( Data, PhysObj )
+function BULLET:CannonPhysicsCollide( Data, PhysObj )
 	if (pewpew:GetConVar( "Firing" ) and pewpew:GetConVar( "Damage" )) then
 		if (!self.LastHit) then self.LastHit = 0 end
 		if (CurTime() > self.LastHit) then

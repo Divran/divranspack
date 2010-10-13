@@ -26,7 +26,7 @@ BULLET.ExplosionEffect = "Enersplosion"
 
 -- Movement
 BULLET.Speed = 150
-BULLET.Gravity = 0.1
+--BULLET.Gravity = 0.1
 BULLET.RecoilForce = 700
 BULLET.Spread = 0
 BULLET.AffectedBySBGravity = true

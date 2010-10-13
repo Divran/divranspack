@@ -26,7 +26,7 @@ BULLET.ExplosionEffect = "pewpew_smokepuff"
 
 -- Movement
 BULLET.Speed = 135
-BULLET.Gravity = 0.06
+--BULLET.Gravity = 0.06
 BULLET.RecoilForce = 400
 BULLET.Spread = 1
 BULLET.AffectedBySBGravity = true

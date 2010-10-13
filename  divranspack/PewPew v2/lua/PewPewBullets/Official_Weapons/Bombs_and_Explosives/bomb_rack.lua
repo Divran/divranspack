@@ -24,12 +24,6 @@ BULLET.ExplosionSound = {"weapons/explode3.wav","weapons/explode4.wav","weapons/
 BULLET.FireEffect = nil
 BULLET.ExplosionEffect = "athesplode"
 
--- Movement
-BULLET.Speed = nil
-BULLET.Gravity = nil
-BULLET.RecoilForce = nil
-BULLET.Spread = nil
-
 -- Damage
 BULLET.DamageType = "BlastDamage"
 BULLET.Damage = 650
@@ -54,8 +48,7 @@ BULLET.UseOldSystem = true
 
 
 -- Initialize (Is called when the entity initializes)
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc(self)
+function BULLET:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -76,8 +69,7 @@ function BULLET:InitializeFunc(self)
 end
 
 -- Think (Is called a lot of times :p)
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think()
 	local vel = self:GetVelocity() -- For some reason setting the angle every tick makes it move REALLY slowly, so I used this hacky method of angling it
 	self:SetAngles( vel:GetNormal():Angle() )
 	self.Entity:GetPhysicsObject():SetVelocity( vel )
@@ -110,8 +102,7 @@ function BULLET:ThinkFunc( self )
 	end
 end
 -- This is called when the bullet collides (Advanced users only. It only works if you first override initialize and change it to vphysics)
-BULLET.PhysicsCollideOverride = true
-function BULLET:PhysicsCollideFunc(CollisionData, PhysObj)
+function BULLET:PhysicsCollide(CollisionData, PhysObj)
 	if (self.Collided == false) then
 		self.Collided = true
 	end

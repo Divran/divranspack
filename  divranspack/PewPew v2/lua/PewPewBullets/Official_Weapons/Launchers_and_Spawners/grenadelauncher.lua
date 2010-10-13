@@ -31,7 +31,6 @@ BULLET.EmptyMagSound = nil
 
 -- Movement
 BULLET.Speed = 50
-BULLET.Gravity = 0.2
 BULLET.RecoilForce = 100
 BULLET.Spread = 0
 
@@ -60,9 +59,7 @@ BULLET.UseOldSystem = true
 
 -- Overrides
 
-
-BULLET.InitializeOverride = true
-function BULLET:InitializeFunc(self)
+function BULLET:Initialize()
 	self:DefaultInitialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
@@ -76,8 +73,7 @@ function BULLET:InitializeFunc(self)
 	phys:ApplyForceCenter( self.Entity:GetForward() * phys:GetMass() * self.Bullet.Speed * 35 )
 end
 
-BULLET.ThinkOverride = true
-function BULLET:ThinkFunc( self )
+function BULLET:Think()
 	-- Lifetime
 	if (self.Lifetime) then
 		if (CurTime() > self.Lifetime) then

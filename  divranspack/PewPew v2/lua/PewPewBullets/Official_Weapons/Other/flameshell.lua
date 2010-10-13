@@ -26,7 +26,7 @@ BULLET.ExplosionEffect = "firey"
 
 -- Movement
 BULLET.Speed = 65
-BULLET.Gravity = 0.2
+--BULLET.Gravity = 0.2
 BULLET.RecoilForce = 500
 BULLET.Spread = 0
 
@@ -48,8 +48,7 @@ BULLET.AmmoReloadtime = 0
 BULLET.EnergyPerShot = 9000
 
 -- Explode (Is called when the bullet explodes)
-BULLET.ExplodeOverride = true
-function BULLET:Explode(self, trace)
+function BULLET:Explode(trace)
 
 	local Pos = self.Entity:GetPos()
 	local Norm = self.Entity:GetUp()

@@ -7,7 +7,7 @@ local function CreateMenu()
 	frame = vgui.Create("DFrame")
 	frame:SetPos( ScrW()/2-w/2, ScrH()/2-h/2 )
 	frame:SetSize( w, h )
-	frame:SetTitle( "PewPew Weapon Selection & Options Menu" )
+	frame:SetTitle( "PewPew Weapon Selection Menu" )
 	frame:SetVisible( false)
 	frame:SetDraggable( true )
 	frame:ShowCloseButton( true )
@@ -15,9 +15,12 @@ local function CreateMenu()
 	frame:SetScreenLock( false )
 	frame:MakePopup()
 	
+	--[[
 	local psheet = vgui.Create("DPropertySheet",frame)
 	psheet:SetPos( 4, 24 )
 	psheet:SetSize( w - 8, h - 24 - 4 )
+	
+	
 	
 		-- Weapon selection tab
 		local frame2 = vgui.Create("DPanel")
@@ -50,7 +53,6 @@ local function CreateMenu()
 										function( value ) return value or 0 end
 									},
 			}
-			
 		
 		
 		local n = 0
@@ -63,20 +65,23 @@ local function CreateMenu()
 			slider:SetMinMax( v[2], v[3] )
 			n = n + 1
 		end
+	]]
 
 		-- DTree
-		local tree = vgui.Create("DTree", frame2)
+		local tree = vgui.Create("DTree", frame)
 		tree:SetPadding( 5 )
 		tree:SetPos( 2, 2 )
-		tree:SetSize( 300, frame2:GetTall() - 4 )
+		tree:StretchToParent(4,24,4,4)
+		--tree:SetSize( 300, frame:GetTall() - 4 )
 		
-		
+	--[[
 		local function UpdateSliders( wpn )
 			if (!wpn) then return end
 			for k,v in pairs( sliders ) do
 				v[5]:SetValue( v[4](wpn[k]) )
 			end
 		end
+	]]
 		
 		local function AddNode( parent, folder, curtbl, curcat )
 			parent = folder
@@ -102,11 +107,11 @@ local function CreateMenu()
 				RunConsoleCommand("pewpew_closeusemenu")
 				frame:SetVisible( false )
 			else
-				if (node.IsWeapon) then
-					UpdateSliders( pewpew:GetWeapon( node.WeaponName ) )
-				else
+				--if (node.IsWeapon) then
+				--	UpdateSliders( pewpew:GetWeapon( node.WeaponName ) )
+				--else
 					oldfunc( self, node )
-				end
+				--end
 				self.SelectedNode = node
 			end
 		end
@@ -120,18 +125,18 @@ local function CreateMenu()
 			end
 		end
 		
-		psheet:AddSheet( "Weapon", frame2, nil, false, false, "Select Weapon" )
+		--psheet:AddSheet( "Weapon", frame2, nil, false, false, "Select Weapon" )
 end
-
-timer.Simple(2, CreateMenu )
 
 concommand.Add("PewPew_WeaponMenu", function( ply, cmd, arg )
 	-- Open weapons menu
+	if (!frame) then CreateMenu() end
 	frame:SetVisible( true )	
 end)
 
 concommand.Add("+PewPew_WeaponMenu", function( ply, cmd, arg )
 	-- Open weapons menu
+	if (!frame) then CreateMenu() end
 	frame:SetVisible( true )
 end)
 

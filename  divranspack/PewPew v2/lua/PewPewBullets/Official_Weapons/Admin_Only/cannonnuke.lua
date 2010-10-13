@@ -25,8 +25,8 @@ BULLET.FireEffect = "artyfire"
 BULLET.ExplosionEffect = "breachsplode"
 
 -- Movement
-BULLET.Speed = 60
-BULLET.Gravity = 0.2
+BULLET.Speed = 150
+--BULLET.Gravity = 0.2
 BULLET.RecoilForce = 1000
 BULLET.Spread = 0
 BULLET.AffectedBySBGravity = true

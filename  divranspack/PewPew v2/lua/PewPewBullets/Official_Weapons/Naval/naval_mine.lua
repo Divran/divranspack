@@ -44,8 +44,7 @@ BULLET.Ammo = 0
 
 BULLET.EnergyPerShot = 20000
 
-BULLET.CannonThinkOverride = true
-function BULLET:CannonThink( self )
+function BULLET:CannonThink()
 	local phys = self.Entity:GetPhysicsObject()
 	if (!phys) then return end
 	
@@ -79,8 +78,7 @@ function BULLET:CannonThink( self )
 	return true
 end
 
-BULLET.CannonPhysicsCollideOverride = true
-function BULLET:CannonPhysicsCollideFunc( Data, PhysObj )
+function BULLET:CannonPhysicsCollide( Data, PhysObj )
 
 	local Pos = self.Entity:GetPos()
 	local Norm = self.Entity:GetUp()

@@ -62,8 +62,7 @@ BULLET.UseOldSystem = true
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Wire Input (This is called whenever a wire input is changed)
-BULLET.WireInputOverride = true
-function BULLET:WireInput( self, inputname, value )
+function BULLET:WireInput( inputname, value )
 	if (inputname == "Speed") then
 		self.CustomSpeed = math.Clamp(value,10,200)
 	else
@@ -72,8 +71,7 @@ function BULLET:WireInput( self, inputname, value )
 end
 
 -- Initialize (Is called when the bullet initializes)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	self.Bullet.Speed = self.CustomSpeed or 100
 	self:OldSystem_FireBullet()
 end

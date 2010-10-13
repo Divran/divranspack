@@ -12,12 +12,6 @@ BULLET.Description = "EMP Bomb. No damage, but disables wiring for 15 seconds."
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
--- Appearance
-BULLET.Model = nil
-BULLET.Material = nil
-BULLET.Color = nil
-BULLET.Trail = nil
-
 -- Effects / Sounds
 BULLET.FireSound = {"weapons/explode1.wav","weapons/explode2.wav"}
 BULLET.ExplosionEffect = "HEATsplode"
@@ -38,8 +32,7 @@ BULLET.EnergyPerShot = 15500
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Fire (Is called before the cannon is about to fire)
-BULLET.FireOverride = true
-function BULLET:Fire( self )
+function BULLET:Fire()
 	local Pos = self.Entity:GetPos()
 		
 	-- Effect
