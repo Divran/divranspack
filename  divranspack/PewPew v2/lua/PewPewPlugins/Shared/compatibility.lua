@@ -19,6 +19,7 @@ pewpew.Compatibility[1] = function( self, weapon ) -- Make weapons at version 1 
 	if (weapon.Gravity and weapon.Gravity != 0) then
 		weapon.Gravity = weapon.Gravity * (1/self.ServerTick)
 	end
+	weapon._Gravity = weapon.Gravity * pewpew.ServerTick ^ 2
 	
 	-- Convert Speed
 	--if (weapon.Speed and type(weapon.Speed) == "number") then
@@ -114,10 +115,15 @@ end
 pewpew.Compatibility[0] = pewpew.Compatibility[1]
 
 pewpew.Compatibility[2] = function( self, weapon )
-	-- Add gravity to be used by the E2 functions and client side menus, if weapon.Gravity is nil.
-	if (!weapon.Gravity) then
+	print("hello")
+	if (!weapon.Gravity) then -- Add gravity to be used by the E2 functions and client side menus, if weapon.Gravity is nil.
+		print("gravity didnt exist")
 		weapon._Gravity = 600 * pewpew.ServerTick ^ 2
+	else -- Add gravity to be used by the E2 functions and client side menus, if the weapon uses a custom gravity value
+		print("gravity existed")
+		weapon._Gravity = weapon.Gravity * pewpew.ServerTick ^ 2
 	end
+	print("_gravity: " .. pewpew._Gravity)
 end
 
 function pewpew:MakeCompatible( weapon )

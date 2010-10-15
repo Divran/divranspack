@@ -3,6 +3,8 @@ local Length = v.Length
 local Dot = v.Dot
 local sqrt = math.sqrt
 
+-- Helper functions
+
 local function RaySphereIntersection( Start, Dir, Pos, Radius ) -- Thanks to Feha
 	local A = 2 * Length(Dir)^2
 	local B = 2 * Dot(Dir,Start - Pos)
@@ -38,26 +40,10 @@ local function RayCircleIntersection( Start, Dir, Pos, Normal, Radius )
 	return false
 end
 
+if (SERVER) then umsg.PoolString("PewPew_Stargate_EH_Position_Change") end
+
 function pewpew:Trace( pos, dir, filter, Bullet ) -- Bullet arg is only necessary for Stargate Event Horizons. It's made to work for bullets, but can be used for lasors as well.
 	if (StarGate) then -- If Stargate is installed
-	
-		--[[ Check for EH
-		if (Bullet) then
-			for k,v in ipairs( pewpew.SGGates ) do
-				if (v and ValidEntity( v ) and v:IsOpen() and !v.ShuttingDown) then -- if open
-					local hit, _ = RayCircleIntersection( pos, dir, v:LocalToWorld(v:OBBCenter()), v:GetForward(), 103 ) -- I got 103 using some E2 code
-					if (hit) then
-						local newpos, newdir = v:TeleportVectorWithEffect( hit, dir:GetNormalized() )
-						Bullet.Pos = newpos
-						Bullet.Vel = newdir * dir:Length()
-						pos = newpos
-						dir = newdir
-						if (!filter) then filter = {} elseif (type(filter) == "Entity") then filter = {filter} end
-						filter[#filter+1] = v
-					end
-				end
-			end
-		end]]
 	
 		if (SERVER) then
 			local trace = StarGate.Trace:New( pos, dir, filter )
@@ -73,27 +59,20 @@ function pewpew:Trace( pos, dir, filter, Bullet ) -- Bullet arg is only necessar
 						trace.HitShield = true
 						return trace
 					else
-						if (filter and type(filter) == "Entity") then
-							filter = { filter }
-						elseif (!filter) then 
-							filter = {} 
-						end
-						
+						if (!filter) then filter = {} elseif (type(filter) == "Entity") then filter = {filter} end
 						filter[#filter+1] = trace.Entity
-						--table.insert( filter, trace.Entity )
 						return self:Trace( trace.HitPos, dir, filter )
 					end
 				elseif (trace.Entity:GetClass() == "event_horizon") then
 					if (trace.Entity:GetParent() and string.find(trace.Entity:GetParent():GetClass(),"stargate_") and Bullet) then
-						local newpos, newdir = trace.Entity:TeleportVectorWithEffect( trace.HitPos, dir )
-						--print("pos: " .. tostring(pos))
-						--print("dir: " .. tostring(dir))
-						--print("newpos: " .. tostring(newpos))
-						--print("newdir: " .. tostring(newdir))
+						local newpos, newdir = GetTeleportedVector( trace.Entity, trace.Entity.Target, trace.HitPos, dir:GetNormalized() )
+						if (Bullet.BulletData and Bullet.BulletData.TraceDelay) then
+							Bullet.BulletData.TraceDelay = CurTime() + (Bullet.WeaponData.Speed * Bullet.SpeedOffset) / (1/pewpew.ServerTick) * pewpew.ServerTick
+						end
 						Bullet.Pos = newpos
-						Bullet.Vel = newdir-- * dir:Length()
+						Bullet.Vel = newdir * (1/pewpew.ServerTick) * Length(dir)
 						pos = newpos
-						dir = newdir
+						dir = newdir * Length(dir)
 						if (!filter) then filter = {} elseif (type(filter) == "Entity") then filter = {filter} end
 						filter[#filter+1] = trace.Entity
 						filter[#filter+1] = trace.Entity:GetParent()
@@ -120,7 +99,28 @@ function pewpew:Trace( pos, dir, filter, Bullet ) -- Bullet arg is only necessar
 				end
 			end
 			
-			-- If no SG shield was hit, go on with a regular trace..
+			-- This doesn't work because there's no reliable way to get the target of a gate client side afaik
+			--[[ If no SG shield was hit, go on with an EH check...
+			if (Bullet) then
+				for k,v in ipairs( pewpew.SGGates ) do
+					if (v and ValidEntity( v ) and v._IsOpen) then
+						local hit, _ = RayCircleIntersection( pos, dir, v:LocalToWorld(v:OBBCenter()), v:GetForward(), 103 )
+						if (hit) then
+							local newpos, newdir = v:GetTeleportedVector( pos, dir:GetNormalized() )
+							Bullet.Pos = newpos
+							Bullet.Vel = newdir * (1/pewpew.ServerTick) * Length(dir)
+							pos = newpos
+							dir = newdir * Length(dir)
+							if (Bullet.Prop and Bullet.Prop:IsValid()) then Bullet.Prop:SetPos( newpos ) end
+							if (!filter) then filter = {} elseif (type(filter) == "Entity") then filter = {filter} end
+							filter[#filter+1] = v
+							return self:Trace( pos, dir, filter, Bullet )
+						end						
+					end
+				end
+			end]]
+			
+			-- No shield or EH was hit. Use a regular trace.
 			local tr = {}
 			tr.start = pos
 			tr.endpos = pos + dir
@@ -140,12 +140,26 @@ end
 -- Keep track of stargate shields and gates. Used for the pewpew trace to remove bullets at the right time and check for EHs.
 if (CLIENT) then
 	pewpew.SGShields = {}
+	--pewpew.SGGates = {}
 
 	hook.Add("OnEntityCreated","PewPew_StargateShield_Spawn",function( ent )
 		if (ent and ValidEntity( ent )) then
 			if (ent:GetClass() == "shield") then
 				pewpew.SGShields[#pewpew.SGShields+1] = ent
-			end
+			end--[[elseif (string.find(ent:GetClass(),"stargate_") and ent.IsStargate) then
+				pewpew.SGGates[#pewpew.SGGates+1] = ent
+			elseif (ent:GetClass() == "event_horizon") then -- Hacky way of checking if a gate is opening
+				timer.Simple(0,function(ent)
+					-- Get SG
+					local SG = ent:GetParent()
+					if (SG and SG:IsValid() and SG.IsStargate) then
+						if (!table.HasValue( pewpew.SGGates, SG )) then
+							pewpew.SGGates[#pewpew.SGGates+1] = SG
+						end
+						SG._IsOpen = true
+					end
+				end,ent)
+			end]]
 		end
 	end)
 
@@ -157,6 +171,33 @@ if (CLIENT) then
 					return
 				end
 			end
-		end
+		end--[[elseif (string.find(ent:GetClass(),"stargate_") and ent.IsStargate) then
+			for k,v in ipairs( pewpew.SGGates ) do
+				if (v == ent) then
+					table.remove( pewpew.SGGates, k )
+					return
+				end
+			end
+		elseif (ent:GetClass() == "event_horizon") then -- Hacky way of checking if a gate is closing
+			timer.Simple(0,function(ent)
+				-- Get SG
+				local SG = ent:GetParent()
+				if (SG and SG:IsValid() and SG.IsStargate) then
+					SG._IsOpen = nil
+				end
+			end,ent)
+		end]]
 	end)
+	--[[
+	hook.Add("Initialize","PewPew_StargateInitialize",function()
+		timer.Simple(10,function()
+			local e = ents.FindByClass("stargate_*")
+			for k,v in ipairs( e ) do
+				if (v.IsStargate) then
+					pewpew.SGGates[#pewpew.SGGates+1] = v
+				end
+			end
+		end)
+	end)
+	]]
 end

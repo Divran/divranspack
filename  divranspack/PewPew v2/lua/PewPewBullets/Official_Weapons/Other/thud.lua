@@ -59,7 +59,7 @@ function BULLET:Explode( Index, trace )
 				phys:ApplyForceCenter( dir * 10000000 )
 			end
 		end
-		WorldSound( self.Bullet.ExplosionSound[1], trace.HitPos+trace.HitNormal*5,100,100)
+		WorldSound( self.WeaponData.ExplosionSound[1], trace.HitPos+trace.HitNormal*5,100,100)
 	end
 	pewpew:RemoveBullet(Index)
 end

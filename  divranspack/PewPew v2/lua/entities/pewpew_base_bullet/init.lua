@@ -13,7 +13,11 @@ function ENT:DefaultInitialize()
 	
 	if (self.Bullet.Version >= 2) then
 		local n = self.Bullet.Spread
-		self.Vel = self.FlightDirection * self.Bullet.Speed * math.Rand(1-n/100,1+n/100) * (1/tk)
+		if (n and n != 0) then
+			self.Vel = self.FlightDirection * self.Bullet.Speed * math.Rand(1-n/100,1+n/100) * (1/tk)
+		else
+			self.Vel = self.FlightDirection * self.Bullet.Speed * (1/tk)
+		end
 	end
 	
 	-- Lifetime

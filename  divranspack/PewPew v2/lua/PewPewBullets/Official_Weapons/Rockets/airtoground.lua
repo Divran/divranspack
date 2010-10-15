@@ -88,7 +88,7 @@ end
 -- Initialize (Is called when the bullet initializes)
 function BULLET:Initialize()   
 	self:DefaultInitialize()
-	self.TargetDir = self.Entity:GetUp()
+	self.TargetDir = self.FlightDirection
 	self.MaxZ = self.TargetDir.z
 	if (self.Cannon:IsValid()) then
 		if (self.Cannon.TargetPos and self.Cannon.TargetPos != Vector(0,0,0)) then
@@ -106,10 +106,24 @@ end
 function BULLET:Think()
 	-- Make it fly
 	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-	if (self.TargetPos != Vector(0,0,0)) then
+	if (self.Cannon and self.Cannon:IsValid() and self.Cannon.TargetPos) then
 		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
 		self.FlightDirection = self.FlightDirection:GetNormalized()
+		
+		self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
+			
+		if (self.TargetDir.z < self.MaxZ) then self.MaxZ = self.TargetDir.z end
+		self.TargetDir.z = math.min( self.TargetDir.z, self.MaxZ )
 	end
+	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+
+--[[
+	-- Make it fly
+	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
+	--if (self.TargetDir != Vector(0,0,0)) then
+		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
+		self.FlightDirection = self.FlightDirection:GetNormalized()
+	--end
 	if (self.Cannon:IsValid()) then
 		if (self.Cannon.TargetPos and self.Cannon.TargetPos != Vector(0,0,0)) then
 			self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
@@ -118,6 +132,7 @@ function BULLET:Think()
 		end
 	end
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+]]
 	
 	-- Lifetime
 	if (self.Lifetime) then

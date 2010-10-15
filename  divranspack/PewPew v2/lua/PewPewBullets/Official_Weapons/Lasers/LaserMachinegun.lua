@@ -26,7 +26,7 @@ BULLET.ExplosionEffect = "pewpew_laserhiteffect"
 
 -- Movement
 BULLET.Speed = 120
-BULLET.Gravity = 0.01
+--BULLET.Gravity = 0.01
 BULLET.RecoilForce = 10
 BULLET.Spread = 0.4
 BULLET.AffectedBySBGravity = true

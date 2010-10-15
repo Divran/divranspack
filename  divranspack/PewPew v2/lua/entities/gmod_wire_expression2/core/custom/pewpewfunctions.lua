@@ -147,11 +147,18 @@ e2function number entity:pewSpeed()
 	return this.Bullet.Speed or 0
 end
 
--- Returns the gravity
+-- Returns the gravity per second
 e2function number entity:pewGravity()
 	if (!validPhysics(this)) then return 0 end
 	if (this:GetClass() != "pewpew_base_cannon") then return 0 end
-	return this.Bullet.Gravity or this.Bullet._Gravity or 0
+	return this.Bullet._Gravity or 0
+end
+
+-- Returns the gravity per tick
+e2function number entity:pewGravitySec()
+	if (!validPhysics(this)) then return 0 end
+	if (this:GetClass() != "pewpew_base_cannon") then return 0 end
+	return this.Bullet.Gravity or 600
 end
 
 -- Returns the recoil force

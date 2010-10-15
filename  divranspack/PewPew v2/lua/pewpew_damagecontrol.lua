@@ -57,12 +57,14 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 				if (ent != IgnoreEnt) then
 					-- Do any other addons or scripts in this addon have anything to say about this?
 					if (self:CallHookBool("PewPew_ShouldDoBlastDamage",ent,Position,Radius,Damage,RangeDamageMul,IgnoreEnt,DamageDealer)) then
-						table.insert( DamagedProps, ent )
+						DamagedProps[#DamagedProps+1] = ent
+						--table.insert( DamagedProps, ent )
 					end
 				end
 			else
 				if (self:CallHookBool("PewPew_ShouldDoBlastDamage",ent,Position,Radius,Damage,RangeDamageMul,IgnoreEnt,DamageDealer)) then
-					table.insert( DamagedProps, ent )
+					DamagedProps[#DamagedProps+1] = ent
+					--table.insert( DamagedProps, ent )
 				end
 			end
 		end

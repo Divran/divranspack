@@ -118,13 +118,11 @@ end
 function BULLET:Think()
 	-- Make it fly
 	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
-	if (self.Cannon and self.Cannon:IsValid()) then 
-		if (self.Cannon.TargetPos != Vector(0,0,0)) then
-			self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
-			self.FlightDirection = self.FlightDirection:GetNormalized()
+	if (self.Cannon and self.Cannon:IsValid() and self.Cannon.TargetPos) then
+		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
+		self.FlightDirection = self.FlightDirection:GetNormalized()
 
-			self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
-		end
+		self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
 	end
 	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 	

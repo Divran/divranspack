@@ -30,7 +30,7 @@ BULLET.ExplosionEffect = "railgun"
 
 -- Movement
 BULLET.Speed = 90
-BULLET.Gravity = 0.04
+BULLET.Gravity = 200
 BULLET.RecoilForce = 0
 BULLET.Spread = 0.15
 BULLET.AffectedBySBGravity = true

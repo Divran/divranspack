@@ -165,8 +165,7 @@ function pewpew:DefaultBulletInitialize( Bullet )
 	end
 	if (CLIENT) then
 		if (Bullet.Prop) then
-			/*
-			print("PROP:",tostring(Bullet.Prop))
+		--[[
 			-- Trail
 			if (D.Trail) then
 				local trail = ents.Create("env_spritetrail")
@@ -181,10 +180,11 @@ function pewpew:DefaultBulletInitialize( Bullet )
 				local clr = trl.Color
 				trail:SetKeyValue("rendercolor",tostring(clr.r) .. " " .. tostring(clr.g) .. " " .. tostring(clr.b))
 				trail:SetKeyValue("renderamt","5")
-				trail:SetKeyValue("rendermode",tostring(0))
+				trail:SetKeyValue("rendermode","0")
 				trail:Spawn()
 			end
-			*/
+		]]
+			
 			
 			-- Material
 			if (D.Material) then
