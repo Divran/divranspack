@@ -183,6 +183,10 @@ if (SERVER) then
 		end
 	end
 	
+	local function SetScale( ent, ply, x, y )
+		EGP:SetScale( ent, x, y )
+	end
+	
 	umsg.PoolString( "ReceiveObjects" )
 	local function SendObjects( Ent, ply, DataToSend )
 		if (!Ent or !Ent:IsValid() or !ply or !ply:IsValid() or !DataToSend) then return end
@@ -215,6 +219,11 @@ if (SERVER) then
 				-- Check if the object doesn't exist serverside anymore (It may have been removed by a command in the queue before this, like egpClear or egpRemove)
 				if (!EGP:HasObject( Ent, v.index )) then
 					EGP:CreateObject( Ent, v.ID, v )
+				end
+				
+				-- Scale the positions and size
+				if (Ent.Scaling) then
+					EGP:ScaleObject( Ent, v )
 				end
 			
 				EGP.umsg.Short( v.index ) -- Send index of object
@@ -347,6 +356,9 @@ if (SERVER) then
 			end
 			
 			self:AddQueue( Ent, E2.player, LoadFrame, "LoadFrame", Data[1] )
+		elseif (Action == "SetScale") then
+			local Data = {...}
+			self:AddQueue( Ent, E2.player, SetScale, "SetScale", Data[1], Data[2] )
 		end
 	end
 else -- SERVER/CLIENT
@@ -483,7 +495,7 @@ if (SERVER) then
 		local targets
 		if (entid) then
 			local tempent = Entity(entid)
-			if (EGP:ValidEGP( tempent )) then
+			if (self:ValidEGP( tempent )) then
 				targets = { tempent }
 			else
 				return false, "ERROR: Invalid screen."
@@ -532,11 +544,15 @@ else
 	function EGP:ReceiveDataStream( decoded )
 		for k,v in ipairs( decoded ) do
 			local Ent = v.Ent
-			if (EGP:ValidEGP( Ent )) then
+			if (self:ValidEGP( Ent )) then
 				Ent.RenderTable = {}
 				for k2,v2 in pairs( v.Objects ) do
-					local Obj = EGP:GetObjectByID(v2.ID)
-					EGP:EditObject( Obj, v2.Settings )
+					local Obj = self:GetObjectByID(v2.ID)
+					self:EditObject( Obj, v2.Settings )
+					-- If parented, reset the parent indexes
+					if (Obj.parent and Obj.parent != 0) then
+						self:AddParentIndexes( Obj )
+					end
 					Obj.index = v2.index
 					table.insert( Ent.RenderTable, Obj )
 				end
