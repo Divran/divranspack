@@ -2,6 +2,7 @@
 -- Parenting functions
 --------------------------------------------------------
 local EGP = EGP
+EGP.ParentingFuncs = {}
 
 local function addUV( v, t ) -- Polygon u v fix
 	if (v.verticesindex) then
@@ -12,6 +13,7 @@ local function addUV( v, t ) -- Polygon u v fix
 		end
 	end		
 end
+EGP.ParentingFuncs.addUV = addUV
 
 local function makeArray( v, fakepos )
 	local ret = {}
@@ -43,6 +45,7 @@ local function makeArray( v, fakepos )
 	end
 	return ret
 end
+EGP.ParentingFuncs.makeArray = makeArray
 
 local function makeTable( v, data )
 	local ret = {}
@@ -60,6 +63,7 @@ local function makeTable( v, data )
 	end
 	return ret
 end
+EGP.ParentingFuncs.makeTable = makeTable
 
 local function getCenter( data )
 	local centerx, centery = 0, 0
@@ -70,6 +74,7 @@ local function getCenter( data )
 	end
 	return centerx / (n/2), centery / (n/2)
 end
+EGP.ParentingFuncs.getCenter = getCenter
 
 -- (returns true if obj has vertices, false if not, followed by the new position data)
 function EGP:GetGlobalPos( Ent, index )
@@ -166,50 +171,6 @@ function EGP:GetGlobalPos( Ent, index )
 	-- Shouldn't ever get down here
 	ErrorNoHalt("[EGP] Parenting error. Tried to get position of nonexistant object (index = " .. index .. ")")
 	return false, {x=0,y=0,angle=0}
-end
-
---------------------------------------------------------
--- Scaling functions
--- This isn't really parenting but it needs the makeArray and makeTable functions to work, so I'll put it here
---------------------------------------------------------
-
-function EGP:ScaleObject( ent, v )
-	if (!self:ValidEGP( ent )) then return end
-	local xScale = ent.xScale
-	local yScale = ent.yScale
-	if (!xScale or !yScale) then return end
-
-	local xMin = xScale[1]
-	local xMax = xScale[2]
-	local yMin = yScale[1]
-	local yMax = yScale[2]
-	
-	local xMul = 512/(xMax-xMin)
-	local yMul = 512/(yMax-yMin)
-	
-	if (v.verticesindex) then -- Object has vertices
-		local r = makeArray( v, true )
-		for i=1,#r,2 do
-			r[i] = (r[i] - xMin) * xMul
-			r[i+1] = (r[i+1]- yMin) * yMul
-		end
-		local settings = {}
-		if (type(v.verticesindex) == "string") then settings = { [v.verticesindex] = makeTable( v, r ) } else settings = makeTable( v, r ) end
-		self:EditObject( v, settings )
-	else
-		if (v.x) then
-			v.x = (v.x - xMin) * xMul
-		end
-		if (v.y) then
-			v.y = (v.y - yMin) * yMul
-		end
-		if (v.w) then
-			v.w = v.w * xMul
-		end
-		if (v.h) then
-			v.h = v.h * yMul
-		end			
-	end
 end
 
 --------------------------------------------------------

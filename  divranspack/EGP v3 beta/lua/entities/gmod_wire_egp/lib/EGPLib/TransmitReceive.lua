@@ -439,6 +439,9 @@ else -- SERVER/CLIENT
 							Obj.index = index
 							Ent.RenderTable[k] = Obj
 							if (Obj.OnCreate) then Obj:OnCreate() end
+						
+							-- For EGP HUD
+							if (Obj.res) then Obj.res = nil end
 						else -- Edit
 							self:EditObject( v, v:Receive( um ) )
 							
@@ -446,13 +449,16 @@ else -- SERVER/CLIENT
 							if (v.parent and v.parent != 0) then
 								EGP:AddParentIndexes( v )
 							end
+						
+							-- For EGP HUD
+							if (v.res) then v.res = nil end
 						end
 					else -- Object does not exist. Create new
 						local Obj = self:GetObjectByID( ID )
 						self:EditObject( Obj, Obj:Receive( um ) )
 						Obj.index = index
 						if (Obj.OnCreate) then Obj:OnCreate() end
-						table.insert( Ent.RenderTable, Obj )
+						Ent.RenderTable[#Ent.RenderTable+1] = Obj--table.insert( Ent.RenderTable, Obj )
 					end
 					
 					-- Change Order

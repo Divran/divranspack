@@ -1,12 +1,82 @@
 include('shared.lua')
 include("HUDDraw.lua")
 
+--------------------------------------------------------
+-- 0-512 to screen res & back
+--------------------------------------------------------
+
+local makeArray = EGP.ParentingFuncs.makeArray
+local makeTable = EGP.ParentingFuncs.makeTable
+
+function ENT:ScaleObject( bool, v )
+	local xMin, xMax, yMin, yMax, _xMul, _yMul
+	if (bool) then -- 512 -> screen
+		xMin = 0
+		xMax = 512
+		yMin = 0
+		yMax = 512
+		_xMul = ScrW()
+		_yMul = ScrH()
+	else -- screen -> 512
+		xMin = 0
+		xMax = ScrW()
+		yMin = 0
+		yMax = ScrH()
+		_xMul = 512
+		_yMul = 512
+	end
+	--print("bool " .. tostring(bool))
+	--print("-------------------------------")
+	--PrintTable(v)
+	--print("-------------------------------")
+	
+	local xMul = _xMul/(xMax-xMin)
+	local yMul = _yMul/(yMax-yMin)
+	
+	if (v.verticesindex) then -- Object has vertices
+		local r = makeArray( v, true )
+		for i=1,#r,2 do
+			r[i] = (r[i] - xMin) * xMul
+			r[i+1] = (r[i+1]- yMin) * yMul
+		end
+		local settings = {}
+		if (type(v.verticesindex) == "string") then settings = { [v.verticesindex] = makeTable( v, r ) } else settings = makeTable( v, r ) end
+		EGP:EditObject( v, settings )
+	else
+		if (v.x) then
+			v.x = (v.x - xMin) * xMul
+		end
+		if (v.y) then
+			v.y = (v.y - yMin) * yMul
+		end
+		if (v.w) then
+			v.w = v.w * xMul
+		end
+		if (v.h) then
+			v.h = v.h * yMul
+		end			
+	end
+	
+	v.res = bool
+	
+	
+	--print("-------------------------------")
+	--PrintTable(v)
+	--print("-------------------------------")
+end
+
+--------------------------------------------------------
+-- screen res to 0-512
+--------------------------------------------------------
+
+
+--[[
 local function to512( n, n2 )
-	return n / 512 * n2
+	return n / n2 * 512--n / 512 * n2
 end
 
 local function toScreenRes( n, n2 )
-	return n / n2 * 512
+	return n / 512 * n2--n / n2 * 512
 end
 
 function ENT:ChangePositions( Obj, bool )
@@ -44,6 +114,7 @@ function ENT:ChangePositions( Obj, bool )
 	
 	Obj.res = bool
 end
+]]
 
 function ENT:Initialize()
 	self.RenderTable = {}
@@ -54,11 +125,10 @@ function ENT:Initialize()
 end
 
 function ENT:EGP_Update() 
-
 	for k,v in ipairs( self.RenderTable ) do
 		if (v.res == nil) then v.res = false end
 		if (v.res != self.Resolution) then
-			self:ChangePositions( v, !v.res )
+			self:ScaleObject( !v.res, v )
 		end
 		if (v.parent and v.parent != 0) then
 			if (!v.IsParented) then EGP:SetParent( self, v.index, v.parentindex ) end

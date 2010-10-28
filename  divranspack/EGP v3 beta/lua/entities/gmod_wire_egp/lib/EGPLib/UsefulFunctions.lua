@@ -24,6 +24,52 @@ function EGP:SetScale( ent, x, y )
 	end
 end
 
+--------------------------------------------------------
+-- Scaling functions
+--------------------------------------------------------
+
+local makeArray = EGP.ParentingFuncs.makeArray
+local makeTable = EGP.ParentingFuncs.makeTable
+
+function EGP:ScaleObject( ent, v )
+	if (!self:ValidEGP( ent )) then return end
+	local xScale = ent.xScale
+	local yScale = ent.yScale
+	if (!xScale or !yScale) then return end
+
+	local xMin = xScale[1]
+	local xMax = xScale[2]
+	local yMin = yScale[1]
+	local yMax = yScale[2]
+	
+	local xMul = 512/(xMax-xMin)
+	local yMul = 512/(yMax-yMin)
+	
+	if (v.verticesindex) then -- Object has vertices
+		local r = makeArray( v, true )
+		for i=1,#r,2 do
+			r[i] = (r[i] - xMin) * xMul
+			r[i+1] = (r[i+1]- yMin) * yMul
+		end
+		local settings = {}
+		if (type(v.verticesindex) == "string") then settings = { [v.verticesindex] = makeTable( v, r ) } else settings = makeTable( v, r ) end
+		self:EditObject( v, settings )
+	else
+		if (v.x) then
+			v.x = (v.x - xMin) * xMul
+		end
+		if (v.y) then
+			v.y = (v.y - yMin) * yMul
+		end
+		if (v.w) then
+			v.w = v.w * xMul
+		end
+		if (v.h) then
+			v.h = v.h * yMul
+		end			
+	end
+end
+
 ----------------------------
 -- IsDifferent check
 ----------------------------
