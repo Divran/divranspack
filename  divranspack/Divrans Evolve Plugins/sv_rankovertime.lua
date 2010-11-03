@@ -11,11 +11,11 @@ PLUGIN.Usage = "<[block/unblock] [player]> OR JUST <[player]>"
 PLUGIN.Privileges = { "Block ranks over time", "Unblock ranks over time" }
 
 --------- EDITABLE AREA
--- rankname = { targetrank, timerequired (seconds) }
-PLUGIN.RankUps = {	["guest"] = { "respected", 60 },
-					["respected"] = { "admin", 60*2 },
-					["admin"] = { "superadmin", 60*3 },
-					["superadmin"] = { "owner", 60*4 },
+-- 					rankname = { targetrank, timerequired (seconds) }
+PLUGIN.RankUps = {	["guest"] = { "respected", 60*10 },
+					["respected"] = { "admin", 60*60 },
+					["admin"] = { "superadmin", 60*120 },
+					--["superadmin"] = { "owner", 60*240 },
 				 }
 --------- EDITABLE AREA
 
