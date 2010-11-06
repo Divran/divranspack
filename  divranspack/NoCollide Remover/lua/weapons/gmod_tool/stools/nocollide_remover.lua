@@ -7,11 +7,9 @@ TOOL.Name			= "NoCollide Remover"
 if ( CLIENT ) then
     language.Add( "Tool_nocollide_remover_name", "NoCollide Remover Tool" )
     language.Add( "Tool_nocollide_remover_desc", "A tool that CAN remove no-collides." )
-    language.Add( "Tool_nocollide_remover_0", "Primary: Select first entity, Reload: Remove all no-collides" )
+    language.Add( "Tool_nocollide_remover_0", "Primary: Select first entity, Secondary: Remove all no-collides from the entity" )
 	language.Add( "Tool_nocollide_remover_1", "Select the second entity.")
 end
-
-TOOL.Ent = nil
 
 function TOOL:LeftClick( trace )
 	if (!trace or !trace.Hit or !trace.Entity or !trace.Entity:IsValid()) then return false end
@@ -30,9 +28,10 @@ function TOOL:LeftClick( trace )
 			end
 		end
 	end
+	return true
 end
 
-function TOOL:Reload( trace )
+function TOOL:RightClick( trace )
 	if (!trace or !trace.Hit or !trace.Entity or !trace.Entity:IsValid()) then return false end
 	if (CLIENT) then return true end
 	if (constraint.HasConstraints(trace.Entity)) then
@@ -45,4 +44,5 @@ function TOOL:Reload( trace )
 			end
 		end
 	end
+	return true
 end
