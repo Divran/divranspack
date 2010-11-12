@@ -19,14 +19,19 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 	local targets = ents.FindInSphere( Position, Radius )
 	if (!targets or table.Count(targets) == 0) then return end
 	local DamagedProps = {}
+	local n = 0
 	for _, ent in ipairs( targets ) do
 		if (self:CheckValid( ent )) then
 			if (IgnoreEnt) then
 				if (ent != IgnoreEnt) then
-					table.insert( DamagedProps, ent )
+					n = n + 1
+					DamagedProps[n] = ent
+					--table.insert( DamagedProps, ent )
 				end
 			else
-				table.insert( DamagedProps, ent )
+				n = n + 1
+				DamagedProps[n] = ent
+				--table.insert( DamagedProps, ent )
 			end
 		end
 	end
@@ -34,7 +39,7 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 	for _, ent in ipairs( DamagedProps ) do
 		local Distance = Position:Distance( ent:GetPos() )
 		local Dmg = math.Clamp( Damage - (Distance * RangeDamageMul), 0, Damage )
-		Dmg = self:ReduceBlastDamage( Dmg, #DamagedProps )
+		Dmg = self:ReduceBlastDamage( Dmg, n )
 		self:DealDamageBase( ent, Dmg, DamageDealer )
 	end
 end
