@@ -16,7 +16,7 @@ BULLET.Model = "models/Items/grenadeAmmo.mdl"
 BULLET.FireSound = {"npc/attack_helicopter/aheli_mine_drop1.wav"}
 
 -- Reloading/Ammo
-BULLET.Reloadtime = 3
+BULLET.Reloadtime = 1
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
