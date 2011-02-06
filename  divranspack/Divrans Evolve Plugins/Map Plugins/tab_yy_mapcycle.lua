@@ -10,7 +10,8 @@ TAB.Width = 520
 TAB.Icon = "gui/silkicons/world"
 
 function TAB:Update()
-	if (evolve.MapCycle) then
+	local maps = evolve:MapCyclePlugin_GetMaps()
+	if (maps) then
 		-- Get selected line and value
 		local line = self.CycleList:GetSelectedLine()
 		local lineval
@@ -20,7 +21,7 @@ function TAB:Update()
 		
 		-- Re-fill list
 		self.CycleList:Clear()
-		for _, filename in pairs(evolve.MapCycle) do
+		for _, filename in pairs( maps ) do
 			self.CycleList:AddLine( filename )
 		end
 		
@@ -49,82 +50,81 @@ function TAB:Update()
 end
 
 local function CallUpdate( handler )
-	if (handler == "evolve_cyclemaplist") then
+	if (handler == "ev_mapcycle_datastream") then
 		timer.Simple( 0.1, function() TAB:Update() end )
 	end
 end
 hook.Add("CompletedIncomingStream", "CallUpdate", CallUpdate)
+function evolve:MapCyclePlugin_UpdateTab() TAB:Update() end
 
 function TAB:Initialize( pnl )
-	self.Container = vgui.Create( "DPanel", pnl )
-	self.Container:SetSize( self.Width - 10, pnl:GetParent():GetTall() )
-	self.Container.Paint = function() end
 
-	self.MapList = vgui.Create( "DListView" )
-	self.MapList:SetParent( self.Container )
+	local w,h = self.Width, pnl:GetParent():GetTall()
+
+	self.MapList = vgui.Create( "DListView", pnl )
 	self.MapList:SetPos( 0, 2 )
-	self.MapList:SetSize( self.Container:GetWide() / 2 - 2, self.Container:GetTall() - 58 )
+	self.MapList:SetSize( w / 2 - 2, h - 58 )
 	self.MapList:SetMultiSelect( false )
 	self.MapList:AddColumn("Maps")
-	if (evolve.Maps) then
-		for _, filename in pairs(evolve.Maps) do
+	local maps, _ = evolve:MapPlugin_GetMaps()
+	if (#maps>0) then
+		for _, filename in pairs(maps) do
 			self.MapList:AddLine( filename )
 		end
 		self.MapList:SelectFirstItem()
 	else
-		timer.Simple( 5, function( self ) 
-				for _, filename in pairs(evolve.Maps) do
-					self.MapList:AddLine( filename )
-				end
-				self.MapList:SelectFirstItem()
+		timer.Simple( 5, function( self )
+			for _, filename in pairs(maps) do
+				self.MapList:AddLine( filename )
+			end
+			self.MapList:SelectFirstItem()
 		end, TAB )
 	end
 	
-	self.CycleList = vgui.Create("DListView")
-	self.CycleList:SetParent( self.Container )
-	self.CycleList:SetPos( self.Container:GetWide() / 2 + 2, 2 )
-	self.CycleList:SetSize( self.Container:GetWide() / 2 - 4, self.Container:GetTall() - 58 )
+	self.CycleList = vgui.Create("DListView",pnl)
+	self.CycleList:SetPos( w / 2 + 2, 2 )
+	self.CycleList:SetSize( w / 2 - 4, h - 58 )
 	self.CycleList:SetMultiSelect( false )
 	self.CycleList:AddColumn("Cycle")
 	
 	local nrbuttons = 6
 
-	self.AddButton = vgui.Create("DButton", self.Container )
-	self.AddButton:SetSize( self.Container:GetWide() / nrbuttons - 2, 20 )
-	self.AddButton:SetPos( 0 , self.Container:GetTall() - 52 )
+	self.AddButton = vgui.Create("DButton", pnl )
+	self.AddButton:SetSize( w / nrbuttons - 2, 20 )
+	self.AddButton:SetPos( 0 , h - 52 )
 	self.AddButton:SetText( "Add Map" )
 	function self.AddButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "add", TAB.MapList:GetLine(TAB.MapList:GetSelectedLine()):GetValue(1) )
 	end
 	
-	self.RemoveButton = vgui.Create("DButton", self.Container )
-	self.RemoveButton:SetSize( self.Container:GetWide() / nrbuttons - 2, 20 )
-	self.RemoveButton:SetPos( self.Container:GetWide() * (1/nrbuttons) , self.Container:GetTall() - 52 )
+	self.RemoveButton = vgui.Create("DButton", pnl )
+	self.RemoveButton:SetSize( w / nrbuttons - 2, 20 )
+	self.RemoveButton:SetPos( w * (1/nrbuttons) , h - 52 )
 	self.RemoveButton:SetText( "Remove Map" )
 	function self.RemoveButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "remove", TAB.CycleList:GetSelectedLine() )
 	end
 	
-	self.MoveUpButton = vgui.Create("DButton", self.Container )
-	self.MoveUpButton:SetWide( self.Container:GetWide() / nrbuttons - 2 )
+	self.MoveUpButton = vgui.Create("DButton", pnl )
+	self.MoveUpButton:SetWide( w / nrbuttons - 2 )
 	self.MoveUpButton:SetTall( 20 )
-	self.MoveUpButton:SetPos( self.Container:GetWide() * (2/nrbuttons) , self.Container:GetTall() - 52 )
+	self.MoveUpButton:SetPos( w * (2/nrbuttons) , h - 52 )
 	self.MoveUpButton:SetText( "Move Up" )
 	function self.MoveUpButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "moveup", TAB.CycleList:GetSelectedLine() )
 	end
 	
-	self.MoveDownButton = vgui.Create("DButton", self.Container )
-	self.MoveDownButton:SetSize( self.Container:GetWide() / nrbuttons - 2, 20 )
-	self.MoveDownButton:SetPos( self.Container:GetWide() * (3/nrbuttons) , self.Container:GetTall() - 52 )
+	self.MoveDownButton = vgui.Create("DButton", pnl )
+	self.MoveDownButton:SetSize( w / nrbuttons - 2, 20 )
+	self.MoveDownButton:SetPos( w * (3/nrbuttons) , h - 52 )
 	self.MoveDownButton:SetText( "Move Down" )
 	function self.MoveDownButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "movedown", TAB.CycleList:GetSelectedLine() )
 	end
 	
-	self.TimeList = vgui.Create( "DMultiChoice", self.Container )
-	self.TimeList:SetSize( self.Container:GetWide() / nrbuttons - 2, 20 )
-	self.TimeList:SetPos( self.Container:GetWide() * (4/nrbuttons), self.Container:GetTall() - 52 )
+	self.TimeList = vgui.Create( "DMultiChoice", pnl )
+	self.TimeList:SetSize( w / nrbuttons - 2, 20 )
+	self.TimeList:SetPos( w * (4/nrbuttons), h - 52 )
 	self.TimeList:SetEditable( false )
 	self.TimeList.Times = 	{ 	{ "5 minutes", "5" },
 								{ "15 minutes", "15" },
@@ -145,20 +145,20 @@ function TAB:Initialize( pnl )
 		RunConsoleCommand( "ev", "mapcycle", "interval", self.Times[index][2], self.Times[index][1] )
 	end	
 	
-	self.MoveDownButton = vgui.Create("DButton", self.Container )
-	self.MoveDownButton:SetSize( self.Container:GetWide() / nrbuttons - 2, 20 )
-	self.MoveDownButton:SetPos( self.Container:GetWide() * (5/nrbuttons) , self.Container:GetTall() - 52 )
+	self.MoveDownButton = vgui.Create("DButton", pnl )
+	self.MoveDownButton:SetSize( w / nrbuttons - 2, 20 )
+	self.MoveDownButton:SetPos( w * (5/nrbuttons) , h - 52 )
 	self.MoveDownButton:SetText( "Toggle" )
 	function self.MoveDownButton:DoClick()
 		RunConsoleCommand( "ev", "mapcycle", "toggle" )
 	end
 	
-	self.Block = vgui.Create( "DFrame", self.Container )
+	self.Block = vgui.Create( "DFrame", pnl )
 	self.Block:SetDraggable( false )
 	self.Block:SetTitle( "" )
 	self.Block:ShowCloseButton( false )
 	self.Block:SetPos( 0, 0 )
-	self.Block:SetSize( self.Container:GetWide(), self.Container:GetTall() )
+	self.Block:SetSize( w, h )
 	self.Block.Paint = function()
 		surface.SetDrawColor( 46, 46, 46, 255 )
 		surface.DrawRect( 0, 0, self.Block:GetWide(), self.Block:GetTall() )
@@ -166,7 +166,7 @@ function TAB:Initialize( pnl )
 		draw.SimpleText( "You need the Maps List Plugin ('sh_mapslist.lua') for this tab to work.", "ScoreboardText", self.Block:GetWide() / 2, self.Block:GetTall() / 2 - 20, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
 	end
 	
-	if ( table.Count(evolve.Maps) ) then self.Block:SetPos( self.Block:GetWide(), 0 ) end
+	if ( table.Count(maps) ) then self.Block:SetPos( self.Block:GetWide(), 0 ) end
 end
 
 evolve:RegisterTab( TAB )

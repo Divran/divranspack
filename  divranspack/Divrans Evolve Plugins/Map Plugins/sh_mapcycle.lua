@@ -10,365 +10,413 @@ PLUGIN.ChatCommand = "mapcycle"
 PLUGIN.Usage = "[add/remove/toggle/moveup/movedown/interval] [mapname/interval]"
 PLUGIN.Privileges = { "Map Cycle" }
 
--- Variables
-PLUGIN.Enabled = true
-PLUGIN.Cycle = {}
-PLUGIN.MapChangeInterval = 1
-PLUGIN.MapChangeAt = -1
-PLUGIN.NextMap = ""
-PLUGIN.Maps = {}
-evolve.MapCycle = {}
+if (!datastream) then require("datastream") end
+if (!glon) then require("glon") end
 
-if !datastream then require"datastream" end
+PLUGIN.Enabled = false
+PLUGIN.Maps = {}
+PLUGIN.Interval = -1
+PLUGIN.ChangeAt = -1
 
 if (SERVER) then
+	
+	----------------------------
+	-- Call
+	----------------------------
+
+	local funcs = { ["add"] = true, ["remove"] = true, ["toggle"] = true, ["moveup"] = true, ["movedown"] = true, ["interval"] = true }
 	function PLUGIN:Call( ply, args )
-		if (ply:EV_HasPrivilege( "Map Cycle" )) then
-			if (args[1] and args[1] != "") then
-				local what = args[1]
-				if (what == "add") then
-					if (!self:MapExists( args[2] )) then
-						evolve:Notify( ply, evolve.colors.red, "That map does not exist." )
-					else
-						self:AddMap( args[2] )
-						self:SendMapInfo( nil, true )
-						evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " added the map ", evolve.colors.red, args[2], evolve.colors.white, " to the map cycle list." )
-					end
-				elseif (what == "remove") then
-					local nr = tonumber(args[2])
-					if (!nr or nr == 0) then
-						if (!self:MapExists( args[2] )) then
-							evolve:Notify( ply, evolve.colors.red, "That map does not exist." )
-						else
-							local bool, index = self:HasMap( args[2] )
-							if (bool) then
-								self:RemoveMap( index )
-								self:SendMapInfo( nil, true )
-								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " removed the map ", evolve.colors.red, args[2], evolve.colors.white, " from the map cycle list." )
-							else
-								evolve:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
-							end
-						end
-					else
-						if (nr > 0 and nr <= #self.Cycle) then
-							local mapname = self.Cycle[nr]
-							if (self:HasMap( mapname )) then
-								self:RemoveMap( nr )
-								self:SendMapInfo( nil, true )
-								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " removed the map ", evolve.colors.red, mapname, evolve.colors.white, " from the map cycle list." )
-							else
-								evolve:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
-							end
-						end
-					end
-				elseif (what == "toggle") then
-					self.Enabled = !self.Enabled
-					self.MapChangeAt = RealTime() + self.MapChangeInterval * 60
-					self:SaveCycle()
-					self:SendMapInfo( nil, false )
-					if (self.Enabled) then
-						evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has enabled the map cycle." )
-					else
-						evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has disabled the map cycle." )
-					end
-				elseif (what == "moveup") then
-					local nr = tonumber(args[2])
-					if (!nr or nr == 0) then
-						if (!self:MapExists( args[2] )) then
-							evolve:Notify( ply, evolve.colors.red, "That map does not exist." )
-						else
-							local bool, index = self:HasMap( args[2] )
-							if (bool) then
-								local bool2 = self:MoveUp( index )
-								self:SendMapInfo( nil, true )
-								if (bool2) then
-									evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, args[2], evolve.colors.white, " one step up in the list." )
-								else
-									evolve:Notify( ply, evolve.colors.red, "That map cannot be moved up." )
-								end
-							else
-								evolve:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
-							end
-						end
-					else
-						if (nr > 0 and nr <= #self.Cycle) then
-							local mapname = self.Cycle[nr]
-							local bool = self:MoveUp( nr )
-							self:SendMapInfo( nil, true )
-							if (bool) then
-								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, mapname, evolve.colors.white, " one step up in the list." )
-							else
-								evolve:Notify( ply, evolve.colors.red, "That map cannot be moved up." )
-							end
-						end
-					end
-				elseif (what == "movedown") then
-					local nr = tonumber(args[2])
-					if (!nr or nr == 0) then
-						if (!self:MapExists( args[2] )) then
-							evolve:Notify( ply, evolve.colors.red, "That map does not exist." )
-						else
-							local bool, index = self:HasMap( args[2] )
-							if (bool) then
-								local bool2 = self:MoveDown( index )
-								self:SendMapInfo( nil, true )
-								if (bool2) then
-									evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, args[2], evolve.colors.white, " one step down in the list." )
-								else
-									evolve:Notify( ply, evolve.colors.red, "That map cannot be moved down." )
-								end
-							else
-								evolve:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
-							end
-						end
-					else
-						if (nr > 0 and nr <= #self.Cycle) then
-							local mapname = self.Cycle[nr]
-							local bool = self:MoveDown( nr )
-							self:SendMapInfo( nil, true )
-							if (bool) then
-								evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, mapname, evolve.colors.white, " one step down in the list." )
-							else
-								evolve:Notify( ply, evolve.colors.red, "That map cannot be moved down." )
-							end
-						end
-					end
-				elseif (what == "interval") then
-					local int = args[2]
-					if (int) then
-						self.MapChangeInterval = math.max( int, 0.25 )
-						self.MapChangeAt = RealTime() + self.MapChangeInterval * 60
-						self:SaveCycle()
-						self:SendMapInfo( nil, false )
-						if (args[3]) then
-							evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " changed the map cycle interval to ", evolve.colors.red, tostring(self.MapChangeInterval), evolve.colors.white, " minutes.", evolve.colors.red, " (" .. args[3] .. ")" )
-						else
-							evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " changed the map cycle interval to ", evolve.colors.red, tostring(self.MapChangeInterval), evolve.colors.white, " minutes." )
-						end
-					end
-				end
+	
+		-- Error checking
+		if (!ply:EV_HasPrivilege( "Map Cycle" )) then 
+			evolve:Notify( ply, evolve.colors.red, evolve.constants.notallowed )
+			return 
+		end
+		if (!args[1] or args[1] == "") then 
+			evolve:Notify( ply, evolve.colors.red, "You must specify an action (add/remove/toggle/moveup/movedown/interval)" )
+			return 
+		end
+		if (!funcs[args[1]]) then 
+			evolve:Notify( ply, evolve.colors.red, "Invalid action ('"..args[1].."')." )
+			return 
+		end
+		
+		if (!self[args[1]]( self, ply, args )) then return end -- If the function ran alright, call it client side...
+		
+		umsg.Start( "ev_mapcycle_clientside_cmd" )
+			umsg.Char( #args )
+			for i=1,#args do
+				umsg.String( args[i] )
 			end
-		end
+		umsg.End()
 	end
 	
-	-----------------
-	-- Add and remove
-	
-	function PLUGIN:AddMap( mapname )
-		if (!self.Cycle) then self.Cycle = {} end
-		if (#self.Cycle == 0) then
-			self.MapChangeAt = RealTime() + self.MapChangeInterval * 60
-		end
-		self.Cycle[#self.Cycle+1] = mapname
-		self:SaveCycle()
-	end
-	
-	function PLUGIN:RemoveMap( mapnameorindex )
-		if (type(mapnameorindex) == "string") then
-			local bool, index = self:HasMap( mapnameorindex )
-			if (bool) then
-				table.remove( self.Cycle, index )
-				self:SaveCycle()
-			end
-		elseif (type(mapnameorindex) == "number") then
-			table.remove( self.Cycle, mapnameorindex )
-			self:SaveCycle()
-		end	
-	end
-	
-	-----------------
-	-- Edit list order
-	
-	function PLUGIN:MoveUp( index )
-		local from = self.Cycle[index]
-		local to = self.Cycle[index-1] or ""
-		if (to and to != "") then
-			self.Cycle[index] = to
-			self.Cycle[index-1] = from
-			self:SaveCycle()
-			return true
-		end
-		return false
-	end
-	
-	function PLUGIN:MoveDown( index )
-		local from = self.Cycle[index]
-		local to = self.Cycle[index+1] or ""
-		if (to and to != "") then
-			self.Cycle[index] = to
-			self.Cycle[index+1] = from
-			self:SaveCycle()
-			return true
-		end
-		return false
-	end
-	
-	-----------------
-	-- Useful functions
+end
 
-	-- Is the map in the cycle list?
-	function PLUGIN:HasMap( mapname )
-		if (self.Cycle) then
-			for index, mapn in pairs( self.Cycle ) do
-				if (mapn == mapname) then
-					return true, index
-				end
-			end
+function PLUGIN:Notify( ... ) -- Helper function to block messages running on the client (potentially making it print twice)
+	if (CLIENT) then return end
+	evolve:Notify( ... )
+end
+
+if (CLIENT) then
+	usermessage.Hook( "ev_mapcycle_clientside_cmd", function( um )
+		local n = um:ReadChar()
+		local args = {}
+		for i=1,n do
+			args[i] = um:ReadString()
 		end
-		return false, 0
+		
+		PLUGIN[args[1]]( PLUGIN, { Nick = function() end }, args )
+	end)
+end
+
+----------------------------
+-- Add
+----------------------------
+
+function PLUGIN:add( ply, args )
+	if (!args[2] or args[2] == "") then 
+		self:Notify( ply, evolve.colors.red, "You must specify a map to add." )
+		return 
+	end
+	self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " added the map ", evolve.colors.red, args[2], evolve.colors.white, " to the map cycle list." )
+	self.Maps[#self.Maps+1] = args[2]
+	self:Save()
+	if (CLIENT) then evolve:MapCyclePlugin_UpdateTab() end
+	
+	return true
+end
+
+----------------------------
+-- remove
+----------------------------
+
+function PLUGIN:remove( ply, args )
+	if (!args[2] or args[2] == "") then
+		self:Notify( ply, evolve.colors.red, "You must specify a map." )
+		return
 	end
 	
-	-- Does the map exist on the server?
-	function PLUGIN:MapExists( mapname )
-		for index, mapn in pairs( self.Maps ) do
-			if (mapn == mapname) then
-				return true, index
-			end
-		end
-		return false, 0
+	local nr = tonumber(args[2])
+	if (!nr or nr == 0) then 
+		self:Notify( ply, evolve.colors.red, "The specified map must be the number index of the map." )
+		return 
 	end
 	
-	-- Does the cycle file exist? if not, create it
-	function PLUGIN:MapCycleFileExists()
-		if (!file.Exists("evolve/ev_mapcycle.txt")) then
-			file.Write("evolve/ev_mapcycle.txt","")
-			return false
-		end
-		return true
+	if (!self.Maps[nr]) then
+		self:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
+		return 
 	end
 	
-	-----------------
-	-- Main
+	self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " removed the map ", evolve.colors.red, self.Maps[nr], evolve.colors.white, " from the map cycle list." )
+	table.remove( self.Maps, nr )
+	self:Save()
+	if (CLIENT) then evolve:MapCyclePlugin_UpdateTab() end
 	
-	-- Save the cycle to the file
-	function PLUGIN:SaveCycle()
-		file.Write( "evolve/ev_mapcycle.txt", glon.encode( { self.Enabled, self.MapChangeInterval, self.Cycle } ))
-	end
+	return true
+end
+
+----------------------------
+-- Toggle
+----------------------------
+
+function PLUGIN:toggle( ply, args )
+	if (CLIENT) then return end
 	
-	-- Load the cycle from the file
-	function PLUGIN:GetCycle()
-		if (self:MapCycleFileExists()) then
-			local str = file.Read( "evolve/ev_mapcycle.txt" )
-			if (str and str != "") then
-				local tbl = glon.decode( str )
-				self.Enabled = tbl[1]
-				self.MapChangeInterval = tbl[2]
-				self.Cycle = tbl[3]
-			end
-		end
+	self.Enabled = !self.Enabled
+	
+	self.ChangeAt = RealTime() + self.Interval * 60
+	self:Update()
+	
+	self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " toggled the map cycle. It is now ", evolve.colors.red, self.Enabled and "enabled" or "disabled", evolve.colors.white, "." )
+	self:Save()
+end
+
+----------------------------
+-- Move Up
+----------------------------
+
+function PLUGIN:moveup( ply, args )
+	if (!args[2] or args[2] == "") then
+		self:Notify( ply, evolve.colors.red, "You must specify a map." )
+		return
 	end
 
-	-- Change map at the right time
-	function PLUGIN:Think()
-		local nextmap = self.Cycle[1] or ""
+	local nr = tonumber(args[2])
+	if (!nr or nr == 0) then 
+		self:Notify( ply, evolve.colors.red, "The specified map must be the number index of the map." )
+		return 
+	end
 	
-		-- Check if the next map exists
-		if (nextmap and nextmap != "" and self.Enabled) then
-			-- Check if the time has run out
-			if (RealTime() > self.MapChangeAt and self.MapChangeAt != -1) then
-				if (self:MapExists( nextmap )) then
-					self:RemoveMap( 1 )
-					self:AddMap( nextmap )
-					self:SaveCycle()
-					RunConsoleCommand( "changelevel", nextmap )
-					return
-				else
-					evolve:Notify( evolve.colors.red, "Map Cycle Plugin error: Map '" .. nextmap .. "' does not exist!" )
-				end
+	if (nr == 1) then
+		self:Notify( ply, evolve.colors.red, "The specified map is already at the top of the list." )
+		return
+	end
+	
+	if (!self.Maps[nr]) then
+		self:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
+		return 
+	end
+	
+	self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, self.Maps[nr], evolve.colors.white, " one step up in the map cycle list." )
+	
+	local temp = self.Maps[nr-1]
+	self.Maps[nr-1] = self.Maps[nr]
+	self.Maps[nr] = temp
+	
+	self:Save()
+	if (CLIENT) then evolve:MapCyclePlugin_UpdateTab() end
+	
+	return true
+end
+
+----------------------------
+-- Move Down
+----------------------------
+
+function PLUGIN:movedown( ply, args )
+	if (!args[2] or args[2] == "") then
+		self:Notify( ply, evolve.colors.red, "You must specify a map." )
+		return
+	end
+
+	local nr = tonumber(args[2])
+	if (!nr or nr == 0) then 
+		self:Notify( ply, evolve.colors.red, "The specified map must be the number index of the map." )
+		return 
+	end
+	
+	if (nr == #self.Maps) then
+		self:Notify( ply, evolve.colors.red, "The specified map is already at the bottom of the list." )
+		return
+	end
+	
+	if (!self.Maps[nr]) then
+		self:Notify( ply, evolve.colors.red, "That map is not on the cycle list." )
+		return 
+	end
+	
+	self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " moved the map ", evolve.colors.red, self.Maps[nr], evolve.colors.white, " one step down in the map cycle list." )
+	
+	local temp = self.Maps[nr+1]
+	self.Maps[nr+1] = self.Maps[nr]
+	self.Maps[nr] = temp
+	
+	self:Save()
+	if (CLIENT) then evolve:MapCyclePlugin_UpdateTab() end
+	
+	return true
+end
+
+----------------------------
+-- Interval
+----------------------------
+
+function PLUGIN:interval( ply, args )
+	if (CLIENT) then return end
+	
+	if (!args[2] or args[2] == "") then	
+		self:Notify( ply, evolve.colors.red, "You must specify an interval." )
+		return
+	end
+	
+	local nr = tonumber( args[2] )
+	if (!nr or nr == 0) then
+		self:Notify( ply, evolve.colors.red, "Invalid interval specified." )
+		return
+	end
+	
+	self.Interval = nr
+	self.ChangeAt = RealTime() + self.Interval * 60
+	
+	self:Update()
+	self:Save()
+	
+	if (args[3]) then
+		self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " changed the map cycle interval to ", evolve.colors.red, tostring(self.Interval), evolve.colors.white, " minutes.", evolve.colors.red, " (" .. args[3] .. ")" )
+	else
+		self:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " changed the map cycle interval to ", evolve.colors.red, tostring(self.Interval), evolve.colors.white, " minutes." )
+	end
+	
+	return true
+end
+
+----------------------------
+-- Interval
+-- Update all changes on all clients
+----------------------------
+if (CLIENT) then
+	datastream.Hook( "ev_mapcycle_datastream", function( handler, id, encoded, decoded )
+		for k,v in pairs( decoded ) do
+			if (PLUGIN[k] != nil) then
+				PLUGIN[k] = v
 			end
 		end
 		
-		if (self.NextMap != nextmap) then		-- if the nextmap has changed, re-send info to all players
-			self.NextMap = nextmap
-			self:SendMapInfo( nil, true )
+		if (decoded.TimeDifference) then
+			PLUGIN.ChangeAt = RealTime() + decoded.TimeDifference
 		end
-	end
-	
-	-- Send map info
-	function PLUGIN:SendMapInfo( ply, sendall )
-		if (sendall) then
-			datastream.StreamToClients( ply or player.GetAll(), "evolve_cyclemaplist", { sendall, self.MapChangeAt, RealTime(), self.Enabled, self.Cycle } )
-		else
-			datastream.StreamToClients( ply or player.GetAll(), "evolve_cyclemaplist", { sendall, self.MapChangeAt, RealTime(), self.Enabled } )
-		end
-	end
-	
-	-- Send the info when the player spawns
-	function PLUGIN:PlayerInitialSpawn( ply )
-		if (!self.Cycle) then
-			self:GetCycle()
-		end
-		if (!self.NextMap) then
-			self:GetNextMap()
-		end
-		timer.Create( "ev_sendmapinfo_delay"..CurTime(), 1, 1, function( ply )
-			self:SendMapInfo( ply, true )
-		end, ply )
-	end
+		--PLUGIN.TimeDiff = decoded.ServersRealTime - RealTime()
+	end)
+end
 
-	-- Get map list from the map list plugin
-	function PLUGIN:GetMapList()
-		for _, plugin in pairs( evolve.plugins ) do
-			if (plugin.Title == "Get Maps") then
-				self.Maps = plugin.Maps
-				return
-			end
-		end
-		evolve:Notify( "MAP CYCLE WILL NOT WORK WITHOUT THE MAPLIST PLUGIN." )
+local old_changeat = 0
+function PLUGIN:Update( ply, Send_Maps )
+	if (CLIENT) then return end
+	
+	local recipients = ply or player.GetAll()
+	local data = {}
+	
+	if (Send_Maps) then
+		data.Maps = self.Maps
 	end
 	
-	-- Initialization
-	timer.Simple( 0.5, function()
-		PLUGIN:GetMapList()
-		PLUGIN:GetCycle()
-		if (PLUGIN.Enabled) then
-			PLUGIN.MapChangeAt = RealTime() + PLUGIN.MapChangeInterval * 60
+	data.Interval = self.Interval
+	data.Enabled = self.Enabled
+	data.TimeDifference = self.ChangeAt - RealTime()
+	--data.ServersRealTime = RealTime()
+	
+	timer.Adjust( "Evolve_UpdateMapCycle", math.max( self.Interval/100, 300 ), 0 )
+	
+	datastream.StreamToClients( recipients, "ev_mapcycle_datastream", data )
+end
+
+----------------------------
+-- Save
+-- Save the map cycle and other data to a file
+----------------------------
+
+function PLUGIN:Save()
+	if (CLIENT) then return end
+	file.Write( "evolve/ev_mapcycle.txt", glon.encode( { self.Enabled, self.Interval, self.Maps } ) )
+end
+
+----------------------------
+-- Load
+-- Load the map cycle and other data from the file
+----------------------------
+
+function PLUGIN:Load()
+	if (CLIENT) then return end
+	if (file.Exists( "evolve/ev_mapcycle.txt")) then
+		local data = file.Read( "evolve/ev_mapcycle.txt" )
+		if (data and data != "") then
+			data = glon.decode( data )
+			if (next(data)) then
+				self.Enabled = data[1]
+				self.Interval = data[2]
+				self.Maps = data[3]
+			else
+				evolve:Notify( evolve.colors.red, "Error loading map cycle file: Data table is empty" )
+			end
+		else
+			evolve:Notify( evolve.colors.red, "Error loading map cycle file: File is empty" )
+		end
+	else
+		self.Enabled = false
+		self.Ineterval = 0
+		self.Maps = {}
+	end
+end
+
+----------------------------
+-- Think
+-- Change map at the right time
+----------------------------
+
+function PLUGIN:Think()
+	-- Check if enabled
+	if (!self.Enabled) then return end
+	
+	-- Don't run on client
+	if (CLIENT) then return end
+	
+	-- Check if the next map is valid
+	local NextMap = self.Maps[1]
+	if (!NextMap or NextMap == "") then return end
+	
+	-- Check if the timer has run out
+	if (RealTime() > self.ChangeAt and self.ChangeAt != -1) then
+		local _, maps_inverted = evolve:MapPlugin_GetMaps()
+		if (!maps_inverted[NextMap]) then
+			evolve:Notify( evolve.colors.red, "MAP CYCLE ERROR: Next map is not a valid map! Map cycle disabled." )
+			self.Enabled = false
+			self:Update()
+			return
+		end
+		
+		table.remove( self.Maps, 1 )
+		self.Maps[#self.Maps+1] = NextMap
+		self:Update()
+		self:Save()
+		
+		evolve:Notify( evolve.colors.red, "Map changing!" )
+		self.ChangeAt = -1
+		timer.Simple( 0.5, RunConsoleCommand, "changelevel", NextMap )
+	end
+end
+	
+-- Send the info when the player spawns
+function PLUGIN:PlayerInitialSpawn( ply )
+	timer.Simple( 1, function()
+		if (ply and ply:IsValid()) then
+			self:Update( ply, true )
 		end
 	end)
-	
-	-- Update the time for all players every 10 minutes
-	timer.Create( "Evolve_UpdateMapTime", 600, 0, function() PLUGIN:SendMapInfo( nil, false ) end )
-else
-	function PLUGIN:RecieveCycle( crap, stuff, decoded )
-		local sendall = decoded[1]
-		if (sendall) then
-			PLUGIN.MapChangeAt = decoded[2]
-			PLUGIN.TimeDiff = decoded[3] - RealTime()
-			PLUGIN.Enabled = decoded[4]
-			evolve.MapCycle = decoded[5]
-		else
-			PLUGIN.MapChangeAt = decoded[2]
-			PLUGIN.TimeDiff = decoded[3] - RealTime()
-			PLUGIN.Enabled = decoded[4]
-		end
+end
+
+-- Initialization
+timer.Simple( 1, function()
+	if (!evolve.MapPlugin_GetMaps) then
+		evolve:Notify( evolve.colors.red, "YOU MUST HAVE THE MAP LIST PLUGIN ('sh_mapslist.lua') TO USE THIS PLUGIN!" )
+		return
 	end
-	datastream.Hook( "evolve_cyclemaplist", PLUGIN.RecieveCycle )
-	
+	PLUGIN:Load()
+	if (PLUGIN.Enabled) then
+		PLUGIN.ChangeAt = RealTime() + PLUGIN.Interval * 60
+	end
+end)
+
+-- Update the time for all players every 10 minutes
+timer.Create( "Evolve_UpdateMapCycle", 600, 0, function() PLUGIN:Update() end )
+
+if (CLIENT) then
+	PLUGIN.TimeDiff = 0
 	function PLUGIN:HUDPaint()
 		if (self.Enabled) then
-			local nextmap = evolve.MapCycle[1] or ""
-			if (nextmap and self.MapChangeAt) then
-				if (nextmap != "" and self.MapChangeAt != -1) then
-					local w, h = 250, 40
-					local x, y = ScrW() / 2 - w / 2, ScrH() - 44 - h / 2
-					
-					local t = math.max(self.MapChangeAt-RealTime()-(self.TimeDiff or 0),0)
-					local hour = math.floor(t/3600)
-					local minute = math.floor(t/60)-(60*hour)
-					local second = math.floor(t - hour * 3600 - minute*60)
-					
-					local r = 0
-					if (t < 300) then
-						r = 127.5 + math.cos(RealTime() * 3) * 127.5
-					end
-					
-					draw.RoundedBox( 4, x, y, w, h, Color(r, 0, 0, 200) )
-					draw.SimpleText( "Next map: " .. nextmap, "ScoreboardText", x + 12, y + 6, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT )
-					draw.SimpleText( "Time left: [" .. hour .. ":" .. minute .. ":" .. second .. "]", "ScoreboardText", x + 12, y + 18, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT )
+			local nextmap = self.Maps[1]
+			if (nextmap and nextmap != "" and self.ChangeAt and self.ChangeAt != -1) then
+
+				
+				local t = math.max(self.ChangeAt-RealTime()--[[-self.TimeDiff]],0)
+				local hour = math.floor(t/3600)
+				local minute = math.floor(t/60)-(60*hour)
+				local second = math.floor(t - hour * 3600 - minute*60)
+				
+				local r = 0
+				if (t < 300) then
+					r = 127.5 + math.cos(RealTime() * 3) * 127.5
 				end
+				
+				local str1 = "Next map: " .. nextmap
+				local str2 = "Time left: [" .. hour .. ":" .. minute .. ":" .. second .. "]"
+				
+				local w1 = surface.GetTextSize( str1 )
+				local w2 = surface.GetTextSize( str2 )
+				
+				local w, h = math.max( 200, w1, w2 ) + 24, 40
+				local x, y = ScrW() / 2 - w / 2, 44 - h / 2
+				
+				draw.RoundedBox( 4, x, y, w, h, Color(r, 0, 0, 200) )
+				draw.SimpleText( str1, "ScoreboardText", x + 12, y + 6, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT )
+				draw.SimpleText( str2, "ScoreboardText", x + 12, y + 18, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT )
 			end
 		end
 	end
+end
+
+function evolve:MapCyclePlugin_GetMaps()
+	return PLUGIN.Maps
 end
 
 evolve:RegisterPlugin( PLUGIN )

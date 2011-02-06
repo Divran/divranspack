@@ -4,55 +4,58 @@
 
 local PLUGIN = {}
 PLUGIN.Title = "Get Maps"
-PLUGIN.Description = "Get maps and gamemodes for use in the maps tab."
+PLUGIN.Description = "Gets all maps on the server and sends them to the client for use in other plugins."
 PLUGIN.Author = "Divran"
 PLUGIN.ChatCommand = nil
 PLUGIN.Usage = nil
+PLUGIN.Maps = {}
+PLUGIN.Maps_Inverted = {}
+PLUGIN.Gamemodes = {}
+PLUGIN.Gamemodes_Inverted = {}
 
 if !datastream then require"datastream" end
 
 if (SERVER) then
-	concommand.Add( "ev_changemapandgamemode", function( ply, command, args )
-		if ( ply:EV_IsAdmin() ) then
-			local map = args[1]
-			local gamemode = args[2]
-			evolve:Notify( evolve.colors.blue, ply:Nick(), evolve.colors.white, " has changed the map to ", evolve.colors.red, map, evolve.colors.white, " and gamemode to ", evolve.colors.red, gamemode, evolve.colors.white, "." )
-			timer.Simple( 0.5, function() RunConsoleCommand("changegamemode", map, gamemode) end)
-		else
-			evolve:Notify( ply, evolve.colors.red, evolve.constants.notallowed )
-		end
-	end)
-
 	function PLUGIN:GetMaps()
-		PLUGIN.Maps = {}
-		PLUGIN.Gamemodes = {}
-
+		self.Maps = {}
+		self.Gamemodes = {}
+		
 		local files = file.Find( "../maps/*.bsp" )
-		local temp = ""
-		for _, filename in pairs( files ) do
-			temp = filename:gsub( "%.bsp$", "" )
-			table.insert( PLUGIN.Maps, temp)
+		for k, filename in pairs( files ) do
+			self.Maps[k] = filename:gsub( "%.bsp$", "" )
+			self.Maps_Inverted[self.Maps[k]] = k
 		end
-
-		local folders = file.FindDir("../gamemodes/*")
-		for _, foldername in pairs( folders ) do
-			table.insert(PLUGIN.Gamemodes, foldername)
+		
+		local folders = file.FindDir( "../gamemodes/*" )
+		for k, foldername in pairs( folders ) do
+			self.Gamemodes[k] = foldername
+			self.Gamemodes_Inverted[foldername] = k
 		end
 	end
 	PLUGIN:GetMaps()
 
-	function PLUGIN:PlayerInitialSpawn( ply )	
-		datastream.StreamToClients( ply, "evolve_sendmaps", { self.Maps, self.Gamemodes } )
+	function PLUGIN:PlayerInitialSpawn( ply )		
+		timer.Simple( 1, function()
+			if (ply and ply:IsValid()) then
+				datastream.StreamToClients( ply, "ev_sendmaps", { self.Maps, self.Gamemodes } )
+			end
+		end)
 	end
 else
-	evolve.Maps = {}
-	evolve.Gamemodes = {}
-	
-	function PLUGIN:RecieveMaps( handler, id, decoded )
-		evolve.Maps = decoded[1]
-		evolve.Gamemodes = decoded[2]
+	function PLUGIN.RecieveMaps( handler, id, encoded, decoded )
+		PLUGIN.Maps = decoded[1]
+		PLUGIN.Gamemodes = decoded[2]
 	end
-	datastream.Hook("evolve_sendmaps", PLUGIN.RecieveMaps)
+	datastream.Hook("ev_sendmaps", PLUGIN.RecieveMaps)
 end
+
+function evolve:MapPlugin_GetMaps()
+	return PLUGIN.Maps, PLUGIN.Maps_Inverted
+end
+
+function evolve:MapPlugin_GetGamemodes()
+	return PLUGIN.Gamemodes, PLUGIN.Gamemodes_Inverted
+end
+	
 
 evolve:RegisterPlugin( PLUGIN )
