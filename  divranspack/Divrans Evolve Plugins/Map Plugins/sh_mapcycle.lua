@@ -256,25 +256,23 @@ if (CLIENT) then
 		if (decoded.TimeDifference) then
 			PLUGIN.ChangeAt = RealTime() + decoded.TimeDifference
 		end
-		--PLUGIN.TimeDiff = decoded.ServersRealTime - RealTime()
 	end)
 end
 
 local old_changeat = 0
 function PLUGIN:Update( ply, Send_Maps )
 	if (CLIENT) then return end
-	
+
 	local recipients = ply or player.GetAll()
 	local data = {}
-	
+
 	if (Send_Maps) then
 		data.Maps = self.Maps
 	end
-	
+
 	data.Interval = self.Interval
 	data.Enabled = self.Enabled
 	data.TimeDifference = self.ChangeAt - RealTime()
-	--data.ServersRealTime = RealTime()
 	
 	timer.Adjust( "Evolve_UpdateMapCycle", math.max( self.Interval/100, 300 ), 0 )
 	
@@ -378,17 +376,16 @@ timer.Simple( 1, function()
 end)
 
 -- Update the time for all players every 10 minutes
-timer.Create( "Evolve_UpdateMapCycle", 600, 0, function() PLUGIN:Update() end )
+timer.Create( "Evolve_UpdateMapCycle", 600, 0, function(_) _:Update() end, PLUGIN )
 
 if (CLIENT) then
-	PLUGIN.TimeDiff = 0
 	function PLUGIN:HUDPaint()
 		if (self.Enabled) then
 			local nextmap = self.Maps[1]
 			if (nextmap and nextmap != "" and self.ChangeAt and self.ChangeAt != -1) then
 
 				
-				local t = math.max(self.ChangeAt-RealTime()--[[-self.TimeDiff]],0)
+				local t = math.max(self.ChangeAt-RealTime(),0)
 				local hour = math.floor(t/3600)
 				local minute = math.floor(t/60)-(60*hour)
 				local second = math.floor(t - hour * 3600 - minute*60)
