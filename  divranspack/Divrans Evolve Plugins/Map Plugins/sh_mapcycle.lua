@@ -274,7 +274,7 @@ function PLUGIN:Update( ply, Send_Maps )
 	data.Enabled = self.Enabled
 	data.TimeDifference = self.ChangeAt - RealTime()
 	
-	timer.Adjust( "Evolve_UpdateMapCycle", math.max( self.Interval/100, 300 ), 0 )
+	timer.Adjust( "Evolve_UpdateMapCycle", math.max( self.Interval/100, 300 ), 0, nil, self )
 	
 	datastream.StreamToClients( recipients, "ev_mapcycle_datastream", data )
 end
@@ -376,7 +376,7 @@ timer.Simple( 1, function()
 end)
 
 -- Update the time for all players every 10 minutes
-timer.Create( "Evolve_UpdateMapCycle", 600, 0, function(_) _:Update() end, PLUGIN )
+timer.Create( "Evolve_UpdateMapCycle", 600, 0, function() PLUGIN:Update() end )
 
 if (CLIENT) then
 	function PLUGIN:HUDPaint()
