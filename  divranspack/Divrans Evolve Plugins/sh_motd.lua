@@ -76,15 +76,15 @@ if (CLIENT) then
 		
 		self.MotdBox = vgui.Create("HTML",self.MotdPanel)
 		self.MotdBox:StretchToParent( 4,25,4,4 )
-		self.MotdBox:SetHTML( file.Read( "evolvemotd.txt") )
+		self.MotdBox:SetHTML( file.Read( "evolvemotd.txt" ) )
 	end
-	timer.Simple( 0.1, function() PLUGIN:CreateMenu() end)
 	
 	concommand.Add("evolve_motd",function(ply,cmd,args)
 		PLUGIN.MotdPanel:SetVisible( true )
 	end)
 	
 	concommand.Add("evolve_startmotd",function(ply,cmd,args)
+		if not PLUGIN.StartPanel then PLUGIN:CreateMenu() end
 		PLUGIN.StartPanel:SetVisible( true )
 	end)
 	

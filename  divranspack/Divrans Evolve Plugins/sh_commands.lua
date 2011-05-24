@@ -12,7 +12,12 @@ PLUGIN.plugs = {}
 
 function PLUGIN:Initialize()
 	self.plugs = table.Copy( evolve.plugins )
-	table.SortByMember( self.plugs, "ChatCommand", function( a, b ) return a > b end )
+	table.SortByMember( self.plugs, "ChatCommand", function( a, b ) 
+		local tempa, tempb
+		if type(a) == "table" then tempa = a[1] else tempa = a end
+		if type(b) == "table" then tempb = b[1] else tempb = b end
+		return a > b
+	end )
 end
 
 function PLUGIN:Call( ply, args )
@@ -55,7 +60,7 @@ function PLUGIN:Call( ply, args )
 		umsg.Start( "EV_CommandEnd", ply ) umsg.End()
 		evolve:Notify( ply, evolve.colors.white, "All chat commands have been printed to your console." )
 	else
-		for _, plugin in ipairs( commands ) do
+		for _, plugin in ipairs( self.plugs ) do
 			if ( plugin.ChatCommand ) then
 				if ( plugin.Usage ) then
 					print( "!" .. plugin.ChatCommand .. " " .. plugin.Usage .. " - " .. plugin.Description )
