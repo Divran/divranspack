@@ -24,15 +24,14 @@ function PLUGIN:Call( ply, args )
 	if ( ply:IsValid() ) then
 		local printall = false
 		if (args[1] and args[1] == "1") then printall = true end
-		
-		
+
 		if (printall) then
 			umsg.Start( "EV_CommandStart", ply ) umsg.End()
 		
 			for _, plug in ipairs( self.plugs ) do
 				if ( plug.ChatCommand ) then
 					umsg.Start( "EV_Command", ply )
-						umsg.String( plug.ChatCommand )
+						umsg.String( (type(plug.ChatCommand) == "table" and table.concat( plug.ChatCommand, ", " ) or plug.ChatCommand) )
 						umsg.String( tostring( plug.Usage ) )
 						umsg.String( plug.Description )
 					umsg.End()
@@ -46,7 +45,7 @@ function PLUGIN:Call( ply, args )
 					for k,v in ipairs( plug.Privileges ) do
 						if ( ply:EV_HasPrivilege(v) ) then
 							umsg.Start( "EV_Command", ply )
-								umsg.String( plug.ChatCommand )
+								umsg.String( (type(plug.ChatCommand) == "table" and table.concat( plug.ChatCommand, ", " ) or plug.ChatCommand) )
 								umsg.String( plug.Usage or "" )
 								umsg.String( plug.Description )
 							umsg.End()
@@ -63,9 +62,9 @@ function PLUGIN:Call( ply, args )
 		for _, plugin in ipairs( self.plugs ) do
 			if ( plugin.ChatCommand ) then
 				if ( plugin.Usage ) then
-					print( "!" .. plugin.ChatCommand .. " " .. plugin.Usage .. " - " .. plugin.Description )
+					print( "!" .. (type(plug.ChatCommand) == "table" and table.concat( plug.ChatCommand, ", " ) or plug.ChatCommand) .. " " .. plugin.Usage .. " - " .. plugin.Description )
 				else
-					print( "!" .. plugin.ChatCommand .. " - " .. plugin.Description )
+					print( "!" .. (type(plug.ChatCommand) == "table" and table.concat( plug.ChatCommand, ", " ) or plug.ChatCommand) .. " - " .. plugin.Description )
 				end
 			end
 		end
