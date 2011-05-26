@@ -62,9 +62,9 @@ function PLUGIN:Call( ply, args )
 		for _, plugin in ipairs( self.plugs ) do
 			if ( plugin.ChatCommand ) then
 				if ( plugin.Usage ) then
-					print( "!" .. (type(plug.ChatCommand) == "table" and table.concat( plug.ChatCommand, ", " ) or plug.ChatCommand) .. " " .. plugin.Usage .. " - " .. plugin.Description )
+					print( "!" .. (type(plugin.ChatCommand) == "table" and table.concat( plugin.ChatCommand, ", " ) or plugin.ChatCommand) .. " " .. plugin.Usage .. " - " .. plugin.Description )
 				else
-					print( "!" .. (type(plug.ChatCommand) == "table" and table.concat( plug.ChatCommand, ", " ) or plug.ChatCommand) .. " - " .. plugin.Description )
+					print( "!" .. (type(plugin.ChatCommand) == "table" and table.concat( plugin.ChatCommand, ", " ) or plugin.ChatCommand) .. " - " .. plugin.Description )
 				end
 			end
 		end
