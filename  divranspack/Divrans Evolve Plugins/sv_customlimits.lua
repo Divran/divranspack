@@ -163,7 +163,8 @@ local function CheckRemoving( ent )
 	if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
 		local data = Find( BlockedModels, ent:GetModel() )
 		if data and data.limit ~= 0 and data.limit ~= -1 and data.saveas then
-			for _,plylimit in pairs( Limits ) do
+			if Limits[ent.EV_Owner] then
+				local plylimit = Limits[ent.EV_Owner]
 				if plylimit[data.saveas] then
 					plylimit[data.saveas] = plylimit[data.saveas] - 1
 					
@@ -174,7 +175,8 @@ local function CheckRemoving( ent )
 	else
 		local data = Find( BlockedClasses, ent:GetClass() )
 		if data and data.limit ~= 0 and data.limit ~= -1 and data.saveas then
-			for _,plylimit in pairs( Limits ) do
+			if Limits[ent.EV_Owner] then
+				local plylimit = Limits[ent.EV_Owner]
 				if plylimit[data.saveas] then
 					plylimit[data.saveas] = plylimit[data.saveas] - 1
 					
