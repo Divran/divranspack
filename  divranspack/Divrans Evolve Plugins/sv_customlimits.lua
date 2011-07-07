@@ -19,7 +19,7 @@ PLUGIN.Author = "Divran"
 ]]
 
 -- rank shortcuts
-local RANKS_GUEST = { { ["guest"] = true }
+local RANKS_GUEST = { ["guest"] = true }
 local RANKS_ALL = { ["guest"] = true, ["admin"] = true, ["superadmin"] = true, ["owner"] = true }
 local RANKS_ADMINS = { ["admin"] = true, ["superadmin"] = true, ["owner"] = true }
 
@@ -38,7 +38,7 @@ local BlockedModels = { -- Props, ragdolls & effects
 		ranks = RANKS_GUEST }, 
 	
 	{ 	model = "models/props_phx/huge/evildisc_corp.mdl", 
-		limit = LIMITS_EXPLOSIVE,
+		limit = LIMITS_BIGPROPS,
 		saveas = SAVEAS_BIGPROPS,
 		ranks = RANKS_GUEST },
 	
@@ -63,7 +63,8 @@ local BlockedModels = { -- Props, ragdolls & effects
 		limit = LIMITS_EXPLOSIVE, 
 		saveas = SAVEAS_EXPLOSIVE,
 		ranks = RANKS_GUEST },
-		
+	
+	--[[ Examples. Remove as necessary.
 	{	model = "models/Effects/splode.mdl", -- Block the explode effect (just an example)
 		limit = 0, -- 0 to block it completely
 		ranks = RANKS_GUEST },
@@ -71,6 +72,7 @@ local BlockedModels = { -- Props, ragdolls & effects
 	{	model = "models/props_phx/amraam.mdl", -- Infinite amraams for admins, yay (just an example)
 		limit = -1, -- -1 to allow infinite spawns
 		ranks = RANKS_ADMINS },
+	]]
 	 
 }
 
@@ -79,6 +81,8 @@ local BlockedModels = { -- Props, ragdolls & effects
 -- You can use Lua Patterns to narrow the parameters even more. For example,
 -- "^gmod_wire" will block all entities whose class begin with "gmod_wire" (because the "^" symbol makes it find the string at the beginning only)
 local BlockedClasses = { -- Entities, weapons, & vehicles
+	
+	--[[ Examples. Remove as necessary
 	{ 	class = "jeep", -- Block both jeeps (both the HL2 & EP2 ones) (just an example)
 		limit = 0,
 		ranks = RANKS_GUEST },
@@ -88,6 +92,7 @@ local BlockedClasses = { -- Entities, weapons, & vehicles
 		limit = 5,
 		saveas = "ballz :D",
 		ranks = RANKS_ALL, }
+	]]
 }
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -107,7 +112,7 @@ local function Find( tbl, str )
 	end
 end
 
-local function Check( ply, tbl, str )
+local function Check( ply, tbl, str )	
 	local data = Find( tbl, str )
 	if data then
 		local ranks = data.ranks
@@ -127,7 +132,7 @@ local function Check( ply, tbl, str )
 				if not Limits[uid][saveas] then Limits[uid][saveas] = 0 end
 				
 				if Limits[uid][saveas] >= limit then
-					evolve:Notify( ply, evolve.colors.red, "You have reached the limit for this object (Limit: " .. limit .. " Object: '" .. saveas .. "')!" )
+					evolve:Notify( ply, evolve.colors.red, "You have reached the limit for this object (Limit: " .. limit .. "; Object: '" .. saveas .. "')!" )
 					return false
 				end
 				
@@ -138,32 +143,65 @@ local function Check( ply, tbl, str )
 end
 
 local function CheckObjects( ply, mdl )
-	local ret = Check( ply, BlockedModels, mdl )
-	return ret
+	return Check( ply, BlockedModels, mdl )
 end
 
 local function CheckEntities( ply, class )
-	local ret = Check( ply, BlockedClasses, class )
-	return ret
+	return Check( ply, BlockedClasses, class )
 end
 
-local function CheckVehicles( ply, class, name, vehtbl )
-	local ret = Check( ply, BlockedClasses, vehtbl.Class )
-	return ret
+if not TEMPORARY_HAX_AddCount then
+	TEMPORARY_HAX_AddCount = _R.Player.AddCount
+end
+function _R.Player:AddCount( type, ent )
+	if ent and ent:IsValid() and not ent.EV_CUSTOMLIMITCHECKED then
+		if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
+			if CheckObjects( self, ent:GetModel() ) == false then
+				ent.EV_CUSTOMLIMITCHECKED = true
+				ent:Remove()
+				return
+			end
+		else
+			if CheckEntities( self, ent:GetClass() ) == false then
+				ent.EV_CUSTOMLIMITCHECKED = true
+				ent:Remove()
+				return
+			end
+		end
+	end
+	return TEMPORARY_HAX_AddCount( self, type, ent )
 end
 
-hook.Add( "PlayerSpawnSENT", "EV_CustomLimits_SpawnSENT", CheckEntities ) -- Entities
-hook.Add( "PlayerSpawnSWEP", "EV_CustomLimits_SpawnSWEP", CheckEntities ) -- Weapons
-hook.Add( "PlayerSpawnVehicle", "EV_CustomLimits_SpawnVehicle", CheckVehicles ) -- Vehicles
-hook.Add( "PlayerSpawnObject", "EV_CustomLimits_SpawnObject", CheckObjects ) -- Props, ragdolls, & effects
+if not TEMPORARY_HAX_CleanupAdd then
+	TEMPORARY_HAX_CleanupAdd = cleanup.Add
+end
+function cleanup.Add( ply, type, ent )
+	if ent and ent:IsValid() and not ent.EV_CUSTOMLIMITCHECKED then
+		if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
+			if CheckObjects( ply, ent:GetModel() ) == false then
+				ent.EV_CUSTOMLIMITCHECKED = true
+				ent:Remove()
+				return
+			end
+		else
+			if CheckEntities( ply, ent:GetClass() ) == false then
+				ent.EV_CUSTOMLIMITCHECKED = true
+				ent:Remove()
+				return
+			end
+		end
+	end
+	return TEMPORARY_HAX_CleanupAdd( ply, type, ent )
+end
+
 
 local function CheckRemoving( ent )
-	if not ent.EV_Owner then return end
+	if not ent.EV_Owner or ent.EV_CUSTOMLIMITCHECKED then return end
 	
-	if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
-		local data = Find( BlockedModels, ent:GetModel() )
-		if data and data.limit ~= 0 and data.limit ~= -1 and data.saveas then
-			if Limits[ent.EV_Owner] then
+	if Limits[ent.EV_Owner] then
+		if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
+			local data = Find( BlockedModels, ent:GetModel() )
+			if data and data.limit ~= 0 and data.limit ~= -1 and data.saveas then
 				local plylimit = Limits[ent.EV_Owner]
 				if plylimit[data.saveas] then
 					plylimit[data.saveas] = plylimit[data.saveas] - 1
@@ -171,11 +209,9 @@ local function CheckRemoving( ent )
 					if plylimit[data.saveas] <= 0 then plylimit[data.saveas] = nil end
 				end
 			end
-		end
-	else
-		local data = Find( BlockedClasses, ent:GetClass() )
-		if data and data.limit ~= 0 and data.limit ~= -1 and data.saveas then
-			if Limits[ent.EV_Owner] then
+		else
+			local data = Find( BlockedClasses, ent:GetClass() )
+			if data and data.limit ~= 0 and data.limit ~= -1 and data.saveas then
 				local plylimit = Limits[ent.EV_Owner]
 				if plylimit[data.saveas] then
 					plylimit[data.saveas] = plylimit[data.saveas] - 1
