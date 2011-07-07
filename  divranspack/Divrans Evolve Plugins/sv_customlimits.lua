@@ -150,9 +150,7 @@ local function CheckEntities( ply, class )
 	return Check( ply, BlockedClasses, class )
 end
 
-if not TEMPORARY_HAX_AddCount then
-	TEMPORARY_HAX_AddCount = _R.Player.AddCount
-end
+local AddCount = _R.Player.AddCount
 function _R.Player:AddCount( type, ent )
 	if ent and ent:IsValid() and not ent.EV_CUSTOMLIMITCHECKED then
 		if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
@@ -169,12 +167,10 @@ function _R.Player:AddCount( type, ent )
 			end
 		end
 	end
-	return TEMPORARY_HAX_AddCount( self, type, ent )
+	return AddCount( self, type, ent )
 end
 
-if not TEMPORARY_HAX_CleanupAdd then
-	TEMPORARY_HAX_CleanupAdd = cleanup.Add
-end
+local CleanupAdd = cleanup.Add
 function cleanup.Add( ply, type, ent )
 	if ent and ent:IsValid() and not ent.EV_CUSTOMLIMITCHECKED then
 		if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_effect" then
@@ -191,7 +187,7 @@ function cleanup.Add( ply, type, ent )
 			end
 		end
 	end
-	return TEMPORARY_HAX_CleanupAdd( ply, type, ent )
+	return CleanupAdd( ply, type, ent )
 end
 
 
