@@ -137,7 +137,7 @@ function ENT:FreezeAll( bool )
 		self.Frozen = bool
 		self:Foreach( self.AllEntities, function( ent )
 			local phys = ent:GetPhysicsObject()
-			phys:EnableMotion( bool )
+			phys:EnableMotion( not bool )
 			phys:Wake()
 		end)
 		WireLib.TriggerOutput( self, "Frozen", bool and 1 or 0 )
@@ -346,17 +346,31 @@ function ENT:Think()
 	
 	-- Apply force to all constrained props
 	local mass, forward, right, up = self.TotalMass * 0.25, ent:GetForward(), ent:GetRight(), ent:GetUp()
+	
+	local a = up * -AngForce.p * mass * Mul
+	local b = pos + forward * self.Multipliers.forward
+	local c = up * AngForce.p * mass * Mul
+	local d = pos + forward * -self.Multipliers.back
+	local e = right * -AngForce.y * mass * Mul
+	local f = pos + forward * self.Multipliers.forward
+	local g = right * AngForce.y * mass * Mul
+	local h = pos + forward * -self.Multipliers.back
+	local i = up * -AngForce.r * mass
+	local j = pos + right * self.Multipliers.right
+	local k = up * AngForce.r * mass
+	local l = pos + right * -self.Multipliers.left
+	
 	self:Foreach( self.Entities, function( ent )
 		local phys = ent:GetPhysicsObject()
 		phys:SetVelocity( Force )
 		phys:AddAngleVelocity( phys:GetAngleVelocity() * -1 )
 		
-		phys:ApplyForceOffset( up * -AngForce.p * mass * Mul, pos + forward * self.Multipliers.forward )
-		phys:ApplyForceOffset( up * AngForce.p * mass * Mul, pos + forward * -self.Multipliers.back )
-			phys:ApplyForceOffset( right * -AngForce.y * mass * Mul, pos + forward * self.Multipliers.forward )
-			phys:ApplyForceOffset( right * AngForce.y * mass * Mul, pos + forward * -self.Multipliers.back )
-				phys:ApplyForceOffset( up * -AngForce.r * mass, pos + right * self.Multipliers.right )
-				phys:ApplyForceOffset( up * AngForce.r * mass, pos + right * -self.Multipliers.left )		
+		phys:ApplyForceOffset( a, b )
+		phys:ApplyForceOffset( c, d )
+			phys:ApplyForceOffset( e, f )
+			phys:ApplyForceOffset( g, h )
+				phys:ApplyForceOffset( i, j )
+				phys:ApplyForceOffset( k, l )		
 	end)
 	
 	WireLib.TriggerOutput( self, "MPH", MPH )
