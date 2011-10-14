@@ -20,13 +20,13 @@ if (SERVER) then
 		self.Maps = {}
 		self.Gamemodes = {}
 		
-		local files = file.Find( "../maps/*.bsp" )
+		local files = file.Find( "maps/*.bsp", true )
 		for k, filename in pairs( files ) do
 			self.Maps[k] = filename:gsub( "%.bsp$", "" )
 			self.Maps_Inverted[self.Maps[k]] = k
 		end
 		
-		local folders = file.FindDir( "../gamemodes/*" )
+		local folders = file.FindDir( "gamemodes/*", true )
 		for k, foldername in pairs( folders ) do
 			self.Gamemodes[k] = foldername
 			self.Gamemodes_Inverted[foldername] = k
