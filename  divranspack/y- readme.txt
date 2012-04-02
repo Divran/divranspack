@@ -1,3 +1,5 @@
+Do not upload any of the addons to garrysmod.org. Thank you
+
 ---- Advanced Entity Marker
 This is already included in the UWSVN.
 
@@ -18,10 +20,6 @@ Some plugins for Evolve.
 Some useful, some useless E2 extensions.
 Put these in
 addons\wire\lua\entities\gmod_wire_expression2\core\custom
-
----- EGP V3 Beta
-This is one of my major projects. A complete rewrite of Goluch's EGP entity.
-Thread: http://www.wiremod.com/forum/developers-showcase/20727-egp-v3-total-remake.html
 
 ---- Exit Point Controller (Aka Multi Exit Point Controller)
 Allows you to set the exit point of multiple vehicles at once.
@@ -62,7 +60,7 @@ This is a remake of the wire hoverdrive. Much cleaner code, etc
 ----HOW TO INSTALL.
 
 --IF YOU GOT THIS OFF OF GMOD.ORG:
-	1: Go die in hell.
+	1: Report the uploader.
 	2: http://www.facepunch.com/showthread.php?t=688324
 	3: See below
 
