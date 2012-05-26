@@ -11,13 +11,25 @@ PLUGIN.Usage = "[1/0 (all/yours)]"
 PLUGIN.plugs = {}
 
 function PLUGIN:Initialize()
-	self.plugs = table.Copy( evolve.plugins )
-	table.SortByMember( self.plugs, "ChatCommand", function( a, b ) 
-		local tempa, tempb
-		if type(a) == "table" then tempa = a[1] else tempa = a end
-		if type(b) == "table" then tempb = b[1] else tempb = b end
-		return a > b
-	end )
+	self.plugs = {}
+	for k,v in pairs( evolve.plugins ) do
+		if v.ChatCommand then
+			self.plugs[#self.plugs+1] = table.Copy(v)
+		end
+	end
+
+	table.sort( self.plugs, function( a, b )
+		if not a then return false end
+		if not b then return false end
+
+		local tempa = a.ChatCommand
+		local tempb = b.ChatCommand
+
+		if type(tempa) == "table" then tempa = a.ChatCommand[1] end
+		if type(tempb) == "table" then tempb = b.ChatCommand[1] end
+
+		return tempa < tempb
+	end)
 end
 
 function PLUGIN:Call( ply, args )
