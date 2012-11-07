@@ -186,16 +186,16 @@ if (SERVER) then
 	
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
-			if (trace.Entity and ValidEntity(trace.Entity) and !trace.Entity:IsPlayer()) then
+			if (trace.Entity and IsValid(trace.Entity) and !trace.Entity:IsPlayer()) then
 				self:GetOwner():ConCommand("pewpew_model " .. trace.Entity:GetModel())
 				self:GetOwner():ChatPrint("PewPew Cannon model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_name", "PewTool" )
-	language.Add( "Tool_pewpew_desc", "Used to spawn PewPew weaponry." )
-	language.Add( "Tool_pewpew_0", "Primary: Spawn a PewPew weapon and weld it, Secondary: Spawn a PewPew weapon and don't weld it, Reload: Change the model of the weapon." )
+	language.Add( "tool.pewpew.name", "PewTool" )
+	language.Add( "tool.pewpew.desc", "Used to spawn PewPew weaponry." )
+	language.Add( "tool.pewpew.0", "Primary: Spawn a PewPew weapon and weld it, Secondary: Spawn a PewPew weapon and don't weld it, Reload: Change the model of the weapon." )
 	language.Add( "undone_pewpew", "Undone PewPew Weapon" )
 	language.Add( "Cleanup_pewpew", "PewPew Weapons" )
 	language.Add( "Cleaned_pewpew", "Cleaned up all PewPew Weapons" )
@@ -205,9 +205,9 @@ else
 	function TOOL.BuildCPanel( CPanel )
 		-- Header stuff
 		CPanel:ClearControls()
-		CPanel:AddHeader()
-		CPanel:AddDefaultControls()
-		CPanel:AddControl("Header", { Text = "#Tool_pewpew_name", Description = "#Tool_pewpew_desc" })
+//		CPanel:AddHeader()
+//		CPanel:AddDefaultControls()
+//		CPanel:AddControl("Header", { Text = "#tool.pewpew.name", Description = "#tool.pewpew.desc" })
 		
 		CPanel:AddControl("ComboBox", {
 			Label = "#Presets",

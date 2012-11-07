@@ -84,12 +84,12 @@
  	Fraction = math.Clamp( Fraction, 0, 1 ) 
  	
 	self.Entity:SetColor( 255, 255, 255, 100 * Fraction )
-	self.Entity:SetModelScale( Vector() * 25 * (1 - Fraction) )
+	self.Entity:SetModelScale( 25, (1 - Fraction))
 	
  		// Draw our model with the Light material 
- 		SetMaterialOverride( matLight ) 
+ 		render.MaterialOverride( matLight2 ) 
  			self.Entity:DrawModel() 
- 		SetMaterialOverride( 0 ) 
+ 		render.MaterialOverride( 0 ) 
  
    
  end  

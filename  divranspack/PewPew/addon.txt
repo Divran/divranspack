@@ -1,0 +1,12 @@
+"AddonInfo"
+{
+	"name"		"PewPew"
+	"version"	"1"
+	"up_date"	""
+	"author_name"	"Divran"
+	"author_email"	""
+	"author_url"	""
+	
+	"info"		"PewPew"
+	"override"	"0"
+}

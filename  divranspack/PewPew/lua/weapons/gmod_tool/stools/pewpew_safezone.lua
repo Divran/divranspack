@@ -91,9 +91,9 @@ if (SERVER) then
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_safezone_name", "PewPew Safe Zones" )
-	language.Add( "Tool_pewpew_safezone_desc", "Used to spawn PewPew Safe Zone." )
-	language.Add( "Tool_pewpew_safezone_0", "Primary: Spawn a PewPew Safe Zone and weld it, Secondary: Spawn a PewPew Safe Zone and don't weld it, Reload: Change the model of the Safe Zone." )
+	language.Add( "tool.pewpew_safezone.name", "PewPew Safe Zones" )
+	language.Add( "tool.pewpew_safezone.desc", "Used to spawn PewPew Safe Zone." )
+	language.Add( "tool.pewpew_safezone.0", "Primary: Spawn a PewPew Safe Zone and weld it, Secondary: Spawn a PewPew Safe Zone and don't weld it, Reload: Change the model of the Safe Zone." )
 	language.Add( "undone_pewpew_safezone", "Undone PewPew Safe Zone" )
 	language.Add( "Cleanup_pewpew_safezones", "PewPew Safe Zone" )
 	language.Add( "Cleaned_pewpew_safezones", "Cleaned up all PewPew Safe Zone" )
@@ -103,9 +103,9 @@ else
 	function TOOL.BuildCPanel( CPanel )
 		-- Header stuff
 		CPanel:ClearControls()
-		CPanel:AddHeader()
-		CPanel:AddDefaultControls()
-		CPanel:AddControl("Header", { Text = "#Tool_pewpew_safezone_name", Description = "#Tool_pewpew_safezone_desc" })
+//		CPanel:AddHeader()
+//		CPanel:AddDefaultControls()
+//		CPanel:AddControl("Header", { Text = "#tool.pewpew_safezone.name", Description = "#tool.pewpew_safezone.desc" })
 		
 		-- Models
 		CPanel:AddControl("ComboBox", {

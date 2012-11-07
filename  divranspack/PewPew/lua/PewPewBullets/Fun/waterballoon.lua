@@ -10,7 +10,7 @@ BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/dav0r/balloon/balloon.mdl"
+BULLET.Model = "models/MaxOfS2d/balloon_classic.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil

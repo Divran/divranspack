@@ -31,22 +31,20 @@ function pewpew:LoadDirectory( Dir ) -- Thanks to Jcw87 for fixing this function
 	else
 		CurrentCategory = "Other"
 	end
-	
-	local entries = file.FindInLua( Dir .. "/*")
-	for _, entry in ipairs ( entries ) do
-		-- If entry is a file
-		if (string.find(entry, "%.")) then
-			-- If entry is a lua file
-			if (string.sub(entry, -4) == ".lua") then
-				if (SERVER) then 
-					AddCSLuaFile( Dir .. "/" .. entry )
-				end
-				include( Dir .. "/" .. entry )
-			end
-		-- If entry is a directory
-		else 
-			self:LoadDirectory( Dir .. "/" .. entry )
+
+	local fil, List = file.Find(Dir .. "/*", "LUA")
+
+	for _, fdir in pairs(List) do
+		if fdir != ".svn" then // don't spam people with useless .svn folders
+			self:LoadDirectory(Dir.."/"..fdir)
 		end
+	end
+	 
+	for k,v in pairs(file.Find(Dir.."/*.lua", "LUA")) do
+		if (SERVER) then
+			AddCSLuaFile( Dir .. "/" .. v )
+		end
+		include( Dir .. "/" .. v )
 	end
 end
 

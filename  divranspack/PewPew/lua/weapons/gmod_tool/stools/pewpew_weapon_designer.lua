@@ -29,22 +29,20 @@ function TOOL:GetCannonModel()
 end
 
 local Weapon = {}
-				
-require("datastream")	
+					
 if (SERVER) then
 	function TOOL:GetDirection()
 		local dir = tonumber(self:GetClientInfo("direction")) or 1
 		return dir
 	end
 	
-	datastream.Hook( "PewPew_WeaponDesigner", function( ply, handler, id, encoded, decoded )
-		Weapon = decoded
-		Weapon.Name = "Weapon Designer Bullet"
-	end)
-	
-	hook.Add("AcceptStream","PewPew_WeaponDesignerAllow",function( ply, handler, id )
-		if (handler == "PewPew_WeaponDesigner") then
-			return (pewpew.WeaponDesigner)
+	net.Receive("PewPew_WeaponDesigner", function(len, client)
+		if !pewpew.WeaponDesigner then
+			client:ChatPrint("[PewPew] The Weapon Designer is currently disabled.")
+		else
+			Weapon = net.ReadTable()
+			Weapon.Name = "Weapon Designer Bullet"
+			client:ChatPrint("[PewPew] Weapon loaded.")
 		end
 	end)
 	
@@ -133,9 +131,9 @@ if (SERVER) then
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_weapon_designer_name", "PewPew Weapon Designer" )
-	language.Add( "Tool_pewpew_weapon_designer_desc", "Create your own PewPew weapons" )
-	language.Add( "Tool_pewpew_weapon_designer_0", "Primary: Spawn the PewPew weapon and weld it, Secondary: Open the Weapon Designer Menu, Reload: Change the model of the weapon." )
+	language.Add( "tool.pewpew_weapon_designer.name", "PewPew Weapon Designer" )
+	language.Add( "tool.pewpew_weapon_designer.desc", "Create your own PewPew weapons" )
+	language.Add( "tool.pewpew_weapon_designer.0", "Primary: Spawn the PewPew weapon and weld it, Secondary: Open the Weapon Designer Menu, Reload: Change the model of the weapon." )
 	
 	local Menu = nil
 	
@@ -208,15 +206,11 @@ else
 					Weapon[v.Txt] = GetVal( v.textbox:GetValue(), v.Type, v.Type2 )
 				end
 			end
-			datastream.StreamToServer("PewPew_WeaponDesigner",Weapon,
-				function() 
-					LocalPlayer():ChatPrint("[PewPew] Weapon loaded.") 
-				end,
-				function(accepted, tempid, id) 
-					if (!accepted) then 
-						LocalPlayer():ChatPrint("[PewPew] The Weapon Designer is currently disabled.") 
-					end
-				end)
+
+			net.Start("PewPew_WeaponDesigner")
+				net.WriteTable(Weapon)
+			net.SendToServer()
+
 			Menu:SetVisible( false )
 		end
 		

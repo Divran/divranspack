@@ -1,12 +1,12 @@
 local tMats = {}
 
-tMats.Glow1 = Material( "sprites/light_glow02" )
+tMats.Glow1 = Material( "models/effects/vol_light001" )
 
 for _,mat in pairs(tMats) do
 
-	mat:SetMaterialInt("$spriterendermode",9)
-	mat:SetMaterialInt("$ignorez",1)
-	mat:SetMaterialInt("$illumfactor",18)
+	mat:SetInt("$spriterendermode",9)
+	mat:SetInt("$ignorez",1)
+	mat:SetInt("$illumfactor",18)
 	
 end
 

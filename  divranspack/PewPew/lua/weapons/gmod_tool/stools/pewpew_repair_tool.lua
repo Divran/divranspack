@@ -33,9 +33,9 @@ if (SERVER) then
 		end
 	end
 else
-	language.Add( "Tool_pewpew_repair_tool_name", "PewPew Repair Tool" )
-	language.Add( "Tool_pewpew_repair_tool_desc", "Used to repair entities." )
-	language.Add( "Tool_pewpew_repair_tool_0", "Primary: Hold to repair an entity, Reload: Toggle Health Vision." )
+	language.Add( "tool.pewpew_repair_tool.name", "PewPew Repair Tool" )
+	language.Add( "tool.pewpew_repair_tool.desc", "Used to repair entities." )
+	language.Add( "tool.pewpew_repair_tool.0", "Primary: Hold to repair an entity. Reload: Toggle Health Vision." )
 	
 	TOOL.HealthVision = true
 	TOOL.ReloadTimer = 0

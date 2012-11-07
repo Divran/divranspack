@@ -67,7 +67,7 @@ function BULLET:Fire( self )
 	if (!pewpew:FindSafeZone( self.Entity:GetPos() )) then
 		local ent = ents.Create("pewpew_base_bullet")
 		ent:SetPos(trace.HitPos)
-		ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0))
+		ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0):Angle())
 		ent:SetOptions(self.Bullet, self, self.Owner )
 		ent:GetTable().MoreLeft = 20
 		ent:Spawn()
@@ -123,7 +123,7 @@ function BULLET:ThinkFunc( self )
 		if trace.Hit then
 			local ent = ents.Create("pewpew_base_bullet")
 			ent:SetPos(trace.HitPos)
-			ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0))
+			ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0):Angle())
 			ent:SetOptions(self.Bullet, self, self.Owner )
 			ent:GetTable().MoreLeft = self.MoreLeft - 1
 			ent:Spawn()

@@ -101,9 +101,9 @@ if (SERVER) then
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_core_name", "PewPew Cores" )
-	language.Add( "Tool_pewpew_core_desc", "Used to spawn PewPew cores." )
-	language.Add( "Tool_pewpew_core_0", "Primary: Spawn a PewPew core and weld it, Secondary: Spawn a PewPew core and don't weld it, Reload: Change the model of the core." )
+	language.Add( "tool.pewpew_core.name", "PewPew Cores" )
+	language.Add( "tool.pewpew_core.desc", "Used to spawn PewPew cores." )
+	language.Add( "tool.pewpew_core.0", "Primary: Spawn a PewPew core and weld it, Secondary: Spawn a PewPew core and don't weld it, Reload: Change the model of the core." )
 	language.Add( "undone_pewpew_core", "Undone PewPew core" )
 	language.Add( "Cleanup_pewpew_cores", "PewPew Cores" )
 	language.Add( "Cleaned_pewpew_cores", "Cleaned up all PewPew Cores" )
@@ -113,9 +113,9 @@ else
 	function TOOL.BuildCPanel( CPanel )
 		-- Header stuff
 		CPanel:ClearControls()
-		CPanel:AddHeader()
-		CPanel:AddDefaultControls()
-		CPanel:AddControl("Header", { Text = "#Tool_pewpew_core_name", Description = "#Tool_pewpew_core_desc" })
+//		CPanel:AddHeader()
+//		CPanel:AddDefaultControls()
+		CPanel:AddControl("Header", { Text = "#tool.pewpew_core.name", Description = "#tool.pewpew_core.desc" })
 		
 		-- Models
 		CPanel:AddControl("ComboBox", {

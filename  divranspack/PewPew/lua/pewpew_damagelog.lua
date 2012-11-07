@@ -59,18 +59,19 @@ function pewpew:DamageLogAdd( TargetEntity, Damage, DamageDealer )
 	end
 end
 
-timer.Create( "PewPew_PopLogStack", 2.5, 0, function(self)
-	if (table.Count(self.LogStack) > 0) then
-		self:PopLogStack()
+timer.Create( "PewPew_PopLogStack", 2.5, 0, function()
+	if (table.Count(pewpew.LogStack) > 0) then
+		pewpew:PopLogStack()
 	end
-end, pewpew)
+end)
 
 -- Send the log
-require("datastream")
 function pewpew:PopLogStack()
 	if (!pewpew.DamageLogSend) then return end
 	if (table.Count(self.LogStack) > 0) then
-		datastream.StreamToClients( player.GetAll(), "PewPew_Admin_Tool_SendLog", self.LogStack )
+		net.Start("PewPew_Admin_Tool_SendLog")
+			net.WriteTable(self.LogStack)
+		net.Broadcast()
 		--[[ Old broken umsg
 		umsg.Start("PewPew_Admin_Tool_SendLog_Umsg")
 			umsg.Short(table.Count(self.LogStack))

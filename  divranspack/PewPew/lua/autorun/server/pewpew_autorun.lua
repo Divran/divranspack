@@ -21,11 +21,14 @@ AddCSLuaFile("autorun/client/pewpew_menu.lua")
 AddCSLuaFile("pewpew_gcombatcompability.lua")
 include("pewpew_gcombatcompability.lua")
 
--- Tags
+/*-- Tags
 local tags = GetConVar( "sv_tags" ):GetString()
 if (!string.find( tags, "PewPew" )) then
 	RunConsoleCommand( "sv_tags", tags .. ",PewPew" )
-end
+end*/
+
+util.AddNetworkString( "PewPew_Admin_Tool_SendLog" )
+util.AddNetworkString( "PewPew_WeaponDesigner" )
 
 -- If we got this far without errors, it's safe to assume the addon is installed.
 pewpew.Installed = true

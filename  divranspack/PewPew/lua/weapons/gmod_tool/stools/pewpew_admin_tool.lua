@@ -2,13 +2,12 @@
 -- This tool has admin options and a button to open the damage log
 
 TOOL.Category = "PewPew"
-TOOL.Name = "Admin Tool"
-				
-require("datastream")				
+TOOL.Name = "PewPew Admin Tool"
+							
 if (CLIENT) then
-	language.Add( "Tool_pewpew_admin_tool_name", "PewPew Admin Tool" )
-	language.Add( "Tool_pewpew_admin_tool_desc", "Administrate your server!" )
-	language.Add( "Tool_pewpew_admin_tool_0", "-nothing-" )
+	language.Add( "tool.pewpew_admin_tool.name", "PewPew Admin Tool" )
+	language.Add( "tool.pewpew_admin_tool.desc", "Administrate your server!" )
+	language.Add( "tool.pewpew_admin_tool.0", "-nothing-" )
 	
 
 	pewpew.DamageLog = {}
@@ -117,8 +116,8 @@ if (CLIENT) then
 	end
 	concommand.Add("pewpew_cl_applychanges", Apply)
 	
-	datastream.Hook( "PewPew_Admin_Tool_SendLog", function( handler, id, encoded, decoded )
-		for k,v in pairs( decoded ) do
+	net.Receive("PewPew_Admin_Tool_SendLog", function(len)
+		for k,v in pairs( net.ReadTable() ) do
 			if (v[7] == true) then v[7] = "Yes" else v[7] = "No" end
 			table.insert( pewpew.DamageLog, 1, v )
 		end

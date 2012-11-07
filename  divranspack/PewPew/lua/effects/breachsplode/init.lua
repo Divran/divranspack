@@ -9,9 +9,9 @@ tMats.Glow3 = Material("sprites/redglow2")
 
 for _,mat in pairs(tMats) do
 
-	mat:SetMaterialInt("$spriterendermode",9)
-	mat:SetMaterialInt("$ignorez",1)
-	mat:SetMaterialInt("$illumfactor",8)
+	mat:SetInt("$spriterendermode",9)
+	mat:SetInt("$ignorez",1)
+	mat:SetInt("$illumfactor",8)
 	
 end
 
@@ -165,7 +165,7 @@ local startpos = self.Position
 		local Distance = EyePos():Distance( self.Entity:GetPos() )
 		local Pos = self.Entity:GetPos() + (EyePos() - self.Entity:GetPos()):GetNormal() * Distance * (self.Refract^(0.3)) * 0.8
 
-		matRefraction:SetMaterialFloat( "$refractamount", math.sin( self.Refract * math.pi ) * 0.1 )
+		matRefraction:SetFloat( "$refractamount", math.sin( self.Refract * math.pi ) * 0.1 )
 		render.SetMaterial( matRefraction )
 		render.UpdateRefractTexture()
 		render.DrawSprite( Pos, self.Size, self.Size )
