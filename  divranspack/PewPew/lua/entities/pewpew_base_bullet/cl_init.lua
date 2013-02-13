@@ -16,7 +16,13 @@ function ENT:Draw()
 		self.Entity:DrawModel()
 	end
 end
- 
+
+net.Receive( "PewPew_Audio", function( length )
+	local soundSTR = net.ReadString()
+	local position = net.ReadVector()
+	sound.Play( soundSTR, position,0,100,0.9)
+end )
+
 function ENT:Think()
 	if (self.Bullet) then
 		if (self.Bullet.CLThinkOverride) then

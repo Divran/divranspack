@@ -15,7 +15,7 @@ pewpew.EnergyUsage = false
 pewpew.PropProtDamage = false
 pewpew.WeaponDesigner = false
 
-if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) or Environments then
 	pewpew.EnergyUsage = true
 end
 
@@ -226,7 +226,7 @@ concommand.Add("PewPew_RepairToolHealCores",RepairToolHealCores)
 -- Toggle Life Support
 local function ToggleEnergyUsage( ply, command, arg )
 	if ( (ply:IsValid() and ply:IsAdmin()) or !ply:IsValid() ) then
-		if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+		if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) or Environments then
 			if (!arg[1]) then return end
 			local bool = false
 			if (tonumber(arg[1]) != 0) then bool = true end

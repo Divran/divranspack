@@ -3,9 +3,12 @@ AddCSLuaFile( "shared.lua" )
 include('shared.lua')
 
 function ENT:Initialize()   
-	if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+	if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) or Environments then
 		self.BaseClass.Initialize(self)
-		CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(self.Entity)
+		-- This assumes CAF.
+		if not Environments then
+			CAF.GetAddon("Resource Distribution").RegisterNonStorageDevice(self.Entity)
+		end
 	end
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )  	
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
@@ -138,6 +141,7 @@ function ENT:FireBullet()
 		
 		-- Set Model
 		ent:SetModel( self.Bullet.Model )
+		
 		-- Set used bullet
 		ent:SetOptions( self.Bullet, self, self.Owner )
 		
@@ -170,7 +174,7 @@ function ENT:FireBullet()
 			else
 				soundpath = self.Bullet.FireSound[1]
 			end
-			self:EmitSound( soundpath )
+			sound.Play( soundpath, self:GetPos() )
 		end
 		
 		-- Effect
@@ -444,7 +448,7 @@ end
 -------------------------
 -- SB3 dupe functions
 
-if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) then
+if (CAF and CAF.GetAddon("Resource Distribution") and CAF.GetAddon("Life Support")) or Environments then
 	function ENT:PreEntityCopy()
 		self.BaseClass.PreEntityCopy(self) --use this if you have to use PreEntityCopy
 		local RD = CAF.GetAddon("Resource Distribution")

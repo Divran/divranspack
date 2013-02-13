@@ -2,6 +2,18 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include('shared.lua')
 
+function ENT:EnvironmentCheck()	
+	for _,v in pairs(environments) do
+		local distance = v:GetPos():Distance(self:GetPos())
+		if distance <= v.radius then
+			self.environment = v
+			return true -- is the object not in space.
+		end
+	end
+	self.environment = Space()
+	return false
+end
+
 function ENT:Initialize()
 
 	-- Check for damage blocked areas
@@ -16,6 +28,9 @@ function ENT:Initialize()
 			CAF.GetAddon("Spacebuild").OnEnvironmentChanged(self.Entity)
 			self.Entity.environment:UpdateGravity(self.Entity)
 			self.Entity.environment:UpdatePressure(self.Entity)
+		elseif( Environments ) then
+			-- Preform check on entity.
+			self:EnvironmentCheck()
 		end
 	end
 	
@@ -50,16 +65,17 @@ function ENT:Initialize()
 		
 		-- Material
 		if (self.Bullet.Material) then
-			self.Entity:SetMaterial( self.Bullet.Material )
+			self:SetMaterial( self.Bullet.Material )
 		end
 		
 		-- Color
 		if (self.Bullet.Color) then
 			local C = self.Bullet.Color
-			self.Entity:SetColor( C.r, C.g, C.b, C.a or 255 )
+			self:SetColor( C.r, C.g, C.b, C.a or 255 )
 		end
 	end
-	self.Entity:NextThink( CurTime() )
+
+	self:NextThink( CurTime() )
 end   
 
 function ENT:SetOptions( BULLET, Cannon, ply )
@@ -106,7 +122,12 @@ function ENT:Explode(trace)
 			else
 				soundpath = self.Bullet.ExplosionSound[1]
 			end
-			sound.Play( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
+			
+			-- Clientside audio instiantating.
+			net.Start("PewPew_Audio")
+			net.WriteString( soundpath )
+			net.WriteVector( self:GetPos() )
+			net.Broadcast()
 		end
 			
 		-- Damage
@@ -146,36 +167,45 @@ function ENT:Think()
 		return self.Bullet:ThinkFunc( self )
 	else
 		-- Make it fly
-		self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
+		self:SetPos( self:GetPos() + self.FlightDirection * self.Bullet.Speed )
 		local grav = self.Bullet.Gravity or 0
 		
 		-- Make the bullet not fall down in space
-		if (self.Bullet.AffectedByNoGrav) then
-			if (CAF and CAF.GetAddon("Spacebuild")) then
+		if (self.Bullet.AffectedBySBGravity) then
+			if (CAF and CAF.GetAddon("Spacebuild")) or Environments then
+				
 				if (self.environment) then
-					grav = grav * self.environment:GetGravity()
+					if(Environments) then
+						self:EnvironmentCheck()
+						local gravity = self.environment.gravity
+						grav = grav * gravity
+					else
+						-- the get gravity doesn't work with environments. as the get gravity function was a compatibility layer for things like LS/RD
+						-- but it no longer functions.
+						grav = grav * self.environment:GetGravity()
+					end
 				end
 			end
 		end
 		
-		if (grav and grav != 0) then -- Only pull it down if needed
+		if (grav and grav ~= 0) then -- Only pull it down if needed
 			self.FlightDirection = self.FlightDirection - Vector(0,0,grav / (self.Bullet.Speed or 1))
 		end
 			
-		self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+		self:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 		
 		-- Lifetime
 		if (self.Lifetime) then
 			if (CurTime() > self.Lifetime) then
 				if (self.Bullet.ExplodeAfterDeath) then
 					local tr = {}
-					tr.start = self.Entity:GetPos()-self.FlightDirection
-					tr.endpos = self.Entity:GetPos()
-					tr.filter = self.Entity
+					tr.start = self:GetPos()-self.FlightDirection
+					tr.endpos = self:GetPos()
+					tr.filter = self
 					local trace = util.TraceLine( tr )
 					self:Explode( trace )
 				else
-					self.Entity:Remove()
+					self:Remove()
 				end
 			end
 		end
@@ -183,9 +213,9 @@ function ENT:Think()
 		if (CurTime() > self.TraceDelay) then
 			-- Check if it hit something
 			local tr = {}
-			tr.start = self.Entity:GetPos() - self.FlightDirection * self.Bullet.Speed
-			tr.endpos = self.Entity:GetPos()
-			tr.filter = self.Entity
+			tr.start = self:GetPos() - self.FlightDirection * self.Bullet.Speed
+			tr.endpos = self:GetPos()
+			tr.filter = self
 			local trace = util.TraceLine( tr )
 			
 			if (trace.Hit and !self.Exploded) then	
@@ -193,12 +223,12 @@ function ENT:Think()
 				self.Exploded = true
 			else			
 				-- Run more often!
-				self.Entity:NextThink( CurTime() )
+				self:NextThink( CurTime() )
 				return true
 			end
 		else			
 			-- Run more often!
-			self.Entity:NextThink( CurTime() )
+			self:NextThink( CurTime() )
 			return true
 		end
 	end

@@ -29,6 +29,7 @@ end*/
 
 util.AddNetworkString( "PewPew_Admin_Tool_SendLog" )
 util.AddNetworkString( "PewPew_WeaponDesigner" )
+util.AddNetworkString( "PewPew_Audio" )
 
 -- If we got this far without errors, it's safe to assume the addon is installed.
 pewpew.Installed = true

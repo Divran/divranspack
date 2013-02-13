@@ -74,7 +74,9 @@ function ENT:Think()
 	self.pewpew.CoreHealth = hp
 	self.pewpew.CoreMaxHealth = maxhp
 	
-	if (self.pewpew.CoreHealth > self.pewpew.CoreMaxHealth) then self.pewpew.CoreHealth = self.pewpew.CoreMaxHealth end
+	if (self.pewpew.CoreHealth > self.pewpew.CoreMaxHealth) then 
+		self.pewpew.CoreHealth = self.pewpew.CoreMaxHealth 
+	end
 	
 	
 	-- Set NW ints

@@ -151,17 +151,17 @@ if (CLIENT) then
 		for k,v in ipairs( cannons ) do
 			local pos = v:GetPos():ToScreen()
 			local name = v:GetNWString("PewPew_OwnerName","- Error -")
-			surface.SetFont("ScoreboardText")
+			surface.SetFont("DermaDefaultBold")
 			local w = surface.GetTextSize( name )
-			draw.WordBox( 1, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
+			draw.WordBox( 1, pos.x - w / 2, pos.y, name, "DermaDefault", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
 		end
 		
 		for k,v in ipairs( bullets ) do
 			local pos = v:GetPos():ToScreen()
 			local name = v:GetNWString("PewPew_OwnerName","- Error -")
-			surface.SetFont("ScoreboardText")
+			surface.SetFont("DermaDefault")
 			local w = surface.GetTextSize( name )
-			draw.WordBox( 6, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
+			draw.WordBox( 6, pos.x - w / 2, pos.y, name, "DermaDefault", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
 		end
 		
 	end

@@ -56,6 +56,11 @@ BULLET.CustomOutputs = nil
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 -- I suggest you erase any functions you are not using to minimize file size.
 
+BULLET.FireOverride = true
+function BULLET:Fire( self )
+end
+
+
 -- Cannon Think (Is run on: Cannon)
 BULLET.CannonThinkOverride = true
 function BULLET:CannonThink( self ) end
