@@ -47,41 +47,112 @@ BULLET.AmmoReloadtime = 0
 
 BULLET.EnergyPerShot = 11000000
 
+BULLET.UseOldSystem = true
+
+BULLET.CustomInputs = { "Fire", "X", "Y", "Z", "XYZ [VECTOR]" }
+
+
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
--- Initialize (Is called when the entity initializes)
-BULLET.InitializeOverride = false
-function BULLET:InitializeFunc( self )   
-	self.flightvector = self.Entity:GetUp()
-	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
-	self.Entity:SetMoveType( MOVETYPE_NONE )
-	self.Entity:SetSolid( SOLID_VPHYSICS )    
-	self.FlightDirection = self.Entity:GetUp()
-	self.Exploded = false
-	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000
+-- Wire Input (This is called whenever a wire input is changed)
+function BULLET:WireInput( inputname, value )
+	if (inputname == "Fire") then
+		if (value != 0) then
+			self.Firing = true
+		else
+			self.Firing = false
+		end
+		if (value != 0 and self.CanFire == true) then
+			self.LastFired = CurTime()
+			self.CanFire = false
+			if WireLib then WireLib.TriggerOutput(self.Entity, "Can Fire", 0) end
+			self:FireBullet()
+		end
+	elseif (inputname == "X") then
+		if (!self.TargetPos) then self.TargetPos = Vector(0,0,0) end
+		self.TargetPos.x = value
+	elseif (inputname == "Y") then
+		if (!self.TargetPos) then self.TargetPos = Vector(0,0,0) end
+		self.TargetPos.y = value
+	elseif (inputname == "Z") then
+		if (!self.TargetPos) then self.TargetPos = Vector(0,0,0) end
+		self.TargetPos.z = value
+	elseif (inputname == "XYZ") then
+		self.TargetPos = value
+	end		
+end
+
+-- Initialize (Is called when the bullet initializes)
+function BULLET:Initialize()   
+	self:DefaultInitialize()
 	
-	-- Trail
-	if (self.Bullet.Trail) then
-		local trail = self.Bullet.Trail
-		util.SpriteTrail( self.Entity, 0, trail.Color, false, trail.StartSize, trail.EndSize, trail.Length, 1/(trail.StartSize+trail.EndSize)*0.5, trail.Texture )
+	self.TargetDir = self.Entity:GetUp()
+	if (self.Cannon:IsValid()) then
+		if (self.Cannon.TargetPos and self.Cannon.TargetPos != Vector(0,0,0)) then
+			self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
+		end
 	end
 	
-	-- Material
-	if (self.Bullet.Material) then
-		self.Entity:SetMaterial( self.Bullet.Material )
+	-- Lifetime
+	self.Lifetime = false
+	if (self.Bullet.Lifetime) then
+		if (self.Bullet.Lifetime[1] > 0 and self.Bullet.Lifetime[2] > 0) then
+			if (self.Bullet.Lifetime[1] == self.Bullet.Lifetime[2]) then
+				self.Lifetime = CurTime() + self.Bullet.Lifetime[1]
+			else
+				self.Lifetime = CurTime() + math.Rand(self.Bullet.Lifetime[1],self.Bullet.Lifetime[2])
+			end
+		end
 	end
-	
-	-- Color
-	if (self.Bullet.Color) then
-		local C = self.Bullet.Color
-		self.Entity:SetColor( C.r, C.g, C.b, 255 )
-	end
-	
+
 	local trail = ents.Create("env_fire_trail")
-	trail:SetPos( self.Entity:GetPos() - self.Entity:GetUp() * 40 )
+	trail:SetPos( self.Entity:GetPos() - self.Entity:GetUp() * 20 )
 	trail:Spawn()
 	trail:SetParent( self.Entity )
+end
+
+-- Think
+function BULLET:Think()
+	-- Make it fly
+	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * self.Bullet.Speed )
+	if (self.Cannon and self.Cannon:IsValid() and self.Cannon.TargetPos) then
+		self.FlightDirection = self.FlightDirection + (self.TargetDir-self.FlightDirection) / 20
+		self.FlightDirection = self.FlightDirection:GetNormalized()
+
+		self.TargetDir = (self.Cannon.TargetPos-self:GetPos()):GetNormalized()
+	end
+	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
+	
+	-- Lifetime
+	if (self.Lifetime) then
+		if (CurTime() > self.Lifetime) then
+			if (self.Bullet.ExplodeAfterDeath) then
+				local trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self)
+				self:Explode( trace )
+			else
+				self.Entity:Remove()
+			end
+		end
+	end
+	
+	if (CurTime() > self.TraceDelay) then
+		-- Check if it hit something
+		local trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Bullet.Speed, self.FlightDirection * self.Bullet.Speed, self )
+		
+		if (trace.Hit and !self.Exploded) then	
+			self.Exploded = true
+			self:Explode( trace )
+		else			
+			-- Run more often!
+			self.Entity:NextThink( CurTime() )
+			return true
+		end
+	else			
+		-- Run more often!
+		self.Entity:NextThink( CurTime() )
+		return true
+	end
 end
 
 pewpew:AddWeapon( BULLET )

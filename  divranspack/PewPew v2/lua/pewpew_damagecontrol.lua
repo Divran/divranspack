@@ -95,7 +95,7 @@ function pewpew:BlastDamage( Position, Radius, Damage, RangeDamageMul, IgnoreEnt
 	end
 end
 
-local PLAYER = _R.Player
+local PLAYER = FindMetaTable("player")
 if (PLAYER) then
 	local OldFunc = PLAYER.GodEnable
 	function PLAYER:GodEnable()
@@ -227,19 +227,21 @@ end
 -- EMPDamage - (Electro Magnetic Pulse. Disables all wiring within the radius for the duration)
 pewpew.EMPAffected = {}
 
--- Override TriggerInput
-local OriginalFunc = WireLib.TriggerInput
-function WireLib.TriggerInput(ent, name, value, ...)
-	-- My addition
-	if (pewpew.EMPAffected[ent:EntIndex()] and pewpew.EMPAffected[ent:EntIndex()][1]) then  -- if it is affected
-		if (CurTime() < pewpew.EMPAffected[ent:EntIndex()][2]) then -- if the time isn't up yet
-			return
-		else -- if the time is up
-			pewpew.EMPAffected[ent:EntIndex()] = nil 
+if WireLib then
+	-- Override TriggerInput
+	local OriginalFunc = WireLib.TriggerInput
+	function WireLib.TriggerInput(ent, name, value, ...)
+		-- My addition
+		if (pewpew.EMPAffected[ent:EntIndex()] and pewpew.EMPAffected[ent:EntIndex()][1]) then  -- if it is affected
+			if (CurTime() < pewpew.EMPAffected[ent:EntIndex()][2]) then -- if the time isn't up yet
+				return
+			else -- if the time is up
+				pewpew.EMPAffected[ent:EntIndex()] = nil 
+			end
 		end
+		
+		OriginalFunc( ent, name, value, ... )
 	end
-	
-	OriginalFunc( ent, name, value, ... )
 end
 
 -- Add to EMPAffected
@@ -286,12 +288,12 @@ function pewpew:FireDamage( TargetEntity, DPS, Duration, DamageDealer )
 	
 	-- Start a timer
 	local timername = "pewpew_firedamage_"..TargetEntity:EntIndex()..CurTime()
-	timer.Create( timername, 0.1, Duration*10, function( TargetEntity, DPS, timername ) 
+	timer.Create(timername, 0.1, Duration*10, function() 
 		-- Damage
 		pewpew:DealDamageBase( TargetEntity, DPS/10, DamageDealer )
 		-- Auto remove timer if dead
 		if (!TargetEntity or !TargetEntity:IsValid()) then timer.Remove( timername ) end
-	end, TargetEntity, DPS, timername, DamageDealer )
+	end)
 end
 
 -- Defense Damage (Used to destroy PewPew bullets. Each PewPew Bullet has 100 health.)
@@ -362,7 +364,7 @@ function pewpew:DealDamageBase( TargetEntity, Damage, DamageDealer )
 	self:CheckIfDead( TargetEntity )
 	
 	-- Allow others to hook
-	self:CallHookBool("PewPew_Damage",TargetEntity,Damage,DamageDealer)	
+	self:CallHookBool("PewPew_Damage",TargetEntity,Damage,DamageDealer)
 end
 
 ------------------------------------------------------------------------------------------------------------

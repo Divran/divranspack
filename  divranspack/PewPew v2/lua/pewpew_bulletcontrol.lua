@@ -1,5 +1,10 @@
 -- PewPew Bullet Control
 -- These functions make bullets fly
+if SERVER then
+	util.AddNetworkString("PewPew_FireBullet")
+	util.AddNetworkString("PewPew_RemoveBullet")
+	util.AddNetworkString("PewPew_ServerTick")
+end
 ------------------------------------------------------------------------------------------------------------
 
 pewpew.Bullets = {}
@@ -12,19 +17,20 @@ function pewpew:FireBullet( Pos, Dir, Owner, WeaponData, Cannon, FireDir )
 	-- Does any other addon have anything to say about this?
 	if (self:CallHookBool("PewPew_FireBullet",Pos,Dir,WeaponData,Cannon,Owner) == false) then return end
 	
-	local receivers = RecipientFilter()
+	/*
+	local players = {}
 	local send = false
 	for k,v in ipairs( player.GetAll() ) do
 		local n = v.PewPew_BulletBlock or -1
 		local amount = v:GetNWInt( "PewPew_BulletAmount", 0 )
 		if (amount < 255) then
 			if (n == -1) then
-				receivers:AddPlayer( v )
+				table.insert(players,v)
 				v:SetNWInt( "PewPew_BulletAmount", amount + 1 )
 				send = true
 			elseif (n > 0) then
 				if (CurTime() > (v.PewPew_LastBullet or 0) + n / 1000) then
-					receivers:AddPlayer( v )
+					table.insert(players,v)
 					v:SetNWInt( "PewPew_BulletAmount", amount + 1 )
 					send = true
 					v.PewPew_LastBullet = CurTime()
@@ -32,23 +38,25 @@ function pewpew:FireBullet( Pos, Dir, Owner, WeaponData, Cannon, FireDir )
 			end
 		end
 	end
+	*/
+	
 	local n = WeaponData.Spread
 	local SpeedOffset = 1
 	if (n and n > 0) then
 		SpeedOffset = math.Rand(1,1+n/100)
 	end
-	if ( send ) then
-		umsg.Start("PewPew_FireBullet",receivers)
-			umsg.Entity(Cannon)
-			umsg.Float(Dir.x)
-			umsg.Float(Dir.y)
-			umsg.Float(Dir.z)
-			umsg.Float(SpeedOffset)
-			umsg.Char(FireDir) -- FireDir is used to get the position on the client (better than sending the position as well)
-			umsg.Entity(Owner)
-			umsg.String(WeaponData.Name)
-		umsg.End()
-	end
+	
+	if not (Cannon and Dir and SpeedOffset and FireDir and Owner and WeaponData and WeaponData.Name) then return end
+	
+	net.Start("PewPew_FireBullet")
+		net.WriteEntity(Cannon)
+		net.WriteVector(Dir)
+		net.WriteFloat(SpeedOffset)
+		net.WriteUInt(FireDir,8) -- FireDir is used to get the position on the client (better than sending the position as well)
+		net.WriteEntity(Owner)
+		net.WriteString(WeaponData.Name)
+	net.Broadcast()
+	--print("bullet sent")
 	
 	local NewBullet = { Pos = Pos, Dir = Dir, Owner = Owner, Cannon = Cannon, WeaponData = WeaponData, BulletData = {}, RemoveTimer = CurTime() + 60, SpeedOffset = SpeedOffset }
 	table.insert( self.Bullets, NewBullet )
@@ -57,28 +65,28 @@ function pewpew:FireBullet( Pos, Dir, Owner, WeaponData, Cannon, FireDir )
 end
 
 if (CLIENT) then
-	local function ClientFireBullet( um )
+	local function ClientFireBullet()
 		-- Cannon
-		local Cannon = um:ReadEntity()
+		local Cannon = net.ReadEntity()
 		
 		-- Pos/Dir
-		local Dir = Vector(um:ReadFloat(),um:ReadFloat(),um:ReadFloat())
-		local SpeedOffset = um:ReadFloat()
-		local FireDir = um:ReadChar()
+		local Dir = net.ReadVector()
+		local SpeedOffset = net.ReadFloat()
+		local FireDir = net.ReadUInt(8)
 		local temp, Pos = pewpew:GetFireDirection( FireDir, Cannon )
 		
 		-- Owner
-		local Owner = um:ReadEntity()
+		local Owner = net.ReadEntity()
 		
 		-- Weapon
-		local WpnName = um:ReadString()
+		local WpnName = net.ReadString()
 		local Weapon = pewpew:GetWeapon( WpnName )
 		if (!Weapon) then return end
+		if not Pos then return end
 		
-		if (#pewpew.Bullets < 255) then
-			local ent = ents.Create("prop_physics")
-			if (ent) then 
-				ent:SetModel(Weapon.Model)
+		if (#pewpew.Bullets < (GetConVarNumber("PewPew_MaxBullets") or 255)) then
+			local ent = ClientsideModel(Weapon.Model)
+			if (ent) then
 				ent:SetPos(Pos)
 				ent:SetAngles(Dir:Angle() + Angle(90,0,0) + (Weapon.AngleOffset or Angle(0,0,0)) )
 				ent:Spawn()
@@ -87,9 +95,10 @@ if (CLIENT) then
 			if (ent) then ent.PewPewTable = NewBullet end
 			table.insert( pewpew.Bullets, NewBullet )
 			pewpew:BulletInitialize( NewBullet )
+			--print("bullet recieved")
 		end
 	end
-	usermessage.Hook("PewPew_FireBullet",ClientFireBullet)
+	net.Receive("PewPew_FireBullet",ClientFireBullet)
 end
 
 local RemoveBulletsTable = {}
@@ -127,13 +136,13 @@ end
 
 if (SERVER) then
 	function pewpew:RemoveClientBullet( Index )
-		umsg.Start("PewPew_RemoveBullet")
-			umsg.Char( Index - 128 )
-		umsg.End()
+		net.Start("PewPew_RemoveBullet")
+			net.WriteUInt( Index - 128, 8)
+		net.Broadcast()
 	end
 else
-	usermessage.Hook( "PewPew_RemoveBullet", function( um )
-		local Index = um:ReadChar() + 128
+	net.Receive( "PewPew_RemoveBullet", function()
+		local Index = net.ReadUInt(8) + 128
 		pewpew:RemoveBullet( Index )
 	end)
 end
@@ -150,7 +159,8 @@ function pewpew:DefaultBulletInitialize( Bullet )
 	--B.TraceDelay = CurTime() + (D.Speed) * (1/tk)
 	--B.TraceDelay = CurTime() + (D.Speed + (1/(D.Speed*tk)) * 0) / (1/tk) * tk
 	
-	Bullet.Vel = Bullet.Dir * D.Speed * Bullet.SpeedOffset * (1/tk)
+	Bullet.Vel = (Bullet.Dir * D.Speed * Bullet.SpeedOffset * (1/tk)) * (tk/(1/66))
+	
 	
 	-- Lifetime
 	B.Lifetime = false
@@ -194,7 +204,8 @@ function pewpew:DefaultBulletInitialize( Bullet )
 			-- Color
 			if (D.Color) then
 				local C = D.Color
-				Bullet.Prop:SetColor( C.r, C.g, C.b, C.a or 255 )
+				Bullet.Prop:SetColor( Color(C.r, C.g, C.b, C.a or 255) )
+				if C.a then Bullet.Prop:SetRenderMode(RENDERMODE_TRANSALPHA) end
 			end
 		end
 	end
@@ -220,23 +231,7 @@ end
 ------------------------------------------------------------------------------------------------------------
 -- Tick
 
-function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
-	if (!Index and Bullet) then -- If index is nil, attempt to find it
-		for k,v in pairs( self.Bullets ) do
-			if (Bullet.Pos == v.Pos) then
-				Index = k
-				break
-			end
-		end
-
-		-- If Index is still nil, abort
-		if (!Index) then return end
-	elseif (!Bullet and Index) then -- If bullet is nil, attempt to find it
-		Bullet = self.Bullets[Index]
-		-- If Bullet is still nil, abort
-		if (!Bullet) then return end
-	elseif (!Bullet and !Index) then return end
-	
+function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )	
 	local D = Bullet.WeaponData
 	local B = Bullet.BulletData
 	
@@ -263,6 +258,7 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 	local tk = self.ServerTick or (1/66.667)
 	if (D.Gravity != nil) then grav = D.Gravity end
 	-- TODO: Spacebuild gravity
+	
 	if (grav and grav > 0) then
 		Bullet.Vel = Bullet.Vel - Vector(0,0,grav) * tk * (LagCompensation or 1)
 	end
@@ -291,6 +287,7 @@ function pewpew:DefaultBulletThink( Bullet, Index, LagCompensation )
 			or contents == 1 -- It flew out of the map
 			or contents2 == 1) then -- It's going to fly out of the map in the next tick
 			self:RemoveBullet( Index )
+		
 		elseif (Bullet.Prop and Bullet.Prop:IsValid()) then
 			Bullet.Prop:SetPos( Bullet.Pos )
 			Bullet.Prop:SetAngles( Bullet.Vel:Angle() + Angle( 90,0,0 ) + (D.AngleOffset or Angle(0,0,0)) )
@@ -326,23 +323,25 @@ end
 -- Recieve tick
 local LastTick = 0
 local HasTick = false
-pewpew.ServerTick = 0
+if SERVER then pewpew.ServerTick = 0 end
 
 if (CLIENT) then
-	usermessage.Hook("PewPew_ServerTick",function(um)
-		pewpew.ServerTick = um:ReadFloat()
+	net.Receive("PewPew_ServerTick",function()
+		pewpew.ServerTick = net.ReadFloat()
 	end)
 else
-	hook.Add("PlayerInitialSpawn","PewPew_ServerTick_InitialSpawn",function(ply)
-		timer.Simple(2,function(ply)
-			if (ply and ply:IsValid()) then -- check if the client was disconnected on spawn
-				umsg.Start("PewPew_ServerTick",ply)
-					umsg.Float(pewpew.ServerTick)
-				umsg.End()
-			end
-		end,ply)
-	end)
+	function pewpew.SendTick(ply)
+		timer.Simple(2,function()
+			net.Start("PewPew_ServerTick")
+				net.WriteFloat(pewpew.ServerTick)
+			net.Broadcast()
+		end)
+	end
+	hook.Add("PlayerInitialSpawn", "PewPew-SendTick", pewpew.SendTick)
+	timer.Create("PewPew-SendTick", 30, 0, pewpew.SendTick)
 end
+
+concommand.Add("pewpew_sendtick", pewpew.SendTick)
 -----------------
 
 function pewpew:BulletThink()
@@ -364,7 +363,7 @@ function pewpew:BulletThink()
 		if (SERVER) then
 			if (v.WeaponData.Think) then
 				-- Allows you to override the think function
-				v.WeaponData.Think( v )
+				v.WeaponData.Think( v, k )
 			else
 				self:DefaultBulletThink( v, k )
 			end
@@ -372,9 +371,9 @@ function pewpew:BulletThink()
 			local LagCompensation = LastTick / self.ServerTick
 			if (v.WeaponData.CLThink) then
 				-- Allows you to override the think function
-				v.WeaponData.CLThink( v, LagCompensation )
+				v.WeaponData.CLThink( v, k, LagCompensation )
 			else
-				self:DefaultBulletThink( v, k , LagCompensation)
+				self:DefaultBulletThink( v, k, LagCompensation)
 			end
 			
 		end
@@ -424,7 +423,7 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 		else
 			soundpath = D.ExplosionSound[1]
 		end
-		WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
+		sound.Play( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
 	end
 	
 	-- Damage
@@ -432,7 +431,7 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 	local damaged = false
 	if (damagetype and type(damagetype) == "string") then
 		local damagedealer = Bullet.Cannon
-		if (!damagedealer:IsValid()) then damagedealer = Bullet.Owner end
+		if (not IsValid(damagedealer)) then damagedealer = Bullet.Owner end
 		if (damagetype == "BlastDamage") then
 			if (trace.Entity and trace.Entity:IsValid()) then
 				-- Stargate shield damage
@@ -447,7 +446,7 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 				end
 				self:BlastDamage( trace.HitPos, D.Radius, D.Damage, D.RangeDamageMul, trace.Entity, damagedealer )
 			else
-				self:BlastDamage( trace.HitPos, D.Radius, D.Damage, D.RangeDamageMul, damagedealer )
+				self:BlastDamage( trace.HitPos, D.Radius, D.Damage, D.RangeDamageMul, damagedealer, damagedealer )
 			end
 			
 			-- Player Damage
@@ -463,7 +462,7 @@ function pewpew:DefaultExplodeBullet( Index, Bullet, trace )
 		elseif (damagetyp == "DefenseDamage") then
 			self:DefenseDamage( trace.Entity, D.Damage )
 		elseif (damagetype == "FireDamage") then
-			pewpew:FireDamage( trace.Entity, D.DPS, D.Duration, self, damagedealer )
+			pewpew:FireDamage( trace.Entity, D.DPS, D.Duration, damagedealer )
 		end
 	end
 	

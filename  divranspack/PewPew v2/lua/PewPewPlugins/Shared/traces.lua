@@ -1,4 +1,4 @@
-local v = _R.Vector
+local v = FindMetaTable("Vector")
 local Length = v.Length
 local Dot = v.Dot
 local sqrt = math.sqrt
@@ -86,7 +86,7 @@ function pewpew:Trace( pos, dir, filter, Bullet ) -- Bullet arg is only necessar
 			return trace		
 		else
 			for k,v in ipairs( pewpew.SGShields ) do
-				if (v and ValidEntity( v ) and !v:GetNWBool("depleted", false) and !v:GetNWBool("containment",false)) then
+				if (v and IsValid( v ) and !v:GetNWBool("depleted", false) and !v:GetNWBool("containment",false)) then
 					local HitPos = RaySphereIntersection( pos, dir, v:GetPos(), v:GetNWInt("size",1) )
 					if (HitPos and pos:Distance(HitPos) <= dir:Length()) then
 						local ret = {}
@@ -103,7 +103,7 @@ function pewpew:Trace( pos, dir, filter, Bullet ) -- Bullet arg is only necessar
 			--[[ If no SG shield was hit, go on with an EH check...
 			if (Bullet) then
 				for k,v in ipairs( pewpew.SGGates ) do
-					if (v and ValidEntity( v ) and v._IsOpen) then
+					if (v and IsValid( v ) and v._IsOpen) then
 						local hit, _ = RayCircleIntersection( pos, dir, v:LocalToWorld(v:OBBCenter()), v:GetForward(), 103 )
 						if (hit) then
 							local newpos, newdir = v:GetTeleportedVector( pos, dir:GetNormalized() )
@@ -143,7 +143,7 @@ if (CLIENT) then
 	--pewpew.SGGates = {}
 
 	hook.Add("OnEntityCreated","PewPew_StargateShield_Spawn",function( ent )
-		if (ent and ValidEntity( ent )) then
+		if (ent and IsValid( ent )) then
 			if (ent:GetClass() == "shield") then
 				pewpew.SGShields[#pewpew.SGShields+1] = ent
 			end--[[elseif (string.find(ent:GetClass(),"stargate_") and ent.IsStargate) then

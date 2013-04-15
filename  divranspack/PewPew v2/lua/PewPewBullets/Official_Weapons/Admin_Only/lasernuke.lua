@@ -63,7 +63,7 @@ function BULLET:Fire()
 		else
 			soundpath = self.Bullet.ExplosionSound[1]
 		end
-		WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
+		sound.Play( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
 	end
 	
 	if (pewpew:GetConVar( "Damage" )) then

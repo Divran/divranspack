@@ -6,7 +6,7 @@ function pewpew:LoadWeapons()
 	self.Weapons = {}
 	self.Categories = {}
 	
-	self:LoadDirectory( "PewPewBullets" )
+	self:LoadDirectory( "pewpewbullets" )
 end
 concommand.Add("PewPew_LoadBullets",function(ply,cmd,args) 
 	if (ply:IsSuperAdmin() or !ply:IsValid()) then
@@ -52,25 +52,19 @@ function pewpew:LoadDirectory( Dir ) -- Thanks to Jcw87 for fixing this function
 		end
 		CurrentCategoryTable = Temp2
 	else
-		CurrentCategory = "PewPewBullets"
+		CurrentCategory = "pewpewbullets"
 		CurrentCategoryTable = self.Categories
 	end
 	
-	local entries = file.FindInLua( Dir .. "/*")
+	local entries,directories = file.Find( Dir .. "/*", "LUA")
 	for _, entry in ipairs ( entries ) do
-		-- If entry is a file
-		if (string.find(entry, "%.")) then
-			-- If entry is a lua file
-			if (string.sub(entry, -4) == ".lua") then
-				if (SERVER) then 
-					AddCSLuaFile( Dir .. "/" .. entry )
-				end
-				include( Dir .. "/" .. entry )
-			end
-		-- If entry is a directory
-		else 
-			self:LoadDirectory( Dir .. "/" .. entry )
+		if (SERVER) then 
+			AddCSLuaFile( Dir .. "/" .. entry )
 		end
+		include( Dir .. "/" .. entry )
+	end
+	for _, directory in ipairs( directories ) do
+		self:LoadDirectory( Dir .. "/" .. directory )
 	end
 end
 

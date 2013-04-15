@@ -1,3 +1,4 @@
+
 -- Pew Core
 -- This tool spawns PewPew Cores
 
@@ -7,20 +8,22 @@ TOOL.ClientConVar[ "model" ] = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 
 cleanup.Register("pewpew_cores")
 
-local PewPewModels = { 	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {},
-						["models/props_combine/combine_interface001.mdl"] = {}, 
-						["models/props_combine/combine_interface002.mdl"] = {},
-						["models/props_combine/combine_interface003.mdl"] = {},
-						["models/props_combine/breenconsole.mdl"] = {},
-						["models/props_lab/reciever01b.mdl"] = {},
-						["models/props_lab/reciever01a.mdl"] = {},
-						["models/props_lab/reciever_cart.mdl"] = {},
-						["models/props_lab/securitybank.mdl"] = {},
-						["models/props_lab/servers.mdl"] = {},
-						["models/props_lab/workspace002.mdl"] = {},
-						["models/props_lab/workspace003.mdl"] = {},
-						["models/props_lab/workspace004.mdl"] = {},
-						["models/props_combine/weaponstripper.mdl"] = {} }
+local PewPewModels = {
+	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {},
+	["models/props_combine/combine_interface001.mdl"] = {}, 
+	["models/props_combine/combine_interface002.mdl"] = {},
+	["models/props_combine/combine_interface003.mdl"] = {},
+	["models/props_combine/breenconsole.mdl"] = {},
+	["models/props_lab/reciever01b.mdl"] = {},
+	["models/props_lab/reciever01a.mdl"] = {},
+	["models/props_lab/reciever_cart.mdl"] = {},
+	["models/props_lab/securitybank.mdl"] = {},
+	["models/props_lab/servers.mdl"] = {},
+	["models/props_lab/workspace002.mdl"] = {},
+	["models/props_lab/workspace003.mdl"] = {},
+	["models/props_lab/workspace004.mdl"] = {},
+	["models/props_combine/weaponstripper.mdl"] = {}
+}
 
 
 -- This needs to be shared...
@@ -49,6 +52,7 @@ if (SERVER) then
 	function TOOL:LeftClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
+		if (!WireLib) then ply:ChatPrint("Wiremod is not installed.") return end
 		if (!ply:CheckLimit("pewpew_cores")) then return end
 		local model = self:GetCoreModel()
 		if (!model) then return end
@@ -76,6 +80,7 @@ if (SERVER) then
 	function TOOL:RightClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
+
 		if (!ply:CheckLimit("pewpew_cores")) then return end
 		local model = self:GetCoreModel()
 		if (!model) then return end
@@ -94,16 +99,16 @@ if (SERVER) then
 	
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
-			if (trace.Entity and ValidEntity(trace.Entity)) then
+			if (trace.Entity and IsValid(trace.Entity)) then
 				self:GetOwner():ConCommand("pewpew_core_model " .. trace.Entity:GetModel())
 				self:GetOwner():ChatPrint("PewPew Core model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_core_name", "PewPew Cores" )
-	language.Add( "Tool_pewpew_core_desc", "Used to spawn PewPew cores." )
-	language.Add( "Tool_pewpew_core_0", "Primary: Spawn a PewPew core and weld it, Secondary: Spawn a PewPew core and don't weld it, Reload: Change the model of the core." )
+	language.Add( "Tool.pewpew_core.name", "PewPew Cores" )
+	language.Add( "Tool.pewpew_core.desc", "Used to spawn PewPew cores." )
+	language.Add( "Tool.pewpew_core.0", "Primary: Spawn a PewPew core and weld it, Secondary: Spawn a PewPew core and don't weld it, Reload: Change the model of the core." )
 	language.Add( "undone_pewpew_core", "Undone PewPew core" )
 	language.Add( "Cleanup_pewpew_cores", "PewPew Cores" )
 	language.Add( "Cleaned_pewpew_cores", "Cleaned up all PewPew Cores" )
@@ -112,10 +117,7 @@ else
 	
 	function TOOL.BuildCPanel( CPanel )
 		-- Header stuff
-		CPanel:ClearControls()
-		CPanel:AddHeader()
-		CPanel:AddDefaultControls()
-		CPanel:AddControl("Header", { Text = "#Tool_pewpew_core_name", Description = "#Tool_pewpew_core_desc" })
+		CPanel:AddControl("Header", { Text = "#Tool.pewpew_core.name", Description = "#Tool.pewpew_core.desc" })
 		
 		-- Models
 		CPanel:AddControl("ComboBox", {

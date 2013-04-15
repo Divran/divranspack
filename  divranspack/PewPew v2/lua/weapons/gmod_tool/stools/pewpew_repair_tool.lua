@@ -1,3 +1,4 @@
+
 -- Repair Tool
 -- This tool repairs stuff
 
@@ -24,7 +25,7 @@ if (SERVER) then
 					-- Effect
 					local effectdata = EffectData()
 					effectdata:SetOrigin( trace.HitPos )
-					effectdata:SetAngle( trace.HitNormal:Angle() )
+					effectdata:SetAngles( trace.HitNormal:Angle() )
 					util.Effect( "Sparks", effectdata )
 					-- Run slower!
 					self.Timer = CurTime() + 0.1
@@ -34,9 +35,9 @@ if (SERVER) then
 		end
 	end
 else
-	language.Add( "Tool_pewpew_repair_tool_name", "PewPew Repair Tool" )
-	language.Add( "Tool_pewpew_repair_tool_desc", "Used to repair entities." )
-	language.Add( "Tool_pewpew_repair_tool_0", "Primary: Hold to repair an entity, Reload: Toggle Health Vision." )
+	language.Add( "Tool.pewpew_repair_tool.name", "PewPew Repair Tool" )
+	language.Add( "Tool.pewpew_repair_tool.desc", "Used to repair entities." )
+	language.Add( "Tool.pewpew_repair_tool.0", "Primary: Hold to repair an entity, Reload: Toggle Health Vision." )
 	
 	TOOL.HealthVision = true
 	TOOL.ReloadTimer = 0
@@ -104,10 +105,10 @@ else
 				local pos = ent:GetPos():ToScreen()
 				local dist = ent:GetPos():Distance(ply:GetShootPos())
 				local txt =  percent .. "% (" .. hp2 .. "/" .. maxhealth2 .. ")"
-				surface.SetFont("ScoreboardText")
+				surface.SetFont("DermaDefault")
 				local length = surface.GetTextSize(txt)
 				-- Draw string
-				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "ScoreboardText", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(2040-dist,0,255) ), Color( 50, 50, 50, math.Clamp(2040-dist,0,255) ) )
+				draw.WordBox( 6, pos.x - length / 2, pos.y + 20, txt, "DermaDefault", Color( 255 * (1-percent/100), 255 * (percent/100), 0, math.Clamp(2040-dist,0,255) ), Color( 50, 50, 50, math.Clamp(2040-dist,0,255) ) )
 			end
 		end
 	end

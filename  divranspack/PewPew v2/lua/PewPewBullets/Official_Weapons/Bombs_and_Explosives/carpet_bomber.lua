@@ -50,6 +50,8 @@ function BULLET:Initialize()
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	
+	self.Entity:SetMaterial("models/props_canal/canal_bridge_railing_01c") // temp fix
+	
 	
 	constraint.NoCollide(self.Entity, self.Cannon.Entity, 0, 0)
 	
@@ -95,7 +97,7 @@ function BULLET:Think()
 			else
 				soundpath = self.Bullet.ExplosionSound[1]
 			end
-			WorldSound( soundpath, self.Entity:GetPos(),100,100)
+			sound.Play( soundpath, self.Entity:GetPos(),100,100)
 		end
 		
 		self:Remove()

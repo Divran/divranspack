@@ -33,15 +33,9 @@ BULLET.Spread = 3
 BULLET.AffectedBySBGravity = true
 
 -- Damage
-BULLET.DamageType = "BlastDamage"
-BULLET.Damage = 80
-BULLET.Radius = 60
-BULLET.RangeDamageMul = 3
-BULLET.NumberOfSlices = nil
-BULLET.SliceDistance = nil
-BULLET.Duration = nil
-BULLET.PlayerDamage = 50
-BULLET.PlayerDamageRadius = 80
+BULLET.DamageType = "FireDamage"
+BULLET.DPS = 20
+BULLET.Duration = 5
 
 -- Reloading/Ammo
 BULLET.Reloadtime = 0.1
@@ -51,92 +45,44 @@ BULLET.AmmoReloadtime = 0
 -- Other
 BULLET.EnergyPerShot = 100
 
-BULLET.UseOldSystem = true
-
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
 -- Initialize (Is called when the bullet initializes)
-function BULLET:Initialize()   
-	self.Entity:PhysicsInit( SOLID_VPHYSICS ) 	
-	self.Entity:SetMoveType( MOVETYPE_NONE )
-	self.Entity:SetSolid( SOLID_NONE )    
-	self.FlightDirection = self.Entity:GetUp()
+function BULLET:Initialize()
 	self.Exploded = false
-	self.TraceDelay = CurTime() + (self.Bullet.Speed*2)/1000
-	self.Speed = 70
-	self.Entity:SetColor(255,255,255,0)
+	self.Speed = self.WeaponData.Speed
+	self.TraceDelay = CurTime() + (self.Speed*2)/1000
+	self.Vel = self.Dir
 end
 
 -- Think
-function BULLET:Think()
+function BULLET:Think(Index)
 	-- Make it fly
 	self.Speed = self.Speed - 0.5
 	if (self.Speed < 3) then
 		self.Exp = true
 	end
-	self.Entity:SetPos( self.Entity:GetPos() + self.FlightDirection * math.Clamp(self.Speed,4,70)/2 )
-	self.FlightDirection = self.FlightDirection - Vector(0,0,self.Bullet.Gravity / self.Bullet.Speed)
-	self.Entity:SetAngles( self.FlightDirection:Angle() + Angle(90,0,0) )
 	
-	if (CurTime() > self.TraceDelay) then
-		-- Check if it hit something
-		local trace = pewpew:Trace( self:GetPos() - self.FlightDirection * self.Speed, self.FlightDirection * self.Speed )
-		
-		if ((trace.Hit and !self.Exploded) or self.Exp) then	
-			self.Exploded = true
-			-- Effects
-			if (self.Bullet.ExplosionEffect) then
-				local effectdata = EffectData()
-				effectdata:SetOrigin( trace.HitPos + trace.HitNormal * 5 )
-				effectdata:SetStart( trace.HitPos + trace.HitNormal * 5 )
-				effectdata:SetNormal( trace.HitNormal )
-				util.Effect( self.Bullet.ExplosionEffect, effectdata )
-			end
-			
-			-- Sounds
-			if (self.Bullet.ExplosionSound) then
-				local soundpath = ""
-				if (table.Count(self.Bullet.ExplosionSound) > 1) then
-					soundpath = table.Random(self.Bullet.ExplosionSound)
-				else
-					soundpath = self.Bullet.ExplosionSound[1]
-				end
-				WorldSound( soundpath, trace.HitPos+trace.HitNormal*5,100,100)
-			end
-				
-			-- Damage
-			if (trace.Entity and trace.Entity:IsValid()) then
-				if (trace.Entity and trace.Entity:IsValid()) then
-					-- Stargate shield damage
-					if (trace.Entity:GetClass() == "shield") then
-						trace.Entity:Hit(nil,trace.HitPos,self.Bullet.Damage*pewpew:GetConVar("StargateShield_DamageMul"),trace.HitNormal)
-					else
-						pewpew:PointDamage( trace.Entity, self.Bullet.Damage, self )
-					end
-				end
-				pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, trace.Entity, self )
-			else
-				pewpew:BlastDamage( trace.HitPos, self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
-			end
-			
-			-- Player Damage
-			if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew:GetConVar( "Damage" )) then
-				pewpew:PlayerBlastDamage( self.Entity, self.Entity, trace.HitPos + trace.HitNormal * 10, self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage )
-			end
-			
-			self.Entity:SetPos( trace.HitPos )
-			-- Remove the bullet
-			self.Entity:Remove()
-		else			
-			-- Run more often!
-			self.Entity:NextThink( CurTime() )
-			return true
-		end
+	self.Pos = self.Pos + self.Vel * math.Clamp( self.Speed, 4, 70 ) / 2
+	self.Vel = self.Vel - Vector(0,0,self.WeaponData.Gravity / self.WeaponData.Speed)
+	
+	//self.Entity:SetAngles( self.Dir:Angle() + Angle(90,0,0) )
+	
+	local hitsolid = bit.band(util.PointContents( self.Pos ), CONTENTS_SOLID) > 0
+	if ((self.RemoveTimer and self.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
+		or hitsolid) then -- It flew out of the map
+		local trace = pewpew:Trace( self.Pos - self.Vel * self.Speed, self.Vel * self.Speed )
+		pewpew:ExplodeBullet( Index, self, trace )
 	else			
-		-- Run more often!
-		self.Entity:NextThink( CurTime() )
-		return true
+		if (CurTime() > self.TraceDelay) then
+			local trace = pewpew:Trace( self.Pos - self.Vel * self.Speed, self.Vel * self.Speed )
+			
+			if (trace.Hit and !self.Exploded) or self.Exp then
+				self.Exploded = true
+				pewpew:ExplodeBullet( Index, self, trace )
+			end
+		end
 	end
 end
 
@@ -146,14 +92,27 @@ function BULLET:CLInitialize()
 	self.emitter = ParticleEmitter( Vector(0,0,0) )
 	self.delta = 15
 	self.delay = CurTime() + 0.01
+	self.Speed = self.WeaponData.Speed
+	self.TraceDelay = CurTime() + (self.Speed*2)/1000
+	self.Vel = self.Dir
+	self.Prop:SetColor(Color(255,255,255,0))
+	self.Prop:SetRenderMode(RENDERMODE_TRANSALPHA)
 end
 
-function BULLET:CLThink()
+function BULLET:CLThink(Index)
+	self.Speed = self.Speed - 0.5
+	if (self.Speed < 3) then
+		self.Exp=true
+	end
+
+	self.Pos = self.Pos + self.Vel * math.Clamp( self.Speed, 4, 70 ) / 2
+	self.Vel = self.Vel - Vector(0,0,self.WeaponData.Gravity / self.WeaponData.Speed)
+	
 	if (CurTime() > self.delay) then
 		local add = 2
 		if (self.delta > 100) then add = 4 end
 		self.delta = math.Clamp(self.delta + add,2,180)
-		local Pos = self.Entity:GetPos()
+		local Pos = self.Prop:GetPos()
 		local particle = self.emitter:Add("particles/flamelet" .. math.random(1,5), Pos)
 		if (particle) then
 			particle:SetLifeTime(0)
@@ -167,6 +126,27 @@ function BULLET:CLThink()
 			particle:SetColor(255, 255, 255) 
 		end
 		self.delay = CurTime() + math.Rand(0.01,0.04)
+	end
+	
+	local hitsolid = bit.band(util.PointContents( self.Pos ), CONTENTS_SOLID) > 0
+	local hitsolid2 = bit.band(util.PointContents( self.Pos + self.Vel * (pewpew.ServerTick or (1/66.667)) * (LagCompensation or 1) ), CONTENTS_SOLID) > 0
+	
+	if ((self.RemoveTimer and self.RemoveTimer < CurTime()) -- There's no way a bullet can fly for that long.
+		or hitsolid -- It flew out of the map
+		or hitsolid2) then -- It's going to fly out of the map in the next tick
+		pewpew:RemoveBullet( Index )
+	
+	elseif (self.Prop and self.Prop:IsValid()) then
+		self.Prop:SetPos( self.Pos )
+		self.Prop:SetAngles( self.Vel:Angle() + Angle( 90,0,0 ))
+		if (CurTime() > self.TraceDelay) then
+			local trace = pewpew:Trace( self.Pos - self.Vel * self.Speed, self.Vel * self.Speed )
+			
+			if (trace.Hit and !self.Exploded) or self.Exp then
+				self.Exploded = true
+				pewpew:RemoveBullet( Index )
+			end
+		end
 	end
 end
 

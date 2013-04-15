@@ -49,7 +49,7 @@ function BULLET:WireInput( name, value )
 		if (value != 0 and self.CanFire == true) then
 			self.LastFired = CurTime()
 			self.CanFire = false
-			WireLib.TriggerOutput(self.Entity, "Can Fire", 0)
+			if WireLib then WireLib.TriggerOutput(self.Entity, "Can Fire", 0) end
 		end
 	elseif (name == "Reload") then
 		if (self.Ammo and self.Ammo > 0 and self.Ammo < self.Bullet.Ammo) then
@@ -58,9 +58,11 @@ function BULLET:WireInput( name, value )
 					if (self.Ammo and self.Ammo > 0) then
 						self.Ammo = 0
 						self.LastFired = CurTime() + self.Bullet.Reloadtime
-						self.CanFire = false					
-						WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
-						WireLib.TriggerOutput( self.Entity, "Ammo", 0 )
+						self.CanFire = false
+						if WireLib then
+							WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
+							WireLib.TriggerOutput( self.Entity, "Ammo", 0 )
+						end
 					end
 				end
 			end
@@ -89,15 +91,15 @@ function BULLET:CannonThink()
 				end			
 			end
 			self.CanFire = false
-			WireLib.TriggerOutput( self.Entity, "Can Fire", 0)
+			if WireLib then WireLib.TriggerOutput( self.Entity, "Can Fire", 0) end
 			if (CurTime() - self.LastFired > self.Bullet.AmmoReloadtime) then -- check ammo reloadtime
 				self.Ammo = self.Bullet.Ammo
-				WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo )
+				if WireLib then WireLib.TriggerOutput( self.Entity, "Ammo", self.Ammo ) end
 				self.CanFire = true
 				if (self.Firing) then 
 					self.LastFired = CurTime()
 					self.CanFire = false
-				else
+				elseif WireLib then
 					WireLib.TriggerOutput( self.Entity, "Can Fire", 1)
 				end
 			end
@@ -115,17 +117,16 @@ function BULLET:CannonThink()
 				if (!self.ChargeSound:IsPlaying()) then
 					self.ChargeSound:Play()
 				end
-				self.ChargeSound:ChangePitch(math.max(self.ChargeUpTime,1))
-			else
-				WireLib.TriggerOutput( self.Entity, "Can Fire", 1)
-
+				self.ChargeSound:ChangePitch(math.max(self.ChargeUpTime,1),0)
+			elseif WireLib then
+				WireLib.TriggerOutput( self.Entity, "Can Fire", 1 )
 			end
 		end
 	end
 	if (!self.Firing or self.Ammo == 0) then
 		if (self.ChargeUpTime > 0) then 
 			self.ChargeUpTime = self.ChargeUpTime - 2
-			self.ChargeSound:ChangePitch(math.max(self.ChargeUpTime,1))
+			self.ChargeSound:ChangePitch(math.max(self.ChargeUpTime,1),0)
 		else 
 			self.ChargeSound:Stop() 
 		end

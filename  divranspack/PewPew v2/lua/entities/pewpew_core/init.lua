@@ -106,7 +106,6 @@ function ENT:RemoveAllProps()
 			if (phys and phys:IsValid()) then
 				phys:EnableMotion(true)
 				local mass = phys:GetMass()
-				phys:EnableGravity(false)
 				phys:ApplyForceOffset( VectorRand() * mass / 100, VectorRand() * mass / 100 )
 				phys:ApplyForceCenter( VectorRand() * mass / 500 )
 			end
@@ -114,6 +113,7 @@ function ENT:RemoveAllProps()
 		
 		-- Random Explosions
 		timer.Create("PewPew_CoreDeathEffect_"..tostring(self)..CurTime(),math.Clamp(1/(nr/10),0.05,1),math.Clamp(nr*10,2,59),function(props,nr)
+			if not props or not type(props)=="table" then return end
 			local ent = table.Random( props )
 			if (ent and ent:IsValid()) then
 				ent:EmitSound("weapons/explode" .. math.random(3,5) .. ".wav")

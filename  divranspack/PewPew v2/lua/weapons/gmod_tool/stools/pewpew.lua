@@ -1,3 +1,4 @@
+
 -- PewTool
 -- This is the tool used to spawn all PewPew weapons
 
@@ -11,21 +12,23 @@ TOOL.ClientConVar[ "direction" ] = "1"
 
 cleanup.Register("pewpew")
 
-local PewPewModels = { 	["models/combatmodels/tank_gun.mdl"] = {},
-						["models/bull/pewpew_cannon_small.mdl"] = {},
-						["models/bull/pewpew_cannon_medium.mdl"] = {},
-						["models/bull/pewpew_cannon_big.mdl"] = {},
-						["models/props_junk/TrafficCone001a.mdl"] = {},
-						["models/props_lab/huladoll.mdl"] = {},
-						["models/props_c17/oildrum001.mdl"] = {},
-						["models/props_trainstation/trainstation_column001.mdl"] = {},
-						["models/Items/combine_rifle_ammo01.mdl"] = {},
-						["models/props_combine/combine_mortar01a.mdl"] = {},
-						["models/props_combine/breenlight.mdl"] = {},
-						["models/props_c17/pottery03a.mdl"] = {},
-						["models/props_junk/PopCan01a.mdl"] = {},
-						["models/props_trainstation/trainstation_post001.mdl"] = {},
-						["models/props_c17/signpole001.mdl"] = {} }
+local PewPewModels = {	
+	["models/combatmodels/tank_gun.mdl"] = {},
+	["models/bull/pewpew_cannon_small.mdl"] = {},
+	["models/bull/pewpew_cannon_medium.mdl"] = {},
+	["models/bull/pewpew_cannon_big.mdl"] = {},
+	["models/props_junk/TrafficCone001a.mdl"] = {},
+	["models/props_lab/huladoll.mdl"] = {},
+	["models/props_c17/oildrum001.mdl"] = {},
+	["models/props_trainstation/trainstation_column001.mdl"] = {},
+	["models/Items/combine_rifle_ammo01.mdl"] = {},
+	["models/props_combine/combine_mortar01a.mdl"] = {},
+	["models/props_combine/breenlight.mdl"] = {},
+	["models/props_c17/pottery03a.mdl"] = {},
+	["models/props_junk/PopCan01a.mdl"] = {},
+	["models/props_trainstation/trainstation_post001.mdl"] = {},
+	["models/props_c17/signpole001.mdl"] = {}
+}
 
 
 -- This needs to be shared...
@@ -134,6 +137,7 @@ if (SERVER) then
 	function TOOL:RightClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
+
 		
 		-- Get the bullet
 		local bullet = pewpew:GetWeapon( self:GetBulletName() )
@@ -189,16 +193,16 @@ if (SERVER) then
 	
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
-			if (trace.Entity and ValidEntity(trace.Entity) and !trace.Entity:IsPlayer()) then
+			if (trace.Entity and IsValid(trace.Entity) and !trace.Entity:IsPlayer()) then
 				self:GetOwner():ConCommand("pewpew_model " .. trace.Entity:GetModel())
 				self:GetOwner():ChatPrint("PewPew Cannon model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_name", "PewTool" )
-	language.Add( "Tool_pewpew_desc", "Used to spawn PewPew weaponry." )
-	language.Add( "Tool_pewpew_0", "Primary: Spawn a PewPew weapon and weld it, Secondary: Spawn a PewPew weapon and don't weld it, Reload: Change the model of the weapon." )
+	language.Add( "Tool.pewpew.name", "PewTool" )
+	language.Add( "Tool.pewpew.desc", "Used to spawn PewPew weaponry." )
+	language.Add( "Tool.pewpew.0", "Primary: Spawn a PewPew weapon and weld it, Secondary: Spawn a PewPew weapon and don't weld it, Reload: Change the model of the weapon." )
 	language.Add( "undone_pewpew", "Undone PewPew Weapon" )
 	language.Add( "Cleanup_pewpew", "PewPew Weapons" )
 	language.Add( "Cleaned_pewpew", "Cleaned up all PewPew Weapons" )
@@ -207,10 +211,7 @@ else
 	
 	function TOOL.BuildCPanel( CPanel )
 		-- Header stuff
-		CPanel:ClearControls()
-		CPanel:AddHeader()
-		CPanel:AddDefaultControls()
-		CPanel:AddControl("Header", { Text = "#Tool_pewpew_name", Description = "#Tool_pewpew_desc" })
+		CPanel:AddControl("Header", { Text = "#Tool.pewpew.name", Description = "#Tool.pewpew.desc" })
 		
 		CPanel:AddControl("ComboBox", {
 			Label = "#Presets",
@@ -262,13 +263,13 @@ else
 		
 		local panel = vgui.Create("DPanel")
 		CPanel:AddItem(panel)
-		panel:SetTall(500)
+		panel:SetSize(285,500)
 		
 		----------------------------------------------------------------------------------------------------
 		-- Tree
 		----------------------------------------------------------------------------------------------------
 		local tree = vgui.Create("DTree",panel)
-		tree:SetWide( 260 )
+		tree:SetSize(panel:GetSize())
 		tree:SetPadding( 5 )
 		
 		local function AddNode( parent, folder, curtbl, curcat )
@@ -277,10 +278,11 @@ else
 				if (type(v) == "string") then
 					local wpn = folder:AddNode( string.gsub( v, "_", " " ) )
 					wpn.WeaponName = v
-					wpn.Icon:SetImage( "vgui/spawnmenu/file" )
+					wpn.Icon:SetImage( "icon16/page.png" )
 					wpn.IsWeapon = true
 				elseif (type(v) == "table") then	
 					local temp = parent:AddNode( string.gsub( k, "_", " " ) )
+					temp.Icon:SetImage("icon16/folder.png")
 					AddNode( parent, temp, v, k )
 				end
 			end
@@ -317,6 +319,7 @@ else
 		list1:SetSpacing( 1 )
 		list1:EnableHorizontal( false ) 
 		list1:EnableVerticalScrollbar( true )
+		list1:SetSize(panel:GetSize())
 		
 		list1:SetVisible( false )
 		

@@ -11,6 +11,7 @@ BULLET.Author = "Kouta"
 BULLET.Description = "Dazzle enemies with random colours!"
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
+BULLET.UseOldSystem = true
 
 -- Appearance
 BULLET.Model = "models/combatmodels/tankshell.mdl"

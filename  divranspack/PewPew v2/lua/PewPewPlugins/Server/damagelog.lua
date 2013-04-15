@@ -1,3 +1,4 @@
+util.AddNetworkString("PewPew_Option_Tool_SendLog")
 pewpew.DamageLog = {}
 
 function pewpew:AddDamageLog( TargetEntity, Damage, DamageDealer )
@@ -5,9 +6,11 @@ function pewpew:AddDamageLog( TargetEntity, Damage, DamageDealer )
 	
 	local DealerName = "-Unknown-"
 	local Weapon = "-Unknown-"
-	if (DamageDealer and ValidEntity( DamageDealer )) then
+	if (DamageDealer) then
 		if (type(DamageDealer) == "Player") then
 			DealerName = DamageDealer:Nick() or "-Error-"
+		elseif type(DamageDealer)=="number" then
+			DealerName="-Error-"
 		elseif ((DamageDealer:GetClass() == "pewpew_base_cannon" or DamageDealer:GetClass() == "pewpew_base_bullet") and DamageDealer.Owner and DamageDealer.Owner:IsValid()) then
 			DealerName = DamageDealer.Owner:Nick() or "-Error-"
 			if (DamageDealer.Bullet) then
@@ -22,7 +25,7 @@ function pewpew:AddDamageLog( TargetEntity, Damage, DamageDealer )
 	end
 	
 	local Died = false
-	if (!TargetEntity:IsValid() or self:GetHealth( TargetEntity ) < Damage) then
+	if (not IsValid(TargetEntity) or self:GetHealth( TargetEntity ) < Damage) then
 		Died = true
 	end
 	
@@ -43,11 +46,12 @@ end
 hook.Add("PewPew_Damage","PewPew_DamageLog",pewpew.AddDamageLog)
 
 
-require("datastream")
 function pewpew:PopDamageLogStack()
 	if (!pewpew:GetConVar( "DamageLogSending" )) then return end
 	if (#self.DamageLog > 0) then
-		datastream.StreamToClients( player.GetAll(), "PewPew_Option_Tool_SendLog", self.DamageLog )
+		net.Start("PewPew_Option_Tool_SendLog")
+			net.WriteTable( self.DamageLog )
+		net.Broadcast()
 		self.DamageLog = {}
 	end
 end

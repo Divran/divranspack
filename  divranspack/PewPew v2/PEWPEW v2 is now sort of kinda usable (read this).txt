@@ -1,2 +1,0 @@
-I've stopped working on pewpew completely. You can go ahead and try using pewpew v2, but if you find any bugs that take longer than 5 seconds to fix, don't bother reporting them.
-When and if I decide to work on weapons again, I'll make something new from scratch which will be better.

@@ -95,7 +95,7 @@ function BULLET:Think()
 			else
 				soundpath = self.Bullet.ExplosionSound[1]
 			end
-			WorldSound( soundpath, self.Entity:GetPos(),100,100)
+			sound.Play( soundpath, self.Entity:GetPos(),100,100)
 		end
 		
 		self:Remove()

@@ -1,14 +1,18 @@
 local tMats = {}
 
+/* --temporary solution
+
 tMats.Glow1 = Material( "sprites/light_glow02" )
 
 for _,mat in pairs(tMats) do
 
-	mat:SetMaterialInt("$spriterendermode",9)
-	mat:SetMaterialInt("$ignorez",1)
-	mat:SetMaterialInt("$illumfactor",18)
+	mat:SetInt("$spriterendermode",9)
+	mat:SetInt("$ignorez",1)
+	mat:SetInt("$illumfactor",18)
 	
 end
+
+*/
 
 EFFECT.Mat = Material( "effects/select_ring" )
 
@@ -127,6 +131,8 @@ end
 ---------------------------------------------------------*/
 function EFFECT:Render( )
 
+/* -- temmporary solution
+
 local startpos = self.Position
 
 render.SetMaterial(tMats.Glow1)
@@ -137,5 +143,7 @@ render.DrawSprite(startpos, 1700,1450,Color(255,75,75,0.7*self.GAlpha))
 if self.FAlpha > 0 then
 	render.DrawSprite(startpos,3500,2500,Color(255,155,155,self.FAlpha))
 end
+
+*/
 
 end

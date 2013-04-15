@@ -11,6 +11,7 @@ BULLET.Author = "Kouta"
 BULLET.Description = "Makes an area nice and toasty"
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
+BULLET.UseOldSystem = true
 
 -- Appearance
 BULLET.Model = "models/combatmodels/tankshell.mdl"
@@ -72,7 +73,7 @@ function BULLET:Explode(trace)
 	
 	for _,t in pairs(EIS) do
 		if (t:GetClass() == "prop_physics" || t:IsPlayer() || t:IsNPC() && t ~= self.Entity && (not t:IsOnFire())) then
-					t:Ignite(math.Rand(1,5),0) //Might make a check to stop huge things being ignited
+			t:Ignite(math.Rand(1,5),0) //Might make a check to stop huge things being ignited
 		end
 	end
 

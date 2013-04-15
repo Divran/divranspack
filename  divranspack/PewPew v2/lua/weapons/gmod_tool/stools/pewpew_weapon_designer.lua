@@ -1,5 +1,7 @@
+
 -- Weapon Designer
 -- With this tool you can make your own (basic) weapons
+if SERVER then util.AddNetworkString("PewPew_WeaponDesigner") end
 
 TOOL.Category = "PewPew"
 TOOL.Name = "Weapon Designer"
@@ -9,18 +11,20 @@ TOOL.ClientConVar[ "fire_key" ] = "1"
 TOOL.ClientConVar[ "reload_key" ] = "2"
 TOOL.ClientConVar[ "direction" ] = "1"
 
-local PewPewModels = { 	["models/combatmodels/tank_gun.mdl"] = {},
-						["models/props_junk/TrafficCone001a.mdl"] = {},
-						["models/props_lab/huladoll.mdl"] = {},
-						["models/props_c17/oildrum001.mdl"] = {},
-						["models/props_trainstation/trainstation_column001.mdl"] = {},
-						["models/Items/combine_rifle_ammo01.mdl"] = {},
-						["models/props_combine/combine_mortar01a.mdl"] = {},
-						["models/props_combine/breenlight.mdl"] = {},
-						["models/props_c17/pottery03a.mdl"] = {},
-						["models/props_junk/PopCan01a.mdl"] = {},
-						["models/props_trainstation/trainstation_post001.mdl"] = {},
-						["models/props_c17/signpole001.mdl"] = {} }
+local PewPewModels = { 
+	["models/combatmodels/tank_gun.mdl"] = {},
+	["models/props_junk/TrafficCone001a.mdl"] = {},
+	["models/props_lab/huladoll.mdl"] = {},
+	["models/props_c17/oildrum001.mdl"] = {},
+	["models/props_trainstation/trainstation_column001.mdl"] = {},
+	["models/Items/combine_rifle_ammo01.mdl"] = {},
+	["models/props_combine/combine_mortar01a.mdl"] = {},
+	["models/props_combine/breenlight.mdl"] = {},
+	["models/props_c17/pottery03a.mdl"] = {},
+	["models/props_junk/PopCan01a.mdl"] = {},
+	["models/props_trainstation/trainstation_post001.mdl"] = {},
+	["models/props_c17/signpole001.mdl"] = {}
+}
 
 function TOOL:GetCannonModel()
 	local mdl = self:GetClientInfo("model")
@@ -30,21 +34,17 @@ end
 
 local Weapon = {}
 				
-require("datastream")	
+//require("datastream")	Fixit
 if (SERVER) then
 	function TOOL:GetDirection()
 		local dir = tonumber(self:GetClientInfo("direction")) or 1
 		return dir
 	end
 	
-	datastream.Hook( "PewPew_WeaponDesigner", function( ply, handler, id, encoded, decoded )
-		Weapon = decoded
-		Weapon.Name = "Weapon Designer Bullet"
-	end)
-	
-	hook.Add("AcceptStream","PewPew_WeaponDesignerAllow",function( ply, handler, id )
-		if (handler == "PewPew_WeaponDesigner") then
-			return (pewpew:GetConVar( "WeaponDesigner" ))
+	net.Receive( "PewPew_WeaponDesigner", function(l)
+		if tobool(pewpew:GetConVar( "WeaponDesigner" ))==true then
+			Weapon = net.ReadTable()
+			Weapon.Name = "Weapon Designer Bullet"
 		end
 	end)
 	
@@ -68,6 +68,7 @@ if (SERVER) then
 	function TOOL:LeftClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
+
 		
 		if (!pewpew:GetConVar( "WeaponDesigner" )) then 
 			ply:ChatPrint("[PewPew] The Weapon Designer is currently disabled.")
@@ -126,16 +127,16 @@ if (SERVER) then
 	
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
-			if (trace.Entity and ValidEntity(trace.Entity) and !trace.Entity:IsPlayer()) then
+			if (trace.Entity and IsValid(trace.Entity) and !trace.Entity:IsPlayer()) then
 				self:GetOwner():ConCommand("pewpew_model " .. trace.Entity:GetModel())
 				self:GetOwner():ChatPrint("PewPew Cannon model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_weapon_designer_name", "PewPew Weapon Designer" )
-	language.Add( "Tool_pewpew_weapon_designer_desc", "Create your own PewPew weapons" )
-	language.Add( "Tool_pewpew_weapon_designer_0", "Primary: Spawn the PewPew weapon and weld it, Secondary: Open the Weapon Designer Menu, Reload: Change the model of the weapon." )
+	language.Add( "Tool.pewpew_weapon_designer.name", "PewPew Weapon Designer" )
+	language.Add( "Tool.pewpew_weapon_designer.desc", "Create your own PewPew weapons" )
+	language.Add( "Tool.pewpew_weapon_designer.0", "Primary: Spawn the PewPew weapon and weld it, Reload: Change the model of the weapon." )
 	
 	local Menu = nil
 	
@@ -208,15 +209,11 @@ else
 					Weapon[v.Txt] = GetVal( v.textbox:GetValue(), v.Type, v.Type2 )
 				end
 			end
-			datastream.StreamToServer("PewPew_WeaponDesigner",Weapon,
-				function() 
-					LocalPlayer():ChatPrint("[PewPew] Weapon loaded.") 
-				end,
-				function(accepted, tempid, id) 
-					if (!accepted) then 
-						LocalPlayer():ChatPrint("[PewPew] The Weapon Designer is currently disabled.") 
-					end
-				end)
+			Weapon.Version=1
+			net.Start("PewPew_WeaponDesigner")
+				net.WriteTable(Weapon)
+			net.SendToServer()
+			
 			Menu:SetVisible( false )
 		end
 		

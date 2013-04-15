@@ -11,6 +11,7 @@ BULLET.Author = "Free Fall"
 BULLET.Description = "Fires a bomb that will stick to whatever it hits and explodes short time after"
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
+BULLET.UseOldSystem = true
 
 -- Appearance
 BULLET.Model = "models/Roller.mdl"
@@ -46,32 +47,32 @@ BULLET.EnergyPerShot = 3500
 BULLET.FireOverride = false
 
 function BULLET:Initialize()
-	self.Entity:PhysicsInit(SOLID_VPHYSICS)
-	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
-	self.Entity:SetSolid(SOLID_VPHYSICS)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+	self:SetSolid(SOLID_VPHYSICS)
 	
 	self.Propelled = false
 	self.Sticked = false
 	self.StickBlow = 0
 	self.TraceDelay = CurTime() + self.Bullet.Speed / 1000 / 2
 	
-	constraint.NoCollide(self.Entity, self.Cannon.Entity, 0, 0)
+	constraint.NoCollide(self, self.Cannon.Entity, 0, 0)
 	
-	self.Entity:NextThink(CurTime())
+	self:NextThink(CurTime())
 end
 
 function BULLET:Think()
 	if (not self.Propelled) then
-		local phys = self.Entity:GetPhysicsObject()
+		local phys = self:GetPhysicsObject()
 		if (phys:IsValid()) then
-			phys:ApplyForceCenter(self.Entity:GetUp() * phys:GetMass() * self.Bullet.Speed)
+			phys:ApplyForceCenter((self:GetUp() * phys:GetMass() * self.Bullet.Speed)*((pewpew.ServerTick or (1/66))/(1/66)))
 		end
 		
 		self.Propelled = true
 	end
 	
 	if (self.StickEntity and not self.Sticked) then
-		constraint.Weld(self.Entity, self.StickEntity, 0, 0, 0, true)
+		constraint.Weld(self, self.StickEntity, 0, 0, 0, true)
 		
 		self.Sticked = true
 		self.StickBlow = CurTime() + (math.random(20, 50) / 10)
@@ -79,7 +80,7 @@ function BULLET:Think()
 	
 	if (self.Sticked and CurTime() >= self.StickBlow) then
 		if (self.Bullet.PlayerDamageRadius and self.Bullet.PlayerDamage and pewpew:GetConVar( "Damage" )) then
-			pewpew:PlayerBlastDamage(self.Entity, self.Entity, self:GetPos(), self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
+			pewpew:PlayerBlastDamage(self, self, self:GetPos(), self.Bullet.PlayerDamageRadius, self.Bullet.PlayerDamage)
 		end
 		
 		if (self.Bullet.ExplosionEffect) then
@@ -97,26 +98,25 @@ function BULLET:Think()
 			else
 				soundpath = self.Bullet.ExplosionSound[1]
 			end
-			WorldSound(soundpath, self:GetPos(), 100, 100)
+			sound.Play(soundpath, self:GetPos(), 100, 100)
 		end
 		
-		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self.Entity, self )
+		pewpew:BlastDamage(self:GetPos(), self.Bullet.Radius, self.Bullet.Damage, self.Bullet.RangeDamageMul, self, self )
 		
-		self.Entity:Remove()
+		self:Remove()
 	end
 	
-	self.Entity:NextThink(CurTime() + 0.25)
+	self:NextThink(CurTime() + 0.25)
 	return true
 end
 
 function BULLET:PhysicsCollide(CollisionData, PhysObj)
 	if (not (self.Cannon:IsValid() and PhysObj == self.Cannon:GetPhysicsObject()) and self.Propelled and not self.Sticked) then
 		local Entity = CollisionData.HitEntity
-		if (Entity:IsPlayer()) then return end
-	
-		self.StickEntity = Entity
-		
-		self.Entity:NextThink(CurTime())
+		if not Entity:IsPlayer() then
+			self.StickEntity = Entity
+		end
+		self:NextThink(CurTime())
 	end
 end
 

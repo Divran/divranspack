@@ -23,6 +23,8 @@ BULLET.Reloadtime = 3
 BULLET.Ammo = 0
 BULLET.AmmoReloadtime = 0
 
+BULLET.UseOldSystem = true
+
 -- Custom Functions 
 -- (If you set the override var to true, the cannon/bullet will run these instead. Use these functions to do stuff which is not possible with the above variables)
 
@@ -68,9 +70,10 @@ function BULLET:Fire()
 	undo.Finish()
 	
 	self:EmitSound( self.Bullet.FireSound[1] )
-	
-	WireLib.TriggerOutput( self.Entity, "Last Fired", ent or nil )
-	WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+	if WireLib then
+		WireLib.TriggerOutput( self.Entity, "Last Fired", ent or nil )
+		WireLib.TriggerOutput( self.Entity, "Last Fired EntID", ent:EntIndex() or 0 )
+	end
 end
 
 pewpew:AddWeapon( BULLET )

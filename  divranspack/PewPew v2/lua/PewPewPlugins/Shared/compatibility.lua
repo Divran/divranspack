@@ -115,15 +115,15 @@ end
 pewpew.Compatibility[0] = pewpew.Compatibility[1]
 
 pewpew.Compatibility[2] = function( self, weapon )
-	print("hello")
+	//print("hello")
 	if (!weapon.Gravity) then -- Add gravity to be used by the E2 functions and client side menus, if weapon.Gravity is nil.
-		print("gravity didnt exist")
+		//print("gravity didnt exist")
 		weapon._Gravity = 600 * pewpew.ServerTick ^ 2
 	else -- Add gravity to be used by the E2 functions and client side menus, if the weapon uses a custom gravity value
-		print("gravity existed")
+		//print("gravity existed")
 		weapon._Gravity = weapon.Gravity * pewpew.ServerTick ^ 2
 	end
-	print("_gravity: " .. pewpew._Gravity)
+	//print("_gravity: " .. pewpew._Gravity)
 end
 
 function pewpew:MakeCompatible( weapon )

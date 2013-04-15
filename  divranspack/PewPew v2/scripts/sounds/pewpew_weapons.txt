@@ -1,8 +1,0 @@
-PewPew_Fire_Rocket
-{
-	channel		CHAN_WEAPON
-	volume		VOL_NORM
-	pitch		PITCH_NORM
-	soundlevel	SNDLVL_20dB
-	wave		"^arty/rocket.wav"
-}

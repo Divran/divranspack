@@ -1,19 +1,11 @@
 local matRefraction	= Material( "refract_ring" )
+/* --temporary solution, should be fixed properly
+tMat = Material("sprites/light_glow02")
 
-local tMats = {}
-
-tMats.Glow1 = Material("sprites/light_glow02")
---tMats.Glow1 = Material("models/roller/rollermine_glow")
-tMats.Glow2 = Material("sprites/yellowflare")
-tMats.Glow3 = Material("sprites/redglow2")
-
-for _,mat in pairs(tMats) do
-
-	mat:SetMaterialInt("$spriterendermode",9)
-	mat:SetMaterialInt("$ignorez",1)
-	mat:SetMaterialInt("$illumfactor",8)
-	
-end
+tMat:SetInt("$spriterendermode",9)
+tMat:SetInt("$ignorez",1)
+tMat:SetInt("$illumfactor",8)
+*/
 
 /*---------------------------------------------------------
    Init( data table )
@@ -156,16 +148,18 @@ function EFFECT:Render( )
 local startpos = self.Position
 
 	--Base glow
-	render.SetMaterial(tMats.Glow1)
+	/* -- temp solution
+	render.SetMaterial(tMat)
 	render.DrawSprite(startpos, 400*self.GSize,90*self.GSize,Color(80, math.random(80,90), math.random(230,255),self.GAlpha))
 	render.DrawSprite(startpos, 70*self.GSize,280*self.GSize,Color(80, math.random(80,90), math.random(240,255),0.7*self.GAlpha))
+	*/
 	--shockwave
 	if self.Size < 32768 then
 
 		local Distance = EyePos():Distance( self.Entity:GetPos() )
 		local Pos = self.Entity:GetPos() + (EyePos() - self.Entity:GetPos()):GetNormal() * Distance * (self.Refract^(0.3)) * 0.8
 
-		matRefraction:SetMaterialFloat( "$refractamount", math.sin( self.Refract * math.pi ) * 0.1 )
+		matRefraction:SetFloat( "$refractamount", math.sin( self.Refract * math.pi ) * 0.1 )
 		render.SetMaterial( matRefraction )
 		render.UpdateRefractTexture()
 		render.DrawSprite( Pos, self.Size, self.Size )

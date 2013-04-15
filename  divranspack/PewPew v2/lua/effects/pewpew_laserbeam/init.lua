@@ -26,7 +26,7 @@ end
 ---------------------------------------------------------*/
 function EFFECT:Think( )
 
-	if ( CurTime() > self.DieTime ) then
+	if self.DieTime and ( CurTime() > self.DieTime ) then
 		return false 
 	end
 	

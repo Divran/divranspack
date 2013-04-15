@@ -11,6 +11,7 @@ BULLET.Author = "Free Fall"
 BULLET.Description = "Combine laser and lightning. What do you get?"
 BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
+BULLET.UseOldSystem = true
 
 -- Appearance
 BULLET.Model = nil
@@ -58,7 +59,7 @@ function BULLET:Fire()
 	
 	local ent = ents.Create("pewpew_base_bullet")
 	ent:SetPos(trace.HitPos)
-	ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0))
+	ent:SetAngles(trace.HitNormal:Angle() + Angle(90, 0, 0))
 	ent:SetOptions(self.Bullet, self, self.Owner )
 	ent:GetTable().MoreLeft = 20
 	ent:Spawn()
@@ -100,7 +101,8 @@ function BULLET:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_NONE)
 	self.Entity:SetSolid( SOLID_NONE )
-	self.Entity:SetColor(100,100,100,0)
+	self.Entity:SetColor(Color(100,100,100,0))
+	self.Entity:SetRenderMode(RENDERMODE_TRANSALPHA)
 	
 	self.FlightDirection = self.Entity:GetUp()
 	self.Exploded = false
@@ -118,7 +120,7 @@ function BULLET:Think( )
 		if trace.Hit then
 			local ent = ents.Create("pewpew_base_bullet")
 			ent:SetPos(trace.HitPos)
-			ent:SetAngles(trace.HitNormal:Angle() + Vector(90, 0, 0))
+			ent:SetAngles(trace.HitNormal:Angle() + Angle(90, 0, 0))
 			ent:SetOptions(self.Bullet, self, self.Owner )
 			ent:GetTable().MoreLeft = self.MoreLeft - 1
 			ent:Spawn()

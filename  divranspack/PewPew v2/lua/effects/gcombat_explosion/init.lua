@@ -24,7 +24,7 @@
 	
  	self.Entity:SetModel( "models/Combine_Helicopter/helicopter_bomb01.mdl" ) 
  	self.Entity:SetPos( self.vOffset ) 
-	WorldSound( self.expl[ math.random(1,3) ], self.vOffset)
+	sound.Play( self.expl[ math.random(1,3) ], self.vOffset)
 	self.emitter = ParticleEmitter( self.vOffset ) 	
  end 
    
@@ -103,13 +103,14 @@
  	local Fraction = (self.LifeTime - CurTime()) / self.Time 
  	Fraction = math.Clamp( Fraction, 0, 1 ) 
  	
-	self.Entity:SetColor( 255, 255, 255, 255 * Fraction )
-	self.Entity:SetModelScale( Vector() * 10 * (1 - Fraction) )
+	self.Entity:SetColor( Color(255, 255, 255, 255 * Fraction) )
+	self.Entity:SetRenderMode(RENDERMODE_TRANSALPHA)
+	self.Entity:SetModelScale( 10 * (1 - Fraction), 0 )
 	
  		// Draw our model with the Light material 
- 		SetMaterialOverride( matLight ) 
+ 		render.MaterialOverride( matLight ) 
  			self.Entity:DrawModel() 
- 		SetMaterialOverride( 0 ) 
+ 		render.MaterialOverride( 0 ) 
  
    
  end  

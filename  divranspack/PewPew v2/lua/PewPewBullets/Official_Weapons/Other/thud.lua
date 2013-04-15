@@ -41,13 +41,6 @@ BULLET.ExplodeAfterDeath = false
 BULLET.EnergyPerShot = 1000
 
 function BULLET:Explode( Index, trace )
-	print("SELF------------")
-	PrintTable(self)
-	print("SELF------------")
-	print("Index: " .. Index)
-	print("TRACE------------")
-	PrintTable(trace)
-	print("TRACE------------")
 	if (!trace or !trace.Hit) then return end
 	if (trace.Entity and trace.Entity:IsValid()) then
 		local dir = (self.Pos - trace.HitPos):GetNormalized()
@@ -59,7 +52,7 @@ function BULLET:Explode( Index, trace )
 				phys:ApplyForceCenter( dir * 10000000 )
 			end
 		end
-		WorldSound( self.WeaponData.ExplosionSound[1], trace.HitPos+trace.HitNormal*5,100,100)
+		sound.Play( self.WeaponData.ExplosionSound[1], trace.HitPos+trace.HitNormal*5,100,100)
 	end
 	pewpew:RemoveBullet(Index)
 end

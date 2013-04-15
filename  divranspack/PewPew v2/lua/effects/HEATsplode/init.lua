@@ -83,13 +83,14 @@
  	local Fraction = (self.LifeTime - CurTime()) / self.Time 
  	Fraction = math.Clamp( Fraction, 0, 1 ) 
  	
-	self.Entity:SetColor( 255, 255, 255, 100 * Fraction )
-	self.Entity:SetModelScale( Vector() * 25 * (1 - Fraction) )
+	self.Entity:SetColor( Color(255, 255, 255, 100 * Fraction) )
+	self.Entity:SetRenderMode(RENDERMODE_TRANSALPHA)
+	self.Entity:SetModelScale( 25 * (1 - Fraction), 0 )
 	
  		// Draw our model with the Light material 
- 		SetMaterialOverride( matLight ) 
+ 		render.MaterialOverride( matLight ) 
  			self.Entity:DrawModel() 
- 		SetMaterialOverride( 0 ) 
+ 		render.MaterialOverride( 0 ) 
  
    
  end  

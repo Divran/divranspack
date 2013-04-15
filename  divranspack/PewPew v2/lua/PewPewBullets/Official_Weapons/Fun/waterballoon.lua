@@ -13,7 +13,7 @@ BULLET.AdminOnly = false
 BULLET.SuperAdminOnly = false
 
 -- Appearance
-BULLET.Model = "models/dav0r/balloon/balloon.mdl"
+BULLET.Model = "models/maxofs2d/balloon_classic.mdl"
 BULLET.Material = nil
 BULLET.Color = nil
 BULLET.Trail = nil
@@ -51,7 +51,7 @@ BULLET.EnergyPerShot = 400
 -- Initialize (Is called when the bullet initializes)
 function BULLET:CLInitialize()   
 	pewpew:DefaultBulletInitialize( self )
-	self.Prop:SetColor(math.random(25,255), math.random(25,255), math.random(25,255), 255)
+	self.Prop:SetColor(Color(math.random(25,255), math.random(25,255), math.random(25,255), 255))
 end
 
 -- Explode (Is called when the bullet explodes)

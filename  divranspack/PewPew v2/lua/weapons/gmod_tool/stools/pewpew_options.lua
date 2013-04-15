@@ -1,3 +1,4 @@
+
 -- Options tool
 -- This tool has admin options and a button to open the damage log
 
@@ -6,9 +7,10 @@ TOOL.Name = "Options Tool"
 				
 			
 if (CLIENT) then
-	language.Add( "Tool_pewpew_options_name", "PewPew Option Tool" )
-	language.Add( "Tool_pewpew_options_desc", "This tool helps you change settings & administrate your server." )
-	language.Add( "Tool_pewpew_options_0", "-nothing-" )
+	CreateClientConVar("PewPew_MaxBullets", "255", true)
+	language.Add( "Tool.pewpew_options.name", "PewPew Option Tool" )
+	language.Add( "Tool.pewpew_options.desc", "This tool helps you change settings & administrate your server." )
+	language.Add( "Tool.pewpew_options.0", "-nothing-" )
 	
 	pewpew.DamageLog = {}
 	
@@ -33,9 +35,9 @@ if (CLIENT) then
 		end
 	end
 	
-	require("datastream")
-	datastream.Hook( "PewPew_Option_Tool_SendLog", function( handler, id, encoded, decoded )
-		for k,v in pairs( decoded ) do
+	net.Receive( "PewPew_Option_Tool_SendLog", function()
+	local t=net.ReadTable()
+		for k,v in pairs( t ) do
 			if (v[7] == true) then v[7] = "Yes" else v[7] = "No" end
 			table.insert( pewpew.DamageLog, 1, v )
 		end
@@ -81,14 +83,14 @@ if (CLIENT) then
 	CreateLogMenu()
 	
 	function TOOL.BuildCPanel( CPanel )
-		CPanel:AddControl( "Label", {Text="Client-side bullet spawning delay\n-1 = all bullets show\n0 = no bullets show\nother = wait that many miliseconds before spawning the next bullet\nSet this to 0 or a high value if lots of bullets give you low FPS."} )
+		CPanel:AddControl( "Label", {Text="Maximum about of bullets that will spawn clientside, reduce this number if you're lagging due to bullets."} )
 		
 		local slider = vgui.Create("DNumSlider")
-		slider:SetText( "Bullet Spawning Delay:" )
-		slider:SetMinMax( -1, 5000 )
+		slider:SetText( "Max Client Bullets:" )
+		slider:SetMinMax( 0, 255 )
 		slider:SetDecimals( 0 )
-		slider:SetConVar( "PewPew_BlockClientSideBullets" )
-		slider:SetValue( -1 ) -- PROBLEM: This does not set it to -1. It defaults to 0 anyway...
+		slider:SetConVar( "PewPew_MaxBullets" )
+		slider:SetValue( 255 ) -- PROBLEM: This does not set it to -1. It defaults to 0 anyway...
 		
 		CPanel:AddItem( slider )
 
@@ -143,16 +145,16 @@ if (CLIENT) then
 	local function drawname( v, owner )
 		local pos = v:GetPos():ToScreen()
 		local name = owner or v:GetNWString("PewPew_OwnerName","- Error -")
-		surface.SetFont("ScoreboardText")
+		surface.SetFont("DermaDefault")
 		local w = surface.GetTextSize( name )
-		draw.WordBox( 2, pos.x - w / 2, pos.y, name, "ScoreboardText", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
+		draw.WordBox( 2, pos.x - w / 2, pos.y, name, "DermaDefault", Color( 0,0,0,255 ), Color( 50,200,50,255 ) )
 	end
 	
 	function TOOL:DrawHUD()
 		for k,v in ipairs( ents.FindByClass("pewpew_base_cannon") ) do drawname( v ) end
 		for k,v in ipairs( ents.FindByClass("pewpew_base_bullet") ) do drawname( v ) end
 		for k,v in ipairs( pewpew.Bullets ) do
-			if (v.Prop and ValidEntity(v.Prop) and v.Owner) then
+			if (v.Prop and IsValid(v.Prop) and v.Owner) then
 				drawname(v.Prop,v.Owner:Nick())
 			else
 				drawname(v)

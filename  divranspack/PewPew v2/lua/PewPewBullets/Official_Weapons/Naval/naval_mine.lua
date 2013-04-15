@@ -21,7 +21,7 @@ BULLET.Trail = nil
 -- Effects / Sounds
 BULLET.FireSound = {"weapons/explode1.wav","weapons/explode2.wav"}
 BULLET.ExplosionSound = nil
-BULLET.FireEffect = "Enersplosion"
+BULLET.FireEffect = "enersplosion"
 BULLET.ExplosionEffect = nil
 
 -- Movement
@@ -43,6 +43,11 @@ BULLET.Reloadtime = 1
 BULLET.Ammo = 0
 
 BULLET.EnergyPerShot = 20000
+
+function BULLET:Fire() end
+
+BULLET.CustomInputs = {}
+BULLET.CustomOutputs = {}
 
 function BULLET:CannonThink()
 	local phys = self.Entity:GetPhysicsObject()

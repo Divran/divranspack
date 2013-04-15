@@ -1,3 +1,4 @@
+
 -- Pew Safe Zone
 -- This tool spawns PewPew Safe Zones
 
@@ -7,12 +8,14 @@ TOOL.ClientConVar[ "model" ] = "models/Combine_Helicopter/helicopter_bomb01.mdl"
 
 cleanup.Register("pewpew_safezones")
 
-local PewPewModels = { 	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {},
-						["models/props_junk/TrafficCone001a.mdl"] = {},
-						["models/props_lab/huladoll.mdl"] = {},
-						["models/props_combine/breenlight.mdl"] = {},
-						["models/props_c17/pottery03a.mdl"] = {},
-						["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {} }
+local PewPewModels = {
+	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {},
+	["models/props_junk/TrafficCone001a.mdl"] = {},
+	["models/props_lab/huladoll.mdl"] = {},
+	["models/props_combine/breenlight.mdl"] = {},
+	["models/props_c17/pottery03a.mdl"] = {},
+	["models/Combine_Helicopter/helicopter_bomb01.mdl"] = {}
+}
 
 
 -- This needs to be shared...
@@ -39,6 +42,7 @@ if (SERVER) then
 	function TOOL:LeftClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
+		if (!WireLib) then ply:ChatPrint("Wiremod is not installed.") return end
 		if (!ply:CheckLimit("pewpew_safezones")) then return end
 		local model = self:GetZoneModel()
 		if (!model) then return end
@@ -66,6 +70,7 @@ if (SERVER) then
 	function TOOL:RightClick( trace )
 		if (!trace) then return end
 		local ply = self:GetOwner()
+
 		if (!ply:CheckLimit("pewpew_safezones")) then return end
 		local model = self:GetZoneModel()
 		if (!model) then return end
@@ -84,16 +89,16 @@ if (SERVER) then
 	
 	function TOOL:Reload( trace )
 		if (trace.Hit) then
-			if (trace.Entity and ValidEntity(trace.Entity)) then
+			if (trace.Entity and IsValid(trace.Entity)) then
 				self:GetOwner():ConCommand("pewpew_safezone_model " .. trace.Entity:GetModel())
 				self:GetOwner():ChatPrint("PewPew Safe Zone model set to: " .. trace.Entity:GetModel())
 			end
 		end
 	end	
 else
-	language.Add( "Tool_pewpew_safezone_name", "PewPew Safe Zones" )
-	language.Add( "Tool_pewpew_safezone_desc", "Used to spawn PewPew Safe Zone." )
-	language.Add( "Tool_pewpew_safezone_0", "Primary: Spawn a PewPew Safe Zone and weld it, Secondary: Spawn a PewPew Safe Zone and don't weld it, Reload: Change the model of the Safe Zone." )
+	language.Add( "Tool.pewpew_safezone.name", "PewPew Safe Zones" )
+	language.Add( "Tool.pewpew_safezone.desc", "Used to spawn PewPew Safe Zone." )
+	language.Add( "Tool.pewpew_safezone.0", "Primary: Spawn a PewPew Safe Zone and weld it, Secondary: Spawn a PewPew Safe Zone and don't weld it, Reload: Change the model of the Safe Zone." )
 	language.Add( "undone_pewpew_safezone", "Undone PewPew Safe Zone" )
 	language.Add( "Cleanup_pewpew_safezones", "PewPew Safe Zone" )
 	language.Add( "Cleaned_pewpew_safezones", "Cleaned up all PewPew Safe Zone" )
@@ -102,10 +107,7 @@ else
 	
 	function TOOL.BuildCPanel( CPanel )
 		-- Header stuff
-		CPanel:ClearControls()
-		CPanel:AddHeader()
-		CPanel:AddDefaultControls()
-		CPanel:AddControl("Header", { Text = "#Tool_pewpew_safezone_name", Description = "#Tool_pewpew_safezone_desc" })
+		CPanel:AddControl("Header", { Text = "#Tool.pewpew_safezone.name", Description = "#Tool.pewpew_safezone.desc" })
 		
 		-- Models
 		CPanel:AddControl("ComboBox", {

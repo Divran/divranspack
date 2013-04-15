@@ -35,7 +35,7 @@ function BULLET:Fire()
 	-- Sound
 	self:EmitSound( self.Bullet.FireSound[1] )
 	
-	timer.Create("wtf_boom_"..self.Entity:EntIndex().."_"..CurTime(),2,1,function( self ) 
+	timer.Create("wtf_boom_"..self.Entity:EntIndex().."_"..CurTime(),2,1,function() 
 		if (!self.Entity:IsValid()) then return end
 		
 		local Pos = self.Entity:GetPos()
@@ -57,7 +57,7 @@ function BULLET:Fire()
 		if (self.Entity:IsValid()) then
 			self.Entity:Remove()
 		end
-	end, self)
+	end)
 end
 
 pewpew:AddWeapon( BULLET )
