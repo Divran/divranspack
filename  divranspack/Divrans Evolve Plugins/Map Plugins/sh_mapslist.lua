@@ -13,40 +13,43 @@ PLUGIN.Maps_Inverted = {}
 PLUGIN.Gamemodes = {}
 PLUGIN.Gamemodes_Inverted = {}
 
-if !datastream then require"datastream" end
-
 if (SERVER) then
 	function PLUGIN:GetMaps()
 		self.Maps = {}
 		self.Gamemodes = {}
 		
-		local files = file.Find( "maps/*.bsp", true )
+		local files, _ = file.Find( "maps/*.bsp", "GAME" )
 		for k, filename in pairs( files ) do
 			self.Maps[k] = filename:gsub( "%.bsp$", "" )
 			self.Maps_Inverted[self.Maps[k]] = k
 		end
 		
-		local folders = file.FindDir( "gamemodes/*", true )
+		local _, folders = file.Find( "gamemodes/*", "GAME" )
 		for k, foldername in pairs( folders ) do
 			self.Gamemodes[k] = foldername
 			self.Gamemodes_Inverted[foldername] = k
 		end
 	end
 	PLUGIN:GetMaps()
+	
+	util.AddNetworkString("ev_sendmaps")
 
-	function PLUGIN:PlayerInitialSpawn( ply )		
-		timer.Simple( 1, function()
-			if (ply and ply:IsValid()) then
-				datastream.StreamToClients( ply, "ev_sendmaps", { self.Maps, self.Gamemodes } )
+	function PLUGIN:PlayerInitialSpawn( ply )
+		timer.Simple( 2, function()
+			if IsValid(ply) then
+				net.Start( "ev_sendmaps" )
+					net.WriteTable( self.Maps )
+					net.WriteTable( self.Gamemodes )
+				net.Send( ply )
 			end
 		end)
 	end
 else
-	function PLUGIN.RecieveMaps( handler, id, encoded, decoded )
-		PLUGIN.Maps = decoded[1]
-		PLUGIN.Gamemodes = decoded[2]
+	function PLUGIN.RecieveMaps( len )
+		PLUGIN.Maps = net.ReadTable()
+		PLUGIN.Gamemodes = net.ReadTable()
 	end
-	datastream.Hook("ev_sendmaps", PLUGIN.RecieveMaps)
+	net.Receive("ev_sendmaps", PLUGIN.RecieveMaps)
 end
 
 function evolve:MapPlugin_GetMaps()

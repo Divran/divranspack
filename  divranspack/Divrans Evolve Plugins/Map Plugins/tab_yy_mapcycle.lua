@@ -7,7 +7,7 @@ TAB.Title = "Mapcycle"
 TAB.Description = "Automatic map cycle."
 TAB.Author = "Divran"
 TAB.Width = 520
-TAB.Icon = "gui/silkicons/world"
+TAB.Icon = "world"
 
 function TAB:Update()
 	local maps = evolve:MapCyclePlugin_GetMaps()
@@ -49,12 +49,6 @@ function TAB:Update()
 	end
 end
 
-local function CallUpdate( handler )
-	if (handler == "ev_mapcycle_datastream") then
-		timer.Simple( 0.1, function() TAB:Update() end )
-	end
-end
-hook.Add("CompletedIncomingStream", "CallUpdate", CallUpdate)
 function evolve:MapCyclePlugin_UpdateTab() TAB:Update() end
 
 function TAB:Initialize( pnl )
@@ -73,12 +67,12 @@ function TAB:Initialize( pnl )
 		end
 		self.MapList:SelectFirstItem()
 	else
-		timer.Simple( 5, function( self )
+		timer.Simple( 5, function()
 			for _, filename in pairs(maps) do
 				self.MapList:AddLine( filename )
 			end
 			self.MapList:SelectFirstItem()
-		end, TAB )
+		end )
 	end
 	
 	self.CycleList = vgui.Create("DListView",pnl)
@@ -122,10 +116,10 @@ function TAB:Initialize( pnl )
 		RunConsoleCommand( "ev", "mapcycle", "movedown", TAB.CycleList:GetSelectedLine() )
 	end
 	
-	self.TimeList = vgui.Create( "DMultiChoice", pnl )
+	self.TimeList = vgui.Create( "DComboBox", pnl )
 	self.TimeList:SetSize( w / nrbuttons - 2, 20 )
 	self.TimeList:SetPos( w * (4/nrbuttons), h - 52 )
-	self.TimeList:SetEditable( false )
+	--self.TimeList:SetEditable( false )
 	self.TimeList.Times = 	{ 	{ "5 minutes", "5" },
 								{ "15 minutes", "15" },
 								{ "30 minutes", "30" },

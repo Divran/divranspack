@@ -10,9 +10,6 @@ PLUGIN.ChatCommand = "mapcycle"
 PLUGIN.Usage = "[add/remove/toggle/moveup/movedown/interval] [mapname/interval]"
 PLUGIN.Privileges = { "Map Cycle" }
 
-if (!datastream) then require("datastream") end
-if (!glon) then require("glon") end
-
 PLUGIN.Enabled = false
 PLUGIN.Maps = {}
 PLUGIN.Interval = -1
@@ -51,6 +48,7 @@ if (SERVER) then
 		umsg.End()
 	end
 	
+	util.AddNetworkString("ev_mapcycle_datastream")
 end
 
 function PLUGIN:Notify( ... ) -- Helper function to block messages running on the client (potentially making it print twice)
@@ -246,7 +244,8 @@ end
 -- Update all changes on all clients
 ----------------------------
 if (CLIENT) then
-	datastream.Hook( "ev_mapcycle_datastream", function( handler, id, encoded, decoded )
+	net.Receive( "ev_mapcycle_datastream", function( len, ply )
+		local decoded = net.ReadTable()
 		for k,v in pairs( decoded ) do
 			if (PLUGIN[k] != nil) then
 				PLUGIN[k] = v
@@ -256,6 +255,10 @@ if (CLIENT) then
 		if (decoded.TimeDifference) then
 			PLUGIN.ChangeAt = RealTime() + decoded.TimeDifference
 		end
+		
+		if evolve.MapCyclePlugin_UpdateTab then
+			evolve:MapCyclePlugin_UpdateTab()
+		end
 	end)
 end
 
@@ -263,7 +266,7 @@ local old_changeat = 0
 function PLUGIN:Update( ply, Send_Maps )
 	if (CLIENT) then return end
 
-	local recipients = ply or player.GetAll()
+	local recipients = ply
 	local data = {}
 
 	if (Send_Maps) then
@@ -274,9 +277,16 @@ function PLUGIN:Update( ply, Send_Maps )
 	data.Enabled = self.Enabled
 	data.TimeDifference = self.ChangeAt - RealTime()
 	
-	timer.Adjust( "Evolve_UpdateMapCycle", math.max( self.Interval/100, 300 ), 0, nil, self )
+	timer.Adjust( "Evolve_UpdateMapCycle", math.max( self.Interval/100, 300 ), 0, function() self:Update() end, self )
 	
-	datastream.StreamToClients( recipients, "ev_mapcycle_datastream", data )
+	net.Start( "ev_mapcycle_datastream" )
+		net.WriteTable( data )
+		
+	if recipients then
+		net.Send( recipients )
+	else
+		net.Broadcast()
+	end
 end
 
 ----------------------------
@@ -286,7 +296,7 @@ end
 
 function PLUGIN:Save()
 	if (CLIENT) then return end
-	file.Write( "evolve/ev_mapcycle.txt", glon.encode( { self.Enabled, self.Interval, self.Maps } ) )
+	file.Write( "evolve/ev_mapcycle.txt", von.serialize( { self.Enabled, self.Interval, self.Maps } ) )
 end
 
 ----------------------------
@@ -296,14 +306,16 @@ end
 
 function PLUGIN:Load()
 	if (CLIENT) then return end
-	if (file.Exists( "evolve/ev_mapcycle.txt")) then
-		local data = file.Read( "evolve/ev_mapcycle.txt" )
+	if (file.Exists( "evolve/ev_mapcycle.txt", "DATA")) then
+		local data = file.Read( "evolve/ev_mapcycle.txt", "DATA" )
 		if (data and data != "") then
-			data = glon.decode( data )
+			data = von.deserialize( data )
 			if (next(data)) then
 				self.Enabled = data[1]
 				self.Interval = data[2]
 				self.Maps = data[3]
+				self.ChangeAt = RealTime() + self.Interval * 60
+				self:Update( nil, true )
 			else
 				evolve:Notify( evolve.colors.red, "Error loading map cycle file: Data table is empty" )
 			end
@@ -312,7 +324,7 @@ function PLUGIN:Load()
 		end
 	else
 		self.Enabled = false
-		self.Ineterval = 0
+		self.Interval = 0
 		self.Maps = {}
 	end
 end
@@ -321,7 +333,7 @@ end
 -- Think
 -- Change map at the right time
 ----------------------------
-
+PLUGIN.NextUpdate = RealTime() + 60
 function PLUGIN:Think()
 	-- Check if enabled
 	if (!self.Enabled) then return end
@@ -332,6 +344,12 @@ function PLUGIN:Think()
 	-- Check if the next map is valid
 	local NextMap = self.Maps[1]
 	if (!NextMap or NextMap == "") then return end
+	
+	-- Check if we want to send an update to the client
+	if self.NextUpdate < RealTime() then
+		self.NextUpdate = RealTime() + 60
+		self:Update()
+	end
 	
 	-- Check if the timer has run out
 	if (RealTime() > self.ChangeAt and self.ChangeAt != -1) then
@@ -350,14 +368,14 @@ function PLUGIN:Think()
 		
 		evolve:Notify( evolve.colors.red, "Map changing!" )
 		self.ChangeAt = -1
-		timer.Simple( 0.5, RunConsoleCommand, "changelevel", NextMap )
+		timer.Simple( 0.5, function() RunConsoleCommand( "changelevel", NextMap ) end )
 	end
 end
 	
 -- Send the info when the player spawns
 function PLUGIN:PlayerInitialSpawn( ply )
-	timer.Simple( 1, function()
-		if (ply and ply:IsValid()) then
+	timer.Simple( 3, function()
+		if IsValid(ply) then
 			self:Update( ply, true )
 		end
 	end)
@@ -370,15 +388,29 @@ timer.Simple( 1, function()
 		return
 	end
 	PLUGIN:Load()
-	if (PLUGIN.Enabled) then
-		PLUGIN.ChangeAt = RealTime() + PLUGIN.Interval * 60
-	end
 end)
 
 -- Update the time for all players every 10 minutes
 timer.Create( "Evolve_UpdateMapCycle", 600, 0, function() PLUGIN:Update() end )
 
 if (CLIENT) then
+	surface.CreateFont( "Trebuchet36", {
+		font = "Trebuchet18",
+		size = 36,
+		weight = 500,
+		blursize = 0,
+		scanlines = 0,
+		antialias = true,
+		underline = false,
+		italic = false,
+		strikeout = false,
+		symbol = false,
+		rotary = false,
+		shadow = false,
+		additive = false,
+		outline = false
+	} )
+
 	function PLUGIN:HUDPaint()
 		if (self.Enabled) then
 			local nextmap = self.Maps[1]
@@ -391,22 +423,47 @@ if (CLIENT) then
 				local second = math.floor(t - hour * 3600 - minute*60)
 				
 				local r = 0
+				
+				
 				if (t < 300) then
 					r = 127.5 + math.cos(RealTime() * 3) * 127.5
+					
+					if t < 60 then
+						surface.SetDrawColor( Color(255, 0, 0, 150 + math.sin( RealTime() * 4 ) * 80) )
+						surface.DrawRect( 0, 0, ScrW(), ScrH() )
+						surface.SetFont( "Trebuchet36" )
+						surface.SetTextColor( Color(0,0,0,255) )
+						local str = string.format( "MAP WILL CHANGE IN %02d! SAVE YOUR STUFF", second )
+						local w,h = surface.GetTextSize( str )
+						surface.SetTextPos( ScrW()/2 - w/2, ScrH()/2 - h/2 - 40 )
+						surface.DrawText( str )
+						if not self.Warned then
+							surface.PlaySound( "ambient/alarms/alarm_citizen_loop1.wav" )
+							self.Warned = true
+						end
+					elseif self.Warned then
+						self.Warned = nil
+					end
 				end
 				
+				surface.SetFont( "ScoreboardText" )
+				
 				local str1 = "Next map: " .. nextmap
-				local str2 = "Time left: [" .. hour .. ":" .. minute .. ":" .. second .. "]"
+				local str2 = string.format( "Time left: %02d:%02d:%02d",hour,minute,second)
 				
-				local w1 = surface.GetTextSize( str1 )
-				local w2 = surface.GetTextSize( str2 )
+				local w1, h1 = surface.GetTextSize( str1 )
+				local w2, h2 = surface.GetTextSize( str2 )
 				
-				local w, h = math.max( 200, w1, w2 ) + 24, 40
+				local w, h = math.max( w1, w2 ) + 24, h1+h2+6
 				local x, y = ScrW() / 2 - w / 2, 44 - h / 2
 				
-				draw.RoundedBox( 4, x, y, w, h, Color(r, 0, 0, 200) )
-				draw.SimpleText( str1, "ScoreboardText", x + 12, y + 6, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT )
-				draw.SimpleText( str2, "ScoreboardText", x + 12, y + 18, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT )
+				draw.RoundedBox( 6, x, y, w, h, Color(r, 0, 0, 200) )
+				
+				surface.SetTextColor( Color(255,255,255,255) )
+				surface.SetTextPos( x + w/2 - w1/2, y + 2 )
+				surface.DrawText( str1 )
+				surface.SetTextPos( x + w/2 - w2/2, y + 4 + h1 )
+				surface.DrawText( str2 )
 			end
 		end
 	end

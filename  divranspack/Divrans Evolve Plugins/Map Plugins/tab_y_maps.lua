@@ -7,7 +7,7 @@ TAB.Title = "Maps"
 TAB.Description = "Change Map."
 TAB.Author = "Divran"
 TAB.Width = 520
-TAB.Icon = "gui/silkicons/world"
+TAB.Icon = "world"
 
 function TAB:Update() end
 
